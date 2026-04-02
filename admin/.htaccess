@@ -1,0 +1,14 @@
+# admin/.htaccess
+# Uncomment and set your office IP to restrict access
+# Order Deny,Allow
+# Deny from all
+# Allow from 103.x.x.x   ← your office IP
+
+# Prevent directory listing
+Options -Indexes
+
+# Block direct access to sensitive files
+<FilesMatch "\.(sql|log|env|bak)$">
+  Order Allow,Deny
+  Deny from all
+</FilesMatch>
