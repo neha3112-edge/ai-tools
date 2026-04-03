@@ -9,42 +9,41 @@ require_login();
 
 // Handle soft-delete
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
-  $stmt = $pdo->prepare("UPDATE universities SET is_active=0 WHERE id=?");
+  $stmt = $pdo->prepare("UPDATE courses SET is_active=0 WHERE id=?");
   $stmt->execute([(int) $_POST['delete_id']]);
-  set_flash('success', 'University deleted successfully.');
-  redirect(ADMIN_URL . '/universities/index.php');
+  set_flash('success', 'Course deleted successfully.');
+  redirect(ADMIN_URL . '/courses/index.php');
 }
 
 // Search + filter
 $search = trim($_GET['search'] ?? '');
-$level_filter = $_GET['type'] ?? '';
+$level_filter = $_GET['level'] ?? '';
 
-$where = ["u.is_active = 1"];
+$where = ["is_active = 1"];
 $params = [];
 
 if ($search) {
-  $where[] = "(u.name LIKE ? OR u.campus_location LIKE ?)";
+  $where[] = "(name LIKE ? OR display_name LIKE ?)";
   $params[] = "%$search%";
   $params[] = "%$search%";
 }
 if ($level_filter) {
-  $where[] = "u.university_type = ?";
+  $where[] = "course_level = ?";
   $params[] = $level_filter;
 }
 
-$sql = "SELECT u.id, u.name, u.display_name, u.image, u.rating, u.nirf_ranking,
-               u.university_type, u.campus_location, u.created_at
-        FROM universities u
+$sql = "SELECT id, name, display_name, course_level, course_duration, created_at
+        FROM courses
         WHERE " . implode(' AND ', $where) . "
-        ORDER BY u.created_at DESC";
+        ORDER BY created_at DESC";
 
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
-$universities = $stmt->fetchAll();
+$courses = $stmt->fetchAll();
 
-$active_page = 'universities';
-$page_title = 'Universities';
-$page_subtitle = 'Manage all universities';
+$active_page = 'courses';
+$page_title = 'Courses';
+$page_subtitle = 'Manage all master courses';
 $base_path = '..';
 $logout_path = '../logout.php';
 ?>
@@ -54,7 +53,7 @@ $logout_path = '../logout.php';
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Universities — SODE AI Tools</title>
+  <title>Courses — SODE AI Tools</title>
   <?php require_once __DIR__ . '/../includes/layout_head.php'; ?>
 </head>
 
@@ -70,8 +69,8 @@ $logout_path = '../logout.php';
       <!-- Page Header -->
       <div class="page-header">
         <div>
-          <h3>All Universities</h3>
-          <p><?= count($universities) ?> record(s) found</p>
+          <h3>All Courses</h3>
+          <p><?= count($courses) ?> record(s) found</p>
         </div>
         <a href="add.php" class="btn btn-primary">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
@@ -79,7 +78,7 @@ $logout_path = '../logout.php';
             <line x1="12" y1="5" x2="12" y2="19" />
             <line x1="5" y1="12" x2="19" y2="12" />
           </svg>
-          Add University
+          Add Course
         </a>
       </div>
 
@@ -92,14 +91,12 @@ $logout_path = '../logout.php';
               <circle cx="11" cy="11" r="8" />
               <line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
-            <input type="text" name="search" placeholder="Search by name or location…" value="<?= e($search) ?>">
+            <input type="text" name="search" placeholder="Search by course name…" value="<?= e($search) ?>">
           </div>
-          <select name="type" class="form-control" style="width:auto;min-width:160px;">
-            <option value="">All Types</option>
-            <option value="Government" <?= $level_filter === 'Government' ? 'selected' : '' ?>>Government</option>
-            <option value="Private" <?= $level_filter === 'Private' ? 'selected' : '' ?>>Private</option>
-            <option value="Deemed" <?= $level_filter === 'Deemed' ? 'selected' : '' ?>>Deemed</option>
-            <option value="Autonomous" <?= $level_filter === 'Autonomous' ? 'selected' : '' ?>>Autonomous</option>
+          <select name="level" class="form-control" style="width:auto;min-width:160px;">
+            <option value="">All Levels</option>
+            <option value="UG" <?= $level_filter === 'UG' ? 'selected' : '' ?>>UG - Undergraduate</option>
+            <option value="PG" <?= $level_filter === 'PG' ? 'selected' : '' ?>>PG - Postgraduate</option>
           </select>
           <button type="submit" class="btn btn-secondary">Filter</button>
           <?php if ($search || $level_filter): ?>
@@ -114,57 +111,48 @@ $logout_path = '../logout.php';
           <thead>
             <tr>
               <th style="width:50px;">#</th>
-              <th>University</th>
-              <th>Type</th>
-              <th>Location</th>
-              <th>Rating</th>
-              <th>NIRF</th>
+              <th>Course Name</th>
+              <th>Level</th>
+              <th>Duration</th>
               <th>Added</th>
               <th style="width:150px;">Actions</th>
             </tr>
           </thead>
           <tbody>
-            <?php if ($universities): ?>
-              <?php foreach ($universities as $i => $u): ?>
+            <?php if ($courses): ?>
+              <?php foreach ($courses as $i => $c): ?>
                 <tr>
                   <td style="color:var(--text-s);"><?= $i + 1 ?></td>
                   <td>
-                    <div style="display:flex;align-items:center;gap:10px;">
-                      <?php if ($u['image']): ?>
-                        <img src="<?= e($u['image']) ?>"
-                          style="width:36px;height:36px;border-radius:8px;object-fit:cover;border:1px solid var(--border);"
-                          alt="">
-                      <?php else: ?>
-                        <div
-                          style="width:36px;height:36px;border-radius:8px;background:rgba(79,110,247,0.1);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--accent);">
-                          <?= strtoupper(substr($u['name'], 0, 1)) ?>
-                        </div>
+                    <div>
+                      <div class="cell-name"><?= e(get_display_name($c['name'], $c['display_name'])) ?></div>
+                      <?php if ($c['display_name'] && $c['display_name'] !== $c['name']): ?>
+                        <div style="font-size:11px;color:var(--text-s);"><?= e($c['name']) ?></div>
                       <?php endif; ?>
-                      <div>
-                        <div class="cell-name"><?= e(get_display_name($u['name'], $u['display_name'])) ?></div>
-                        <?php if ($u['display_name'] && $u['display_name'] !== $u['name']): ?>
-                          <div style="font-size:11px;color:var(--text-s);"><?= e($u['name']) ?></div>
-                        <?php endif; ?>
-                      </div>
                     </div>
                   </td>
                   <td>
-                    <?= $u['university_type'] ? '<span class="badge" style="background:rgba(79,110,247,0.1);color:var(--accent-h);">' . e($u['university_type']) . '</span>' : '—' ?>
+                    <?php if ($c['course_level']): ?>
+                      <?php $lc = strtolower($c['course_level']); ?>
+                      <span class="badge" style="background:rgba(<?= $c['course_level'] === 'UG' ? '79,110,247' : '124,58,237' ?>,0.15);color:<?= $c['course_level'] === 'UG' ? '#818cf8' : '#a78bfa' ?>;">
+                        <?= e($c['course_level']) ?>
+                      </span>
+                    <?php else: ?>
+                      —
+                    <?php endif; ?>
                   </td>
-                  <td><?= e($u['campus_location'] ?: '—') ?></td>
-                  <td><?= $u['rating'] ? '⭐ ' . e($u['rating']) : '—' ?></td>
-                  <td><?= $u['nirf_ranking'] ? '#' . e($u['nirf_ranking']) : '—' ?></td>
-                  <td><?= date('d M Y', strtotime($u['created_at'])) ?></td>
+                  <td><?= e($c['course_duration'] ?: '—') ?></td>
+                  <td><?= date('d M Y', strtotime($c['created_at'])) ?></td>
                   <td>
                     <div class="action-col">
-                      <a href="view.php?id=<?= $u['id'] ?>" class="btn btn-secondary btn-sm btn-icon" title="View Details">
+                      <a href="view.php?id=<?= $c['id'] ?>" class="btn btn-secondary btn-sm btn-icon" title="View Details">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                           stroke-linecap="round">
                           <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z" />
                           <circle cx="12" cy="12" r="3" />
                         </svg>
                       </a>
-                      <a href="edit.php?id=<?= $u['id'] ?>" class="btn btn-secondary btn-sm btn-icon" title="Edit">
+                      <a href="edit.php?id=<?= $c['id'] ?>" class="btn btn-secondary btn-sm btn-icon" title="Edit">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                           stroke-linecap="round">
                           <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
@@ -172,9 +160,9 @@ $logout_path = '../logout.php';
                         </svg>
                       </a>
                       <form method="POST" style="display:inline;">
-                        <input type="hidden" name="delete_id" value="<?= $u['id'] ?>">
+                        <input type="hidden" name="delete_id" value="<?= $c['id'] ?>">
                         <button type="submit" class="btn btn-danger btn-sm btn-icon" title="Delete"
-                          data-confirm="Delete '<?= e($u['name']) ?>'? This cannot be undone.">
+                          data-confirm="Delete '<?= e($c['name']) ?>'? This cannot be undone.">
                           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                             stroke-linecap="round">
                             <polyline points="3 6 5 6 21 6" />
@@ -189,14 +177,15 @@ $logout_path = '../logout.php';
                 </tr>
               <?php endforeach; ?>
             <?php else: ?>
-              <tr>
-                <td colspan="8">
+              <tr class="empty-row">
+                <td colspan="6" style="text-align: center; color: var(--text-s); padding: 3rem;">
                   <div class="empty-state">
                     <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
-                      stroke-linecap="round">
-                      <path d="M3 21h18M5 21V7l7-4 7 4v14M9 21V11h6v10" />
+                      stroke-linecap="round" style="margin-bottom: 1rem; opacity: 0.5;">
+                      <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                      <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
                     </svg>
-                    <p>No universities found. <a href="add.php" style="color:var(--accent);">Add one now →</a></p>
+                    <p>No courses found. <a href="add.php" style="color:var(--accent);">Add one now →</a></p>
                   </div>
                 </td>
               </tr>

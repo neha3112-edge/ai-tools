@@ -11,6 +11,7 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
+    color-scheme: dark; /* Native browser controls follow dark mode */
     --bg:        #0a0d14;
     --sidebar:   #0e1120;
     --surface:   #111520;
@@ -32,6 +33,7 @@
   }
 
   body.light {
+    color-scheme: light;
     --bg:        #f4f6fb;
     --sidebar:   #ffffff;
     --surface:   #ffffff;
@@ -51,6 +53,9 @@
   body.light table tr:hover td { background: rgba(0,0,0,0.025); }
   body.light table th          { background: rgba(0,0,0,0.025); }
   body.light .sidebar-overlay  { background: rgba(0,0,0,0.35); }
+
+  select option { background: var(--surface); color: var(--text); }
+  body.light select option { background: var(--surface); color: var(--text); }
 
   body {
     font-family: 'Plus Jakarta Sans', sans-serif;
