@@ -311,6 +311,7 @@ $page_subtitle = 'Manage accreditation & approval badges';
       <div>
         <div class="section-title"><?= count($all) ?> Accreditations</div>
         <div class="panel">
+          <div class="table-responsive">
           <table>
             <thead>
               <tr>
@@ -325,28 +326,28 @@ $page_subtitle = 'Manage accreditation & approval badges';
               <?php if ($all): ?>
                   <?php foreach ($all as $i => $a): ?>
                     <tr class="<?= ($edit_item && $edit_item['id'] == $a['id']) ? 'edit-row' : '' ?>">
-                      <td style="color:var(--text-s);"><?= $i + 1 ?></td>
-                      <td>
+                      <td data-label="#"> <?= $i + 1 ?> </td>
+                      <td data-label="Logo">
                         <?php if (!empty($a['image'])): ?>
                             <img src="<?= e($a['image']) ?>" class="accr-thumb" alt="<?= e($a['name']) ?>">
                         <?php else: ?>
                             <div class="accr-thumb-placeholder" title="No image">—</div>
                         <?php endif; ?>
                       </td>
-                      <td>
+                      <td data-label="Name">
                         <span class="cell-name"><?= e($a['name']) ?></span>
                         <?php if ($edit_item && $edit_item['id'] == $a['id']): ?>
                             <span style="font-size:10px;color:var(--accent);margin-left:6px;font-weight:600;">EDITING</span>
                         <?php endif; ?>
                       </td>
-                      <td>
+                      <td data-label="Universities">
                         <?php if ($a['usage_count'] > 0): ?>
                             <span class="usage-badge"><?= $a['usage_count'] ?> uni<?= $a['usage_count'] > 1 ? 's' : '' ?></span>
                         <?php else: ?>
                             <span style="color:var(--text-s);font-size:12px;">None</span>
                         <?php endif; ?>
                       </td>
-                      <td>
+                      <td data-label="Actions">
                         <div class="action-col">
                           <a href="?edit=<?= $a['id'] ?>" class="btn btn-secondary btn-sm btn-icon" title="Edit">
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
@@ -375,6 +376,7 @@ $page_subtitle = 'Manage accreditation & approval badges';
               <?php endif; ?>
             </tbody>
           </table>
+          </div>
         </div>
       </div>
 

@@ -105,8 +105,9 @@ $logout_path = '../logout.php';
           </div>
           <select name="mode" class="form-control" style="width:auto;min-width:160px;">
             <option value="">All Modes</option>
-            <?php foreach($modes as $m): ?>
-              <option value="<?= $m['id'] ?>" <?= $mode_filter == $m['id'] ? 'selected' : '' ?>><?= e($m['mode_name']) ?></option>
+            <?php foreach ($modes as $m): ?>
+              <option value="<?= $m['id'] ?>" <?= $mode_filter == $m['id'] ? 'selected' : '' ?>><?= e($m['mode_name']) ?>
+              </option>
             <?php endforeach; ?>
           </select>
           <button type="submit" class="btn btn-secondary">Filter</button>
@@ -118,83 +119,96 @@ $logout_path = '../logout.php';
 
       <!-- Table -->
       <div class="panel">
-        <table>
-          <thead>
-            <tr>
-              <th style="width:50px;">#</th>
-              <th>University</th>
-              <th>Course</th>
-              <th>Mode</th>
-              <th>Fees / Rating</th>
-              <th>Added</th>
-              <th style="width:100px;">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <?php if ($mappings): ?>
-              <?php foreach ($mappings as $i => $m): ?>
-                <tr>
-                  <td style="color:var(--text-s);"><?= $i + 1 ?></td>
-                  <td>
-                    <div class="cell-name"><?= e(get_display_name($m['u_name'], $m['u_disp'])) ?></div>
-                  </td>
-                  <td>
-                    <div class="cell-name"><?= e(get_display_name($m['c_name'], $m['c_disp'])) ?></div>
-                    <?php if ($m['course_level']): ?>
-                      <div style="font-size:11px;color:var(--accent);"><?= e($m['course_level']) ?></div>
-                    <?php endif; ?>
-                  </td>
-                  <td><span class="badge" style="background:var(--surface-h);color:var(--text);border:1px solid var(--border);"><?= e($m['mode_name']) ?></span></td>
-                  <td>
-                    <div style="font-weight:600;font-size:13px;">
-                      <?= $m['academic_fees'] ? '₹' . number_format($m['academic_fees'], 2) : '—' ?>
-                    </div>
-                    <div style="font-size:11px;color:var(--text-s);">
-                       Rating: <?= $m['course_rating'] ? '⭐ ' . e($m['course_rating']) : '—' ?>
-                    </div>
-                  </td>
-                  <td><?= date('d M Y', strtotime($m['created_at'])) ?></td>
-                  <td>
-                    <div class="action-col">
-                      <a href="edit.php?id=<?= $m['id'] ?>" class="btn btn-secondary btn-sm btn-icon" title="Edit">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                          stroke-linecap="round">
-                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                        </svg>
-                      </a>
-                      <form method="POST" style="display:inline;">
-                        <input type="hidden" name="delete_id" value="<?= $m['id'] ?>">
-                        <button type="submit" class="btn btn-danger btn-sm btn-icon" title="Delete"
-                          data-confirm="Delete mapping?">
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:50px;">#</th>
+                <th>University</th>
+                <th>Course</th>
+                <th>Mode</th>
+                <th>Fees / Rating</th>
+                <th>Added</th>
+                <th style="width:100px;">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php if ($mappings): ?>
+                <?php foreach ($mappings as $i => $m): ?>
+                  <tr>
+                    <td data-label="#"> <?= $i + 1 ?> </td>
+                    <td data-label="University">
+                      <div class="cell-name"><?= e(get_display_name($m['u_name'], $m['u_disp'])) ?></div>
+                    </td>
+                    <td data-label="Course">
+                      <div class="cell-name"><?= e(get_display_name($m['c_name'], $m['c_disp'])) ?></div>
+                      <?php if ($m['course_level']): ?>
+                        <div style="font-size:11px;color:var(--accent);"><?= e($m['course_level']) ?></div>
+                      <?php endif; ?>
+                    </td>
+                    <td data-label="Mode"><span class="badge"
+                        style="background:var(--surface-h);color:var(--text);border:1px solid var(--border);"><?= e($m['mode_name']) ?></span>
+                    </td>
+                    <td data-label="Fees / Rating">
+                      <div style="font-weight:600;font-size:13px;">
+                        <?= $m['academic_fees'] ? '₹' . number_format($m['academic_fees'], 2) : '—' ?>
+                      </div>
+                      <div style="font-size:11px;color:var(--text-s);">
+                        Rating: <?= $m['course_rating'] ? '⭐ ' . e($m['course_rating']) : '—' ?>
+                      </div>
+                    </td>
+                    <td data-label="Added On"><?= date('d M Y', strtotime($m['created_at'])) ?></td>
+                    <td data-label="Actions">
+                      <div class="action-col">
+                        <a href="view.php?id=<?= $m['id'] ?>" class="btn btn-secondary btn-sm btn-icon"
+                          title="View Details">
                           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                             stroke-linecap="round">
-                            <polyline points="3 6 5 6 21 6" />
-                            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-                            <path d="M10 11v6M14 11v6" />
-                            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                            <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z" />
+                            <circle cx="12" cy="12" r="3" />
                           </svg>
-                        </button>
-                      </form>
+                        </a>
+                        <a href="edit.php?id=<?= $m['id'] ?>" class="btn btn-secondary btn-sm btn-icon" title="Edit">
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                          </svg>
+                        </a>
+                        <form method="POST" style="display:inline;">
+                          <input type="hidden" name="delete_id" value="<?= $m['id'] ?>">
+                          <button type="submit" class="btn btn-danger btn-sm btn-icon" title="Delete"
+                            data-confirm="Delete mapping?">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                              stroke-width="2" stroke-linecap="round">
+                              <polyline points="3 6 5 6 21 6" />
+                              <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                              <path d="M10 11v6M14 11v6" />
+                              <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                            </svg>
+                          </button>
+                        </form>
+                      </div>
+                    </td>
+                  </tr>
+                <?php endforeach; ?>
+              <?php else: ?>
+                <tr class="empty-row">
+                  <td colspan="7" style="text-align: center; color: var(--text-s); padding: 3rem;">
+                    <div class="empty-state">
+                      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                        stroke-linecap="round" style="margin-bottom: 1rem; opacity: 0.5;">
+                        <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
+                      </svg>
+                      <p>No mappings found. <a href="add.php" style="color:var(--accent);">Map a university to a course
+                          now →</a></p>
                     </div>
                   </td>
                 </tr>
-              <?php endforeach; ?>
-            <?php else: ?>
-              <tr class="empty-row">
-                <td colspan="7" style="text-align: center; color: var(--text-s); padding: 3rem;">
-                  <div class="empty-state">
-                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
-                      stroke-linecap="round" style="margin-bottom: 1rem; opacity: 0.5;">
-                      <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
-                    </svg>
-                    <p>No mappings found. <a href="add.php" style="color:var(--accent);">Map a university to a course now →</a></p>
-                  </div>
-                </td>
-              </tr>
-            <?php endif; ?>
-          </tbody>
-        </table>
+              <?php endif; ?>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </main>

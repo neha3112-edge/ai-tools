@@ -437,6 +437,8 @@ $page_subtitle = get_display_name($uni['name'], $uni['display_name']);
 
       .uni-hero-actions {
         flex-direction: row;
+        flex-wrap: wrap;
+        width: 100%;
       }
 
       .uni-hero-img,
@@ -649,7 +651,7 @@ $page_subtitle = get_display_name($uni['name'], $uni['display_name']);
 
       <!-- ── TWO COL: Key Advantages + Certificate ── -->
       <?php if ($uni['key_advantages'] || $uni['sample_certificate']): ?>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.25rem;">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:1rem;margin-bottom:1.25rem;">
           <?php if ($uni['key_advantages']): ?>
             <div class="info-card">
               <div class="info-card-title">
@@ -734,71 +736,53 @@ $page_subtitle = get_display_name($uni['name'], $uni['display_name']);
                 <tbody>
                   <?php foreach ($courses as $i => $c): ?>
                     <tr>
-                      <td style="color:var(--text-s);"><?= $i + 1 ?></td>
-                      <td>
-                        <span class="cell-name"><?= e(get_display_name($c['name'], $c['display_name'])) ?></span>
-                        <?php if ($c['display_name'] && $c['display_name'] !== $c['name']): ?>
-                          <div style="font-size:11px;color:var(--text-s);"><?= e($c['name']) ?></div>
-                        <?php endif; ?>
+                      <td data-label="#"> <?= $i + 1 ?> </td>
+                      <td data-label="Course">
+                        <div style="text-align: right;">
+                          <span class="cell-name"><?= e(get_display_name($c['name'], $c['display_name'])) ?></span>
+                          <?php if ($c['display_name'] && $c['display_name'] !== $c['name']): ?>
+                            <div style="font-size:11px;color:var(--text-s);"><?= e($c['name']) ?></div>
+                          <?php endif; ?>
+                        </div>
                       </td>
-                      <td><span
-                          class="course-level-badge badge-<?= strtolower($c['course_level']) ?>"><?= e($c['course_level']) ?></span>
-                      </td>
-                      <td>
-                        <span
-                          style="font-size:12px;background:rgba(79,110,247,0.1);color:var(--accent-h);padding:2px 8px;border-radius:10px;">
+                      <td data-label="Level"><span class="course-level-badge badge-<?= strtolower($c['course_level']) ?>"><?= e($c['course_level']) ?></span></td>
+                      <td data-label="Mode">
+                        <span style="font-size:12px;background:rgba(79,110,247,0.1);color:var(--accent-h);padding:2px 8px;border-radius:10px;">
                           <?= e($c['education_mode']) ?>
                         </span>
                       </td>
-                      <td style="font-size:12px;"><?= $c['course_duration'] ? e($c['course_duration']) : '—' ?></td>
-                      <td style="font-size:13px;font-weight:500;">
+                      <td data-label="Duration" style="font-size:12px;"><?= $c['course_duration'] ? e($c['course_duration']) : '—' ?></td>
+                      <td data-label="Fees" style="font-size:13px;font-weight:500;">
                         <?= $c['academic_fees'] ? '₹' . number_format($c['academic_fees'], 0) : '—' ?>
                       </td>
-                      <td>
+                      <td data-label="Discount">
                         <?php if ($c['fees_discount']): ?>
                           <span class="discount-tag">₹<?= number_format($c['fees_discount'], 0) ?> off</span>
                         <?php else: ?>
                           <span style="color:var(--text-s);">—</span>
                         <?php endif; ?>
                       </td>
-                      <td>
+                      <td data-label="Rating">
                         <?php if ($c['course_rating']): ?>
                           <span class="rating-star">★</span> <?= e($c['course_rating']) ?>
                         <?php else: ?>—<?php endif; ?>
                       </td>
-                      <td>
+                      <td data-label="Brochure">
                         <?php if ($c['brochure_file']): ?>
-                          <a href="<?= e($c['brochure_file']) ?>" target="_blank" class="btn btn-secondary btn-sm"
-                            title="Download Brochure">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                              stroke-linecap="round">
-                              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                              <polyline points="7 10 12 15 17 10" />
-                              <line x1="12" y1="15" x2="12" y2="3" />
-                            </svg>
-                            PDF
+                          <a href="<?= e($c['brochure_file']) ?>" target="_blank" class="btn btn-secondary btn-sm" title="Download Brochure">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg> PDF
                           </a>
                         <?php else: ?>
                           <span style="color:var(--text-s);font-size:12px;">—</span>
                         <?php endif; ?>
                       </td>
-                      <td>
+                      <td data-label="Actions">
                         <div class="action-col">
-                          <a href="<?= ADMIN_URL ?>/courses/view.php?id=<?= $c['id'] ?>"
-                            class="btn btn-secondary btn-sm btn-icon" title="View Course Details">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                              stroke-width="2" stroke-linecap="round">
-                              <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z" />
-                              <circle cx="12" cy="12" r="3" />
-                            </svg>
+                          <a href="<?= ADMIN_URL ?>/courses/view.php?id=<?= $c['id'] ?>" class="btn btn-secondary btn-sm btn-icon" title="View Course Details">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z" /><circle cx="12" cy="12" r="3" /></svg>
                           </a>
-                          <a href="<?= ADMIN_URL ?>/mappings/edit.php?id=<?= $c['mapping_id'] ?>"
-                            class="btn btn-secondary btn-sm btn-icon" title="Edit mapping">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                              stroke-width="2" stroke-linecap="round">
-                              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                            </svg>
+                          <a href="<?= ADMIN_URL ?>/mappings/edit.php?id=<?= $c['mapping_id'] ?>" class="btn btn-secondary btn-sm btn-icon" title="Edit mapping">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
                           </a>
                         </div>
                       </td>

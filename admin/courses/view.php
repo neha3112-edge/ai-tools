@@ -37,7 +37,7 @@ $page_subtitle = get_display_name($course['name'], $course['display_name']);
   <style>
     .detail-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
       gap: 1.5rem;
     }
     .detail-group {
@@ -74,7 +74,7 @@ $page_subtitle = get_display_name($course['name'], $course['display_name']);
     <div class="content">
       <?= render_flash() ?>
 
-      <div class="page-header">
+      <div class="page-header" style="flex-wrap: wrap; gap: 1rem;">
         <div>
           <h3><?= e(get_display_name($course['name'], $course['display_name'])) ?></h3>
           <p>
@@ -84,7 +84,7 @@ $page_subtitle = get_display_name($course['name'], $course['display_name']);
             </span>
           </p>
         </div>
-        <div style="display:flex;gap:.75rem;">
+        <div style="display:flex;gap:.75rem; flex-wrap: wrap;">
           <a href="<?= ADMIN_URL ?>/courses/index.php" class="btn btn-secondary">Back</a>
           <a href="<?= ADMIN_URL ?>/courses/edit.php?id=<?= $id ?>" class="btn btn-primary">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>

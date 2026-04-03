@@ -107,7 +107,8 @@ $logout_path = '../logout.php';
 
       <!-- Table -->
       <div class="panel">
-        <table>
+        <div class="table-responsive">
+          <table>
           <thead>
             <tr>
               <th style="width:50px;">#</th>
@@ -122,8 +123,8 @@ $logout_path = '../logout.php';
             <?php if ($courses): ?>
               <?php foreach ($courses as $i => $c): ?>
                 <tr>
-                  <td style="color:var(--text-s);"><?= $i + 1 ?></td>
-                  <td>
+                  <td data-label="#"> <?= $i + 1 ?> </td>
+                  <td data-label="Course Name">
                     <div>
                       <div class="cell-name"><?= e(get_display_name($c['name'], $c['display_name'])) ?></div>
                       <?php if ($c['display_name'] && $c['display_name'] !== $c['name']): ?>
@@ -131,7 +132,7 @@ $logout_path = '../logout.php';
                       <?php endif; ?>
                     </div>
                   </td>
-                  <td>
+                  <td data-label="Level">
                     <?php if ($c['course_level']): ?>
                       <?php $lc = strtolower($c['course_level']); ?>
                       <span class="badge" style="background:rgba(<?= $c['course_level'] === 'UG' ? '79,110,247' : '124,58,237' ?>,0.15);color:<?= $c['course_level'] === 'UG' ? '#818cf8' : '#a78bfa' ?>;">
@@ -141,35 +142,20 @@ $logout_path = '../logout.php';
                       —
                     <?php endif; ?>
                   </td>
-                  <td><?= e($c['course_duration'] ?: '—') ?></td>
-                  <td><?= date('d M Y', strtotime($c['created_at'])) ?></td>
-                  <td>
+                  <td data-label="Duration"><?= e($c['course_duration'] ?: '—') ?></td>
+                  <td data-label="Added On"><?= date('d M Y', strtotime($c['created_at'])) ?></td>
+                  <td data-label="Actions">
                     <div class="action-col">
                       <a href="view.php?id=<?= $c['id'] ?>" class="btn btn-secondary btn-sm btn-icon" title="View Details">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                          stroke-linecap="round">
-                          <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z" />
-                          <circle cx="12" cy="12" r="3" />
-                        </svg>
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z" /><circle cx="12" cy="12" r="3" /></svg>
                       </a>
                       <a href="edit.php?id=<?= $c['id'] ?>" class="btn btn-secondary btn-sm btn-icon" title="Edit">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                          stroke-linecap="round">
-                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                        </svg>
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
                       </a>
                       <form method="POST" style="display:inline;">
                         <input type="hidden" name="delete_id" value="<?= $c['id'] ?>">
-                        <button type="submit" class="btn btn-danger btn-sm btn-icon" title="Delete"
-                          data-confirm="Delete '<?= e($c['name']) ?>'? This cannot be undone.">
-                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round">
-                            <polyline points="3 6 5 6 21 6" />
-                            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-                            <path d="M10 11v6M14 11v6" />
-                            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
-                          </svg>
+                        <button type="submit" class="btn btn-danger btn-sm btn-icon" title="Delete" data-confirm="Delete '<?= e($c['name']) ?>'? This cannot be undone.">
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /><path d="M10 11v6M14 11v6" /><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" /></svg>
                         </button>
                       </form>
                     </div>
@@ -192,6 +178,7 @@ $logout_path = '../logout.php';
             <?php endif; ?>
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   </main>

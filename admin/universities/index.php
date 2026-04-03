@@ -110,99 +110,83 @@ $logout_path = '../logout.php';
 
       <!-- Table -->
       <div class="panel">
-        <table>
-          <thead>
-            <tr>
-              <th style="width:50px;">#</th>
-              <th>University</th>
-              <th>Type</th>
-              <th>Location</th>
-              <th>Rating</th>
-              <th>NIRF</th>
-              <th>Added</th>
-              <th style="width:150px;">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <?php if ($universities): ?>
-              <?php foreach ($universities as $i => $u): ?>
-                <tr>
-                  <td style="color:var(--text-s);"><?= $i + 1 ?></td>
-                  <td>
-                    <div style="display:flex;align-items:center;gap:10px;">
-                      <?php if ($u['image']): ?>
-                        <img src="<?= e($u['image']) ?>"
-                          style="width:36px;height:36px;border-radius:8px;object-fit:cover;border:1px solid var(--border);"
-                          alt="">
-                      <?php else: ?>
-                        <div
-                          style="width:36px;height:36px;border-radius:8px;background:rgba(79,110,247,0.1);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--accent);">
-                          <?= strtoupper(substr($u['name'], 0, 1)) ?>
-                        </div>
-                      <?php endif; ?>
-                      <div>
-                        <div class="cell-name"><?= e(get_display_name($u['name'], $u['display_name'])) ?></div>
-                        <?php if ($u['display_name'] && $u['display_name'] !== $u['name']): ?>
-                          <div style="font-size:11px;color:var(--text-s);"><?= e($u['name']) ?></div>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:50px;">#</th>
+                <th>University</th>
+                <th>Type</th>
+                <th>Location</th>
+                <th>Rating</th>
+                <th>NIRF</th>
+                <th>Added</th>
+                <th style="width:150px;">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php if ($universities): ?>
+                <?php foreach ($universities as $i => $u): ?>
+                  <tr>
+                    <td data-label="#"> <?= $i + 1 ?> </td>
+                    <td data-label="University">
+                      <div style="display:flex;align-items:center;gap:10px;">
+                        <?php if ($u['image']): ?>
+                          <img src="<?= e($u['image']) ?>" style="width:36px;height:36px;border-radius:8px;object-fit:cover;border:1px solid var(--border);" alt="">
+                        <?php else: ?>
+                          <div style="width:36px;height:36px;border-radius:8px;background:rgba(79,110,247,0.1);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--accent);">
+                            <?= strtoupper(substr($u['name'], 0, 1)) ?>
+                          </div>
                         <?php endif; ?>
+                        <div style="text-align: left;">
+                          <div class="cell-name"><?= e(get_display_name($u['name'], $u['display_name'])) ?></div>
+                          <?php if ($u['display_name'] && $u['display_name'] !== $u['name']): ?>
+                            <div style="font-size:11px;color:var(--text-s);"><?= e($u['name']) ?></div>
+                          <?php endif; ?>
+                        </div>
                       </div>
-                    </div>
-                  </td>
-                  <td>
-                    <?= $u['university_type'] ? '<span class="badge" style="background:rgba(79,110,247,0.1);color:var(--accent-h);">' . e($u['university_type']) . '</span>' : '—' ?>
-                  </td>
-                  <td><?= e($u['campus_location'] ?: '—') ?></td>
-                  <td><?= $u['rating'] ? '⭐ ' . e($u['rating']) : '—' ?></td>
-                  <td><?= $u['nirf_ranking'] ? '#' . e($u['nirf_ranking']) : '—' ?></td>
-                  <td><?= date('d M Y', strtotime($u['created_at'])) ?></td>
-                  <td>
-                    <div class="action-col">
-                      <a href="view.php?id=<?= $u['id'] ?>" class="btn btn-secondary btn-sm btn-icon" title="View Details">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                          stroke-linecap="round">
-                          <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z" />
-                          <circle cx="12" cy="12" r="3" />
-                        </svg>
-                      </a>
-                      <a href="edit.php?id=<?= $u['id'] ?>" class="btn btn-secondary btn-sm btn-icon" title="Edit">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                          stroke-linecap="round">
-                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                        </svg>
-                      </a>
-                      <form method="POST" style="display:inline;">
-                        <input type="hidden" name="delete_id" value="<?= $u['id'] ?>">
-                        <button type="submit" class="btn btn-danger btn-sm btn-icon" title="Delete"
-                          data-confirm="Delete '<?= e($u['name']) ?>'? This cannot be undone.">
-                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round">
-                            <polyline points="3 6 5 6 21 6" />
-                            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-                            <path d="M10 11v6M14 11v6" />
-                            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
-                          </svg>
-                        </button>
-                      </form>
+                    </td>
+                    <td data-label="Type">
+                      <?= $u['university_type'] ? '<span class="badge" style="background:rgba(79,110,247,0.1);color:var(--accent-h);">' . e($u['university_type']) . '</span>' : '—' ?>
+                    </td>
+                    <td data-label="Location"><?= e($u['campus_location'] ?: '—') ?></td>
+                    <td data-label="Rating"><?= $u['rating'] ? '⭐ ' . e($u['rating']) : '—' ?></td>
+                    <td data-label="NIRF Ranking"><?= $u['nirf_ranking'] ? '#' . e($u['nirf_ranking']) : '—' ?></td>
+                    <td data-label="Added On"><?= date('d M Y', strtotime($u['created_at'])) ?></td>
+                    <td data-label="Actions">
+                      <div class="action-col">
+                        <a href="view.php?id=<?= $u['id'] ?>" class="btn btn-secondary btn-sm btn-icon" title="View Details">
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z" /><circle cx="12" cy="12" r="3" /></svg>
+                        </a>
+                        <a href="edit.php?id=<?= $u['id'] ?>" class="btn btn-secondary btn-sm btn-icon" title="Edit">
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
+                        </a>
+                        <form method="POST" style="display:inline;">
+                          <input type="hidden" name="delete_id" value="<?= $u['id'] ?>">
+                          <button type="submit" class="btn btn-danger btn-sm btn-icon" title="Delete" data-confirm="Delete '<?= e($u['name']) ?>'? This cannot be undone.">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /><path d="M10 11v6M14 11v6" /><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" /></svg>
+                          </button>
+                        </form>
+                      </div>
+                    </td>
+                  </tr>
+                <?php endforeach; ?>
+              <?php else: ?>
+                <tr>
+                  <td colspan="8">
+                    <div class="empty-state">
+                      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                        stroke-linecap="round">
+                        <path d="M3 21h18M5 21V7l7-4 7 4v14M9 21V11h6v10" />
+                      </svg>
+                      <p>No universities found. <a href="add.php" style="color:var(--accent);">Add one now →</a></p>
                     </div>
                   </td>
                 </tr>
-              <?php endforeach; ?>
-            <?php else: ?>
-              <tr>
-                <td colspan="8">
-                  <div class="empty-state">
-                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
-                      stroke-linecap="round">
-                      <path d="M3 21h18M5 21V7l7-4 7 4v14M9 21V11h6v10" />
-                    </svg>
-                    <p>No universities found. <a href="add.php" style="color:var(--accent);">Add one now →</a></p>
-                  </div>
-                </td>
-              </tr>
-            <?php endif; ?>
-          </tbody>
-        </table>
+              <?php endif; ?>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </main>
