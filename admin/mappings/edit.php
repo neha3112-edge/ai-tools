@@ -66,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             delete_file($mapping['brochure_file']);
             $brochure = $uploaded;
         } else {
-            $errors['brochure_file'] = 'Invalid file. Max size 10MB.';
+            $errors['brochure_file'] = 'Invalid file. Max size 50MB.';
         }
     }
 
@@ -241,7 +241,7 @@ $page_subtitle = 'Update Course-to-University link';
                </div>
             <?php endif; ?>
             <input type="file" name="brochure_file" accept=".pdf,image/*" class="form-control">
-            <span class="form-hint">Leave blank to keep current file. Max size: 10MB.</span>
+            <span class="form-hint">Leave blank to keep current file. Max size: 50MB.</span>
             <?php if (isset($errors['brochure_file'])): ?><span class="form-hint" style="color:var(--danger)"><?= e($errors['brochure_file']) ?></span><?php endif; ?>
           </div>
         </div>

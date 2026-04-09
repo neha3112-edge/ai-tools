@@ -444,6 +444,50 @@
     background: rgba(255, 255, 255, 0.02);
   }
 
+  /* ── GLOBAL MODALS ── */
+  .modal-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; visibility: hidden;
+    transition: all 0.3s ease;
+  }
+  .modal-overlay.active { opacity: 1; visibility: visible; }
+  .modal-dialog {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: calc(var(--radius) * 1.5);
+    width: 90%; max-width: 440px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+    transform: translateY(20px) scale(0.95);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  .modal-overlay.active .modal-dialog { transform: translateY(0) scale(1); }
+  .modal-header { padding: 1.5rem 1.5rem 0.5rem; text-align: center; }
+  .modal-icon {
+    width: 52px; height: 52px; border-radius: 50%;
+    background: rgba(239, 68, 68, 0.1); color: var(--danger);
+    display: inline-flex; align-items: center; justify-content: center;
+    margin: 0 auto 15px;
+  }
+  .modal-header h3 { margin: 0; font-size: 18px; color: var(--text); font-weight: 600; }
+  .modal-body { padding: 1rem 1.5rem; text-align: center; color: var(--text-m); font-size: 14.5px; line-height: 1.5; }
+  .modal-warning {
+    margin-top: 18px; padding: 12px; background: rgba(239, 68, 68, 0.05);
+    border: 1px dashed rgba(239, 68, 68, 0.2); border-radius: var(--radius);
+    display: flex; gap: 10px; text-align: left; font-size: 13px; color: var(--danger);
+    align-items: flex-start; line-height: 1.4;
+  }
+  .modal-footer {
+    padding: 1rem 1.5rem 1.5rem; display: flex; gap: 10px;
+  }
+  .modal-footer .btn { flex: 1; justify-content: center; padding: 0.6rem 1rem; font-size: 14px; display:inline-flex; align-items:center; gap:6px; }
+  
+  body.light .modal-icon { background: rgba(239, 68, 68, 0.08); }
+  body.light .modal-warning { background: rgba(239, 68, 68, 0.04); }
+
   table td {
     padding: 0.75rem 1.25rem;
     font-size: 13px;

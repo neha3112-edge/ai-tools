@@ -190,8 +190,8 @@ $page_subtitle = 'Online, Offline, Proctored etc.';
                           </a>
                           <form method="POST" style="display:inline;">
                             <input type="hidden" name="delete_id" value="<?= $m['id'] ?>">
-                            <button type="submit" class="btn btn-danger btn-sm btn-icon" title="Delete"
-                              data-confirm="Delete '<?= e($m['mode_name']) ?>'?" <?= $m['usage_count'] > 0 ? 'disabled' : '' ?>>
+                            <button type="button" class="btn btn-danger btn-sm btn-icon" title="Delete"
+                              data-confirm="Delete '<?= e($m['mode_name']) ?>'?">
                               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                 stroke-width="2" stroke-linecap="round">
                                 <polyline points="3 6 5 6 21 6" />

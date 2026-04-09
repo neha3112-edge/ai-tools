@@ -354,10 +354,9 @@ $page_subtitle = 'Manage accreditation & approval badges';
                           </a>
                           <form method="POST" style="display:inline;">
                             <input type="hidden" name="delete_id" value="<?= $a['id'] ?>">
-                            <button type="submit"
+                            <button type="button"
                               class="btn btn-danger btn-sm btn-icon"
-                              title="<?= $a['usage_count'] > 0 ? 'Remove from universities first' : 'Delete' ?>"
-                              <?= $a['usage_count'] > 0 ? 'disabled' : '' ?>
+                              title="<?= $a['usage_count'] > 0 ? 'Assigned to university. Delete will fail.' : 'Delete' ?>"
                               data-confirm="Delete '<?= e($a['name']) ?>'? This will also remove its image.">
                               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
                             </button>

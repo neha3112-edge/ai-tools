@@ -367,9 +367,14 @@ $page_subtitle = get_display_name($uni['name'], $uni['display_name']);
     /* ── CERTIFICATE IMAGE ── */
     .cert-img {
       max-width: 100%;
+      height: 160px;
+      object-fit: contain;
+      background: var(--surface-h);
       border-radius: var(--radius-sm);
       border: 1px solid var(--border);
       display: block;
+      margin: 0 auto;
+      cursor: zoom-in;
     }
 
     /* ── COURSES TABLE ── */
@@ -686,7 +691,7 @@ $page_subtitle = get_display_name($uni['name'], $uni['display_name']);
                 </svg>
                 Sample Certificate
               </div>
-              <a href="<?= e($uni['sample_certificate']) ?>" target="_blank">
+              <a href="<?= e($uni['sample_certificate']) ?>" data-lightbox="cert">
                 <img src="<?= e($uni['sample_certificate']) ?>" class="cert-img" alt="Sample Certificate">
               </a>
               <span style="font-size:11px;color:var(--text-s);margin-top:6px;display:block;">Click to view full size</span>
