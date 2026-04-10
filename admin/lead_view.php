@@ -129,6 +129,6 @@ $logout_path = 'logout.php';
     </div>
   </main>
 
-  <script src="<?= ADMIN_URL ?>/assets/js/admin.js"></script>
+  <?php require_once __DIR__ . '/includes/layout_foot.php'; ?>
 </body>
 </html>

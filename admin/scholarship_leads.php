@@ -7,33 +7,31 @@ require_once '../includes/auth.php';
 require_once '../includes/helpers.php';
 require_login();
 
-// Handle soft-delete or hard-delete? Since it's a simple leads table, we can just hard-delete
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
-  try {
-      $stmt = $pdo->prepare("DELETE FROM brochure_leads WHERE id=?");
-      $stmt->execute([(int) $_POST['delete_id']]);
-      set_flash('success', 'Lead record deleted successfully.');
-  } catch (PDOException $e) {
-      set_flash('error', 'Could not delete the lead record. Please check table existence.');
-  }
-  redirect(ADMIN_URL . '/leads.php');
+    try {
+        $stmt = $pdo->prepare("DELETE FROM scholarship_leads WHERE id=?");
+        $stmt->execute([(int) $_POST['delete_id']]);
+        set_flash('success', 'Lead record deleted successfully.');
+    } catch (PDOException $e) {
+        set_flash('error', 'Could not delete the lead record. Please check table existence.');
+    }
+    redirect(ADMIN_URL . '/scholarship_leads.php');
 }
 
-// Search + filter
 $search = trim($_GET['search'] ?? '');
-
 $where = ["1 = 1"];
 $params = [];
 
 if ($search) {
-  $where[] = "(name LIKE ? OR email LIKE ? OR phone LIKE ?)";
-  $params[] = "%$search%";
-  $params[] = "%$search%";
-  $params[] = "%$search%";
+    $where[] = "(name LIKE ? OR email LIKE ? OR phone LIKE ? OR uni_name LIKE ?)";
+    $params[] = "%$search%";
+    $params[] = "%$search%";
+    $params[] = "%$search%";
+    $params[] = "%$search%";
 }
 
-$sql = "SELECT id, name, email, country_code, phone, course, state, page_url, user_ip, created_at
-        FROM brochure_leads
+$sql = "SELECT id, name, email, country_code, phone, course, state, uni_name, page_url, user_ip, created_at
+        FROM scholarship_leads
         WHERE " . implode(' AND ', $where) . "
         ORDER BY created_at DESC";
 
@@ -42,29 +40,26 @@ try {
     $stmt->execute($params);
     $leads = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
-    // If table doesn't exist yet
     $leads = [];
     if($e->getCode() == '42S02') {
         $table_missing = true;
     }
 }
 
-$active_page = 'leads';
-$page_title = 'Brochure Leads';
-$page_subtitle = 'Manage brochure download requests';
+$active_page = 'scholarship_leads';
+$page_title = 'Scholarship Leads';
+$page_subtitle = 'Manage scholarship claim requests';
 $base_path = '.';
 $logout_path = 'logout.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Brochure Leads — SODE AI Tools</title>
+  <title>Scholarship Leads — SODE AI Tools</title>
   <?php require_once __DIR__ . '/includes/layout_head.php'; ?>
 </head>
-
 <body>
   <?php require_once __DIR__ . '/includes/sidebar.php'; ?>
 
@@ -76,37 +71,30 @@ $logout_path = 'logout.php';
       
       <?php if(isset($table_missing)): ?>
           <div style="background:var(--danger); color:#fff; padding:1rem; border-radius:var(--radius-sm); margin-bottom:2rem;">
-            <strong>Warning:</strong> The `brochure_leads` database table is missing! Please execute the SQL table creation script to capture leads.
+            <strong>Warning:</strong> The `scholarship_leads` database table is missing! Please execute the SQL table creation script.
           </div>
       <?php endif; ?>
 
-      <!-- Page Header -->
       <div class="page-header">
         <div>
-          <h3>All Brochure Leads</h3>
+          <h3>All Scholarship Leads</h3>
           <p><?= count($leads) ?> record(s) found</p>
         </div>
       </div>
 
-      <!-- Search & Filter -->
       <div class="search-bar">
         <form method="GET" style="display:contents;">
           <div class="search-input-wrap" style="flex:1;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-              stroke-linecap="round">
-              <circle cx="11" cy="11" r="8" />
-              <line x1="21" y1="21" x2="16.65" y2="16.65" />
-            </svg>
-            <input type="text" name="search" placeholder="Search by name, email, or phone…" value="<?= e($search) ?>" style="width:100%;">
+             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+            <input type="text" name="search" placeholder="Search by name, email, phone, or university…" value="<?= e($search) ?>" style="width:100%;">
           </div>
           <button type="submit" class="btn btn-secondary">Filter</button>
           <?php if ($search): ?>
-            <a href="leads.php" class="btn btn-secondary">Clear</a>
+            <a href="scholarship_leads.php" class="btn btn-secondary">Clear</a>
           <?php endif; ?>
         </form>
       </div>
 
-      <!-- Table -->
       <div class="panel">
         <div class="table-responsive">
           <table>
@@ -115,7 +103,7 @@ $logout_path = 'logout.php';
               <th style="width:50px;">#</th>
               <th>Name</th>
               <th>Contact Info</th>
-              <th>Course Selected</th>
+              <th>Requested University</th>
               <th>State</th>
               <th>Requested On</th>
               <th style="width:80px; text-align:center;">Action</th>
@@ -135,22 +123,21 @@ $logout_path = 'logout.php';
                           <div style="color:var(--text-m); font-weight:600;"><?= e($l['country_code']) ?> <?= e($l['phone']) ?></div>
                       </div>
                   </td>
-                  <td data-label="Course">
-                      <span class="badge" style="background:rgba(37,99,235,0.1); color:#2563eb;">
-                          <?= e($l['course']) ?>
-                      </span>
+                  <td data-label="University">
+                      <strong style="color:var(--accent-blue); font-size:0.9rem;"><?= e($l['uni_name'] ?: 'N/A') ?></strong><br>
+                      <span style="font-size:0.8rem; color:var(--text-m);"><?= e($l['course']) ?></span>
                   </td>
                   <td data-label="State"><?= e($l['state']) ?></td>
                   <td data-label="Requested On"><?= date('d M Y, h:i A', strtotime($l['created_at'])) ?></td>
                   <td data-label="Action">
                     <div class="action-col" style="justify-content:center;">
-                      <a href="lead_view.php?id=<?= $l['id'] ?>" class="btn btn-secondary btn-sm btn-icon" title="View Details">
+                      <a href="scholarship_lead_view.php?id=<?= $l['id'] ?>" class="btn btn-secondary btn-sm btn-icon" title="View Details">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z" /><circle cx="12" cy="12" r="3" /></svg>
                       </a>
                       <form method="POST" style="display:inline;">
                         <input type="hidden" name="delete_id" value="<?= $l['id'] ?>">
-                        <button type="submit" class="btn btn-danger btn-sm btn-icon" title="Delete Lead" data-confirm="Delete lead from '<?= e($l['name']) ?>'? This cannot be undone.">
-                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /><path d="M10 11v6M14 11v6" /><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" /></svg>
+                        <button type="submit" class="btn btn-danger btn-sm btn-icon" title="Delete Lead" data-confirm="Delete scholarship lead for '<?= e($l['name']) ?>'? This cannot be undone.">
+                           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /><path d="M10 11v6M14 11v6" /><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" /></svg>
                         </button>
                       </form>
                     </div>
@@ -160,9 +147,9 @@ $logout_path = 'logout.php';
             <?php else: ?>
               <tr>
                 <td colspan="7" class="empty-state">
-                  <div class="empty-icon">📝</div>
+                  <div class="empty-icon">🎓</div>
                   <h4>No leads found</h4>
-                  <p>When users download brochures, their details will appear here.</p>
+                  <p>When users claim scholarships, their details will appear here.</p>
                 </td>
               </tr>
             <?php endif; ?>

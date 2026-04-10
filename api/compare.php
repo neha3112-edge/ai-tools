@@ -114,12 +114,13 @@ if ($action === 'get_bulk_comparison') {
     foreach ($uni_ids as $uid) {
         $stmt = $pdo->prepare("
             SELECT uc.id as mapping_id, uc.academic_fees, uc.fees_discount, uc.course_rating, uc.course_specializations, uc.brochure_file,
-                   u.name, u.display_name, u.image, u.rating, u.nirf_ranking, u.year_of_establishment, u.university_type,
+                   u.name, u.display_name, u.image, u.rating, u.nirf_ranking, u.year_of_establishment, ut.type_name as university_type,
                    u.campus_location, u.avg_placement_package, u.placement_assistance, u.emi_facility, u.scholarship,
                    u.key_advantages, u.view_university_link, u.sample_certificate,
                    m.mode_name
             FROM university_courses uc
             JOIN universities u ON uc.university_id = u.id
+            LEFT JOIN university_types ut ON u.university_type_id = ut.id
             JOIN education_modes m ON uc.education_mode_id = m.id
             WHERE uc.course_id = ? AND uc.education_mode_id = ? AND u.id = ? AND uc.is_active = 1 AND u.is_active = 1
             LIMIT 1

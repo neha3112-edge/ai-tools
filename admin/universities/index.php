@@ -18,6 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
 // Search + filter
 $search = trim($_GET['search'] ?? '');
 $level_filter = $_GET['type'] ?? '';
+$university_types = $pdo->query("SELECT type_name FROM university_types WHERE is_active=1 ORDER BY type_name")->fetchAll(PDO::FETCH_COLUMN);
 
 $where = ["u.is_active = 1"];
 $params = [];
@@ -28,13 +29,14 @@ if ($search) {
   $params[] = "%$search%";
 }
 if ($level_filter) {
-  $where[] = "u.university_type = ?";
+  $where[] = "ut.type_name = ?";
   $params[] = $level_filter;
 }
 
 $sql = "SELECT u.id, u.name, u.display_name, u.image, u.rating, u.nirf_ranking,
-               u.university_type, u.campus_location, u.created_at
+               ut.type_name as university_type, u.campus_location, u.created_at
         FROM universities u
+        LEFT JOIN university_types ut ON u.university_type_id = ut.id
         WHERE " . implode(' AND ', $where) . "
         ORDER BY u.created_at DESC";
 
@@ -96,10 +98,9 @@ $logout_path = '../logout.php';
           </div>
           <select name="type" class="form-control" style="width:auto;min-width:160px;">
             <option value="">All Types</option>
-            <option value="Government" <?= $level_filter === 'Government' ? 'selected' : '' ?>>Government</option>
-            <option value="Private" <?= $level_filter === 'Private' ? 'selected' : '' ?>>Private</option>
-            <option value="Deemed" <?= $level_filter === 'Deemed' ? 'selected' : '' ?>>Deemed</option>
-            <option value="Autonomous" <?= $level_filter === 'Autonomous' ? 'selected' : '' ?>>Autonomous</option>
+            <?php foreach($university_types as $t): ?>
+              <option value="<?= e($t) ?>" <?= $level_filter === $t ? 'selected' : '' ?>><?= e($t) ?></option>
+            <?php endforeach; ?>
           </select>
           <button type="submit" class="btn btn-secondary">Filter</button>
           <?php if ($search || $level_filter): ?>

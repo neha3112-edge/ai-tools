@@ -14,7 +14,12 @@ if (!$id) {
 }
 
 // Fetch university
-$stmt = $pdo->prepare("SELECT * FROM universities WHERE id=? AND is_active=1");
+$stmt = $pdo->prepare("
+  SELECT u.*, ut.type_name as university_type 
+  FROM universities u
+  LEFT JOIN university_types ut ON u.university_type_id = ut.id
+  WHERE u.id = ? AND u.is_active=1
+");
 $stmt->execute([$id]);
 $uni = $stmt->fetch();
 if (!$uni) {

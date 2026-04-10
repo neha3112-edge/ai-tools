@@ -88,6 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'quick
 // ── FETCH LOOKUPS ──
 $edu_modes = $pdo->query("SELECT * FROM education_modes ORDER BY id")->fetchAll();
 $exam_modes_all = $pdo->query("SELECT * FROM exam_modes ORDER BY id")->fetchAll();
+$university_types = $pdo->query("SELECT * FROM university_types WHERE is_active=1 ORDER BY type_name")->fetchAll();
 $accreditations = $pdo->query("SELECT * FROM accreditations ORDER BY name")->fetchAll();
 
 $sel_edu = $pdo->prepare("SELECT education_mode_id FROM university_education_modes WHERE university_id=?");
@@ -149,7 +150,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !in_array($_POST['action'] ?? '', [
       $pdo->prepare("
                 UPDATE universities SET
                   name=?,display_name=?,slug=?,image=?,sample_certificate=?,
-                  rating=?,nirf_ranking=?,year_of_establishment=?,university_type=?,
+                  rating=?,nirf_ranking=?,year_of_establishment=?,university_type_id=?,
                   campus_location=?,avg_placement_package=?,placement_assistance=?,
                   emi_facility=?,scholarship=?,key_advantages=?,view_university_link=?
                 WHERE id=?
@@ -160,9 +161,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !in_array($_POST['action'] ?? '', [
             $image,
             $cert,
             $_POST['rating'] ?: null,
-            $_POST['nirf_ranking'] ?: null,
-            $year_est ?: null,
-            $_POST['university_type'] ?: null,
+            trim($_POST['nirf_ranking'] ?? '') ?: null,
+            trim($_POST['year_of_establishment'] ?? '') ?: null,
+            $_POST['university_type_id'] ?: null,
             trim($_POST['campus_location'] ?? '') ?: null,
             trim($_POST['avg_placement_package'] ?? '') ?: null,
             isset($_POST['placement_assistance']) ? 1 : 0,
@@ -484,10 +485,10 @@ $page_subtitle = $uni['name'];
             </div>
             <div class="form-group">
               <label>University Type</label>
-              <select name="university_type" class="form-control">
+              <select name="university_type_id" class="form-control">
                 <option value="">Select type</option>
-                <?php foreach (['Government', 'Private', 'Deemed', 'Autonomous'] as $t): ?>
-                  <option value="<?= $t ?>" <?= ($old['university_type'] ?? '') === $t ? 'selected' : '' ?>><?= $t ?></option>
+                <?php foreach ($university_types as $t): ?>
+                  <option value="<?= $t['id'] ?>" <?= (string)($old['university_type_id'] ?? '') === (string)$t['id'] ? 'selected' : '' ?>><?= e($t['type_name']) ?></option>
                 <?php endforeach; ?>
               </select>
             </div>
