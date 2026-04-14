@@ -472,10 +472,6 @@ a:hover {
   color: var(--text);
 }
 
-.v2-cell:nth-child(even) {
-  /* Actually we can't reliably do even/odd in grid easily without knowing column. We just rely on border. */
-}
-
 /* The left-most column cells (Features labels) */
 .v2-label-cell {
   background: var(--surface-h);
