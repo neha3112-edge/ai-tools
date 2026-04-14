@@ -46,12 +46,15 @@ $csrf_token = $_SESSION['lead_csrf_token'];
 ?>
 <div id="<?= e($form_id) ?>_Area">
     <?php if ($heading): ?>
-        <h2 style="margin: 0; color: var(--accent-blue); text-align: center; margin-bottom: 0.5rem;font-size:1.5rem;">
-            <?= e($heading) ?></h2>
+        <h2 style="margin: 0; color: var(--accent-blue); text-align: center; font-size:1.5rem;">
+            <?= e($heading) ?>
+        </h2>
     <?php endif; ?>
     <?php if ($subheading): ?>
-        <p style="text-align: center; color: var(--text-m); margin-bottom: 1.5rem; font-weight: 500; font-size: 0.95rem;">
-            <?= e($subheading) ?></p>
+        <p
+            style="text-align: center; color: var(--text-m); margin-bottom: 1.5rem; margin-top:0px; font-weight: 500; font-size: 0.95rem;">
+            <?= e($subheading) ?>
+        </p>
     <?php endif; ?>
 
     <form class="dynamic-lead-form" data-wrapper-id="<?= e($form_id) ?>" onsubmit="submitGenericLeadForm(event, this)">
@@ -137,11 +140,11 @@ $csrf_token = $_SESSION['lead_csrf_token'];
             style="display: flex; align-items: flex-start; gap: 8px; margin-bottom: 1.5rem; font-size: 0.8rem; color: var(--text);">
             <input type="checkbox" name="consent" id="consent_<?= e($form_id) ?>" required style="margin-top: 3px;">
             <label for="consent_<?= e($form_id) ?>">I consent to receive university updates via email and mobile number.
-                <a href="#" style="color:var(--accent-blue);">Disclaimer</a></label>
+                <!-- <a href="#" style="color:var(--accent-blue);">Disclaimer</a>--></label>
         </div>
 
         <button type="submit" class="btn btn-success lead-submit-btn"
-            style="width: 100%; border-radius: var(--radius-sm); font-size: 1.1rem; font-weight: 600; padding: 0.8rem; background: #10b981;">
+            style="width: 100%; text-align:center; border-radius: var(--radius-sm); font-size: 1.1rem; font-weight: 600; padding: 0.8rem; background: #10b981;display: flex;align-items: center;justify-content: center;">
             <?= e($button_text) ?>
         </button>
     </form>
@@ -157,7 +160,8 @@ $csrf_token = $_SESSION['lead_csrf_token'];
     </div>
     <h2 style="color: var(--accent-blue); margin-bottom: 0.5rem; font-size: 1.5rem;"><?= e($success_heading) ?></h2>
     <p style="color: var(--text-m); margin-bottom: 2rem; font-size: 0.95rem; line-height: 1.5;">
-        <?= e($success_message) ?></p>
+        <?= e($success_message) ?>
+    </p>
     <button type="button" class="btn btn-secondary trigger-modal-close" data-form-id="<?= e($form_id) ?>"
         style="width: 100%; border-radius: 30px; font-weight: 600; padding: 0.8rem; background: #e2e8f0; color: #1e293b; border: 1px solid #cbd5e1; cursor: pointer;">Close</button>
 </div>

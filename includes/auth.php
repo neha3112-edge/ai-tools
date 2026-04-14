@@ -3,20 +3,23 @@
 // includes/auth.php
 // ============================================================
 
-function is_logged_in(): bool {
+function is_logged_in(): bool
+{
     return isset($_SESSION['admin_id']) && !empty($_SESSION['admin_id']);
 }
 
-function require_login(): void {
+function require_login(): void
+{
     if (!is_logged_in()) {
         header('Location: ' . ADMIN_URL . '/login.php');
         exit;
     }
 }
 
-function require_superadmin(): void {
+function require_superadmin(): void
+{
     require_login();
-    if ($_SESSION['admin_role'] !== 'superadmin') {
+    if ($_SESSION['admin_role'] !== 'admin') {
         header('Location: ' . ADMIN_URL . '/dashboard.php');
         exit;
     }

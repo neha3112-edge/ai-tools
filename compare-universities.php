@@ -17,6 +17,7 @@ require_once __DIR__ . '/includes/helpers.php';
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="icon" type="image/x-icon" href="<?= ADMIN_URL ?>/assets/images/favicon.png" />
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap"
         rel="stylesheet">
@@ -34,29 +35,19 @@ require_once __DIR__ . '/includes/helpers.php';
 
     <nav class="public-navbar">
         <div class="brand">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
-                <path d="M6 12v5c3 3 9 3 12 0v-5" />
-            </svg>
-            SODE AI
+            <img style="width:40px;" src="<?= ADMIN_URL ?>/assets/images/favicon.png">
+            SODE AI Tools
         </div>
         <div class="public-nav-links">
             <a href="<?= BASE_URL ?>/compare-universities.php" class="active">Compare Universities</a>
-            <a href="<?= ADMIN_URL ?>/login.php" class="btn btn-primary" style="color:#fff; padding:0.4rem 1rem;">Admin
-                Login</a>
         </div>
     </nav>
 
     <!-- HERO SECTION -->
     <div class="hero-section">
-        <!-- Marquee Slider -->
-        <div class="marquee-container" id="marqueeContainer">
-            <div class="marquee-track" id="marqueeTrack1">
-                <!-- Populated via JS -->
-            </div>
-            <div class="marquee-track" id="marqueeTrack2" aria-hidden="true">
-                <!-- Duplicate for infinite loop -->
+        <div class="marquee-outer">
+            <div class="marquee-inner" id="marqueeInner">
+                <!-- JS se populate hoga -->
             </div>
         </div>
     </div>
@@ -188,9 +179,9 @@ require_once __DIR__ . '/includes/helpers.php';
                 </div>
 
                 <h2 id="sch_heading"
-                    style="margin: 0; color: #0284c7; text-align: left; margin-bottom: 0.5rem;font-size:1.6rem; font-weight:800;">
+                    style="margin: 0; color: var(--accent-blue); text-align: center; margin-bottom: 0.5rem;font-size:1.6rem; font-weight:800;">
                     Claim Discount</h2>
-                <p style="text-align: left; color: var(--text-m); margin-bottom: 1.5rem; font-size: 0.95rem;">Join
+                <p style="text-align: center; color: var(--text-m); margin-bottom: 1.5rem; font-size: 0.95rem;">Join
                     15,000+ students who secured their future with us.</p>
             </div>
 
@@ -200,7 +191,7 @@ require_once __DIR__ . '/includes/helpers.php';
                 'lead_type' => 'scholarship',
                 'heading' => '', // Using custom JS heading
                 'subheading' => '', // Using custom JS subheading
-                'button_text' => 'Claim Discount & Reveal Code',
+                'button_text' => 'Claim Discount',
                 'success_heading' => 'Submission Successful!',
                 'success_message' => 'Your scholarship request has been received. Our academic counsellor will review your details and contact you shortly with the exact scholarship amount and the complete application process.'
             ];
@@ -276,13 +267,28 @@ require_once __DIR__ . '/includes/helpers.php';
             try {
                 let res = await fetch(`${BASE_URL}/api/compare.php?action=get_marquee_logos`);
                 let json = await res.json();
+
                 if (json.success && json.data.length > 0) {
-                    let html = json.data.map(l => `<img src="${l.image}" alt="${l.name}">`).join('');
-                    // Clone track for seamless loop
-                    document.getElementById('marqueeTrack1').innerHTML = html;
-                    document.getElementById('marqueeTrack2').innerHTML = html;
+                    const inner = document.getElementById('marqueeInner');
+
+                    // Build one set of cards
+                    const buildCards = () =>
+                        json.data.map(l =>
+                            `<div class="logo-card">
+             <img src="${l.image}" alt="${l.name}" loading="lazy">
+           </div>`
+                        ).join('');
+
+                    // Duplicate for seamless infinite loop (original + clone)
+                    inner.innerHTML = buildCards() + buildCards();
+
+                    // Speed adjust: agar logos kam hain toh slow karo
+                    // 30s default theek hai, but you can tune:
+                    // inner.style.animationDuration = json.data.length < 6 ? '15s' : '30s';
                 }
-            } catch (e) { }
+            } catch (e) {
+                console.warn('Marquee fetch failed:', e);
+            }
         }
 
         // ──────────────────────────────────────────────────────────
@@ -509,7 +515,8 @@ require_once __DIR__ . '/includes/helpers.php';
             building: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><path d="M9 22v-4h6v4"></path><path d="M8 6h.01"></path><path d="M16 6h.01"></path><path d="M12 6h.01"></path><path d="M12 10h.01"></path><path d="M12 14h.01"></path><path d="M16 10h.01"></path><path d="M16 14h.01"></path><path d="M8 10h.01"></path><path d="M8 14h.01"></path></svg>`,
             check_shield: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><polyline points="9 12 11 14 15 10"></polyline></svg>`,
             user_check: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><polyline points="17 11 19 13 23 9"></polyline></svg>`,
-            rupee: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12"></path><path d="M6 8h12"></path><path d="M6 13h8.5a4.5 4.5 0 1 0 0-9H6"></path><path d="M14.5 13L6 21"></path></svg>`,
+            rupee: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h12" /><path d="M6 8h12" /><path d="M6 4h5a4 4 0 1 1 0 8H6" /><path d="M10 12l6 8" /></svg>`,
+            advantages: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9 12l2 2l4-4"></path></svg>`,
             book: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>`,
             globe: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>`,
             edit: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`,
@@ -553,7 +560,7 @@ require_once __DIR__ . '/includes/helpers.php';
                 let content = u.uni_image ? `<img src="${u.uni_image}" class="v2-header-logo" style="margin:0;">` : `<h3 style="margin:0;font-size:0.9rem;color:var(--accent-blue);">${u.uni_name}</h3>`;
 
                 headerRowTokens.push(`
-                <div class="v2-header-cell" style="cursor:pointer; background:#fff; border-bottom:4px solid var(--accent-blue);" onclick="openUniModal(${boxIndex})">
+                <div class="v2-header-cell" style="cursor:pointer;" onclick="openUniModal(${boxIndex})">
                     <div style="display:flex; align-items:center; gap:8px;">
                         ${content}
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-m)" stroke-width="2" style="margin-top:2px;"><polyline points="6 9 12 15 18 9"></polyline></svg>
@@ -571,8 +578,8 @@ require_once __DIR__ . '/includes/helpers.php';
                 // Actually it's simpler: if activePairs had 2 items, the next column should just trigger modal for the next empty box.
                 if (emptyIdx) {
                     headerRowTokens.push(`
-                    <div class="v2-header-cell" style="cursor:pointer; background:#fff; border-bottom:4px solid var(--accent-blue); justify-content:center;" onclick="openUniModal(${emptyIdx})">
-                        <div style="color:var(--text-m); font-weight:600;">+ Select University</div>
+                    <div class="v2-header-cell" style="cursor:pointer; justify-content:center;" onclick="openUniModal(${emptyIdx})">
+                        <div class="select_uni_blue_bar" style="color:var(--text-m); font-weight:600;">+ Select University</div>
                     </div>
                 `);
                 }
@@ -608,13 +615,8 @@ require_once __DIR__ . '/includes/helpers.php';
 
             rowsHtml += buildRow(`${courseShort.toUpperCase()} FEES STRUCTURE`, "rupee", u => cellFn(u, x => {
                 return `<div class="desktop-fee">
-                        <div style="color:var(--danger); font-weight:800; font-size:1.4rem; text-align:center; line-height:1;">
-                            <span style="font-size:1rem; display:block;">₹</span>
-                            ${x.fees.replace('₹ ', '')}
-                        </div>
-                        <div style="color:#4b5563; font-weight:600; font-size:0.85rem; text-align:left; line-height:1.2;">
-                            Per<br>Semester
-                        </div>
+                        <div style="color:var(--danger); font-weight:800; font-size:1.3rem;">₹ ${x.fees.replace('₹ ', '')}</div>
+                        <div style="color:#4b5563; font-weight:600; font-size:0.8rem;">Total Fees</div>
                     </div>
                     <div class="mobile-fee">
                         <div style="color:var(--danger); font-weight:800; font-size:1.3rem;">₹ ${x.fees.replace('₹ ', '')}</div>
@@ -636,7 +638,7 @@ require_once __DIR__ . '/includes/helpers.php';
                 return x.emi_facility === 'Yes' ? `<span class="v2-icon-success" style="font-size:1.8rem; font-weight:400;">✓</span>` : `<span class="v2-icon-danger" style="font-size:1.8rem; font-weight:400;">✕</span>`;
             }), unis);
 
-            rowsHtml += buildRow("ADVANTAGES", "star", u => cellFn(u, x => {
+            rowsHtml += buildRow("ADVANTAGES", "advantages", u => cellFn(u, x => {
                 if (!x.advantages || x.advantages.length === 0) return '—';
                 return `<ul class="v2-list" style="padding-left:1.5rem;">` + x.advantages.map(a => `<li style="font-weight:700;color:var(--text); font-size:0.8rem; margin-bottom:0.5rem; line-height:1.3;">${a}</li>`).join('') + `</ul>`;
             }), unis);
@@ -657,7 +659,7 @@ require_once __DIR__ . '/includes/helpers.php';
             rowsHtml += buildRow("DEGREE CERTIFICATE", "award", u => cellFn(u, x => {
                 if (x.sample_certificate) {
                     let imgUrl = getAbsoluteUrl(x.sample_certificate);
-                    return `<div style="display:flex; flex-direction:column; align-items:center; gap:0.5rem; border:1px solid var(--border); padding:0.5rem; border-radius:var(--radius-sm); width:120px; margin:0 auto; cursor:pointer;" onclick="openLightbox('${imgUrl}')">
+                    return `<div class="custom_mob_certificate" style="display:flex; flex-direction:column; align-items:center; gap:0.5rem; border:1px solid var(--border); padding:0.5rem; border-radius:var(--radius-sm); width:120px; margin:0 auto; cursor:pointer;" onclick="openLightbox('${imgUrl}')">
                             <img src="${imgUrl}" style="width:100px; height:70px; object-fit:contain;">
                             <span style="font-size:0.75rem; color:var(--text-m); font-weight:600;">👁 View</span>
                         </div>`;
@@ -695,22 +697,22 @@ require_once __DIR__ . '/includes/helpers.php';
             rowsHtml += buildRow("COURSE BROCHURE", "book", u => cellFn(u, x => {
                 if (x.brochure_file) {
                     let broUrl = getAbsoluteUrl(x.brochure_file);
-                    return `<button onclick="openBrochureModal('${broUrl}')" style="background:#fff; border:2px solid #10b981; border-radius:8px; display:flex; flex-direction:column; align-items:center; width:100%; max-width:140px; margin:0 auto; padding:0.5rem; cursor:pointer; color:#10b981;">
+                    return `<button class="custom_mob_brochure_styling" onclick="openBrochureModal('${broUrl}')" style="background:#fff; border:2px solid #10b981; border-radius:8px; display:flex; justify-content:center; gap:10px; align-items:center; width:100%; max-width:90%; margin:0 auto; padding:0.5rem; cursor:pointer; color:#10b981;">
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                            <span style="font-size:0.75rem; font-weight:800; text-transform:uppercase; margin-top:4px;">Download<br>Brochure</span>
+                            <span style="font-size:0.75rem; font-weight:800; text-transform:uppercase;">Download Brochure</span>
                          </button>`;
                 }
                 return '—';
             }), unis);
 
             rowsHtml += buildRow("GET FREE COUNSELING", "phone", u => cellFn(u, x => {
-                return `<button class="btn btn-primary" onclick="opencounselingModal('${x.uni_name.replace(/'/g, "\\'")}', '${x.uni_image ? x.uni_image : ''}')" style="background:#1b84ff; border-color:#1b84ff; border-radius:8px; display:flex; flex-direction:column; align-items:center; width:100%; max-width:140px; margin:0 auto; padding:0.5rem;">
+                return `<button class="btn btn-primary" onclick="opencounselingModal('${x.uni_name.replace(/'/g, "\\'")}', '${x.uni_image ? x.uni_image : ''}')" style="background:#1b84ff; border-color:#1b84ff; display:flex; justify-content:center; gap:10px; align-items:center; width:100%; max-width:90%; margin:0 auto; padding:10px 20px; cursor:pointer; color:#10b981;">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-                        <span style="font-size:0.7rem; font-weight:700; color:#fff; text-transform:uppercase; margin-top:2px;">Book Free<br>counseling</span>
+                        <span style="font-size:0.7rem; font-weight:700; color:#fff; text-transform:uppercase;">Book Free counseling</span>
                      </button>`;
             }), unis);
 
-            rowsHtml += buildRow("", "", u => cellFn(u, x => `<a href="${x.view_link}" class="v2-btn-know" style="background:#ffc107; color:#000; display:flex; justify-content:center; align-items:center;" target="_blank">Know More</a>`), unis);
+            rowsHtml += buildRow("", "", u => cellFn(u, x => `<a href="${x.view_link}" class="v2-btn-know" style="background:#ffc107; color:#000; display:flex; justify-content:center; align-items:center; width:90%; target="_blank">Know More</a>`), unis);
 
             let finalHtml = `
             <div class="v2-grid" style="grid-template-columns: 260px repeat(3, 1fr); margin-bottom: 2rem;">
