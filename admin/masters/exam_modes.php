@@ -105,6 +105,8 @@ $page_subtitle = 'Online, Offline, Proctored etc.';
       background: rgba(79, 110, 247, 0.12);
       color: var(--accent-h);
     }
+    .ba-trigger-cell { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+    .ba-manage-btn { font-size:11px !important; gap:5px; }
   </style>
 </head>
 
@@ -173,11 +175,21 @@ $page_subtitle = 'Online, Offline, Proctored etc.';
               <tbody>
                 <?php if ($all):
                   foreach ($all as $i => $m): ?>
-                    <tr>
+                    <tr data-ba-row-id="<?= $m['id'] ?>" data-ba-module="exam_modes">
                       <td style="color:var(--text-s);"><?= $i + 1 ?></td>
                       <td><span class="cell-name"><?= e($m['mode_name']) ?></span></td>
                       <td>
-                        <?= $m['usage_count'] > 0 ? '<span class="usage-badge">' . $m['usage_count'] . ' uni' . ($m['usage_count'] > 1 ? 's' : '') . '</span>' : '<span style="color:var(--text-s);font-size:12px;">None</span>' ?>
+                        <div class="ba-trigger-cell">
+                          <?= $m['usage_count'] > 0
+                            ? '<span class="usage-badge ba-usage-badge">' . $m['usage_count'] . ' uni' . ($m['usage_count'] > 1 ? 's' : '') . '</span>'
+                            : '<span style="color:var(--text-s);font-size:12px;" class="ba-none-text">None</span>' ?>
+                          <button type="button" class="btn btn-secondary btn-sm ba-manage-btn"
+                            onclick="openBulkModal('exam_modes', <?= $m['id'] ?>, <?= htmlspecialchars(json_encode($m['mode_name']), ENT_QUOTES) ?>)"
+                            title="Manage universities">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                            Manage
+                          </button>
+                        </div>
                       </td>
                       <td>
                         <div class="action-col">
@@ -220,6 +232,7 @@ $page_subtitle = 'Online, Offline, Proctored etc.';
       </div>
     </div>
   </main>
+  <?php require_once __DIR__ . '/../includes/bulk_assoc_modal.php'; ?>
   <?php require_once __DIR__ . '/../includes/layout_foot.php'; ?>
 </body>
 

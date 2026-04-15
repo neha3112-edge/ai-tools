@@ -99,6 +99,8 @@ $logout_path = '../../logout.php';
     }
     .panel { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.5rem; }
     .panel-header { font-weight:700; color:var(--text); margin-bottom:1.5rem; font-size:1.1rem; border-bottom:1px solid var(--border); padding-bottom:0.75rem; }
+    .ba-trigger-cell { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+    .ba-manage-btn { font-size:11px; gap:5px; }
   </style>
 </head>
 <body>
@@ -160,16 +162,26 @@ $logout_path = '../../logout.php';
                 <tbody>
                   <?php if ($types): ?>
                     <?php foreach ($types as $i => $t): ?>
-                      <tr <?= $edit_item && $edit_item['id'] == $t['id'] ? 'style="background:rgba(37,99,235,0.05);"' : '' ?>>
+                      <tr data-ba-row-id="<?= $t['id'] ?>" data-ba-module="university_types" <?= $edit_item && $edit_item['id'] == $t['id'] ? 'style="background:rgba(37,99,235,0.05);"' : '' ?>>
                         <td data-label="#"> <?= $i + 1 ?> </td>
                         <td data-label="Type Name" style="font-weight:600;color:var(--text);"><?= e($t['type_name']) ?></td>
-                        <td data-label="Usage Count">
-                          <?php if ($t['used_count'] > 0): ?>
-                            <span class="badge" style="background:rgba(37,99,235,0.1);color:#2563eb;"><?= $t['used_count'] ?> Universities</span>
-                          <?php else: ?>
-                            <span class="badge">Unused</span>
-                          <?php endif; ?>
-                        </td>
+                         <td data-label="Usage Count">
+                          <div class="ba-trigger-cell">
+                            <?php if ($t['used_count'] > 0): ?>
+                              <span class="usage-badge ba-usage-badge" style="background:rgba(37,99,235,0.1);color:#2563eb;"><?= $t['used_count'] ?> Universities</span>
+                            <?php else: ?>
+                              <span class="badge ba-none-text">Unused</span>
+                            <?php endif; ?>
+                            <button
+                              type="button"
+                              class="btn btn-secondary btn-sm ba-manage-btn"
+                              onclick="openBulkModal('university_types', <?= $t['id'] ?>, <?= htmlspecialchars(json_encode($t['type_name']), ENT_QUOTES) ?>)"
+                              title="Manage associated universities">
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                              Manage
+                            </button>
+                          </div>
+                         </td>
                         <td data-label="Actions" style="text-align:right;">
                           <div class="action-col" style="justify-content:flex-end;">
                             <a href="?edit=<?= $t['id'] ?>" class="btn btn-secondary btn-sm btn-icon" title="Edit">
@@ -183,7 +195,7 @@ $logout_path = '../../logout.php';
                             </form>
                           </div>
                         </td>
-                      </tr>
+                       </tr>
                     <?php endforeach; ?>
                   <?php else: ?>
                     <tr><td colspan="4" class="empty-state">No types found. Add your first university type.</td></tr>
@@ -197,6 +209,7 @@ $logout_path = '../../logout.php';
     </div>
   </main>
   
+  <?php require_once __DIR__ . '/../includes/bulk_assoc_modal.php'; ?>
   <?php require_once __DIR__ . '/../includes/layout_foot.php'; ?>
 </body>
 </html>

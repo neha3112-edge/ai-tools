@@ -154,10 +154,13 @@ a:hover {
 
 /* ── HERO SECTION ── */
 .hero-section {
-  background: #1b6ef3;
-  padding: 3rem 1rem 12rem;
+  background: linear-gradient(135deg, #1155cc 0%, #1b6ef3 60%, #1a8fff 100%);
+  padding: 2rem 0 13rem;
   overflow: hidden;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 /* ── MARQUEE WRAPPER ── */
@@ -165,41 +168,49 @@ a:hover {
   overflow: hidden;
   width: 100%;
   position: relative;
-  /* Fade edges left & right */
+  padding: 6px 0;
+  /* Soft fade on edges */
   -webkit-mask-image: linear-gradient(to right,
       transparent 0%,
-      black 8%,
-      black 92%,
+      black 6%,
+      black 94%,
       transparent 100%);
   mask-image: linear-gradient(to right,
       transparent 0%,
-      black 8%,
-      black 92%,
+      black 6%,
+      black 94%,
       transparent 100%);
 }
 
+/* Base marquee track */
 .marquee-inner {
   display: flex;
   width: max-content;
-  /* shrink-wraps to actual content */
-  animation: marqueeScroll 30s linear infinite;
+  will-change: transform;
+}
+
+/* Row 1: Right → Left */
+.marquee-ltr {
+  animation: marqueeScrollLTR 30s linear infinite;
+}
+
+/* Row 2: Left → Right */
+.marquee-rtl {
+  animation: marqueeScrollRTL 30s linear infinite;
 }
 
 .marquee-inner:hover {
   animation-play-state: paused;
-  /* pause on hover */
 }
 
-@keyframes marqueeScroll {
-  0% {
-    transform: translateX(0);
-  }
+@keyframes marqueeScrollLTR {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-25%); }  /* 4 copies → shift by 1 set = 25% */
+}
 
-  100% {
-    transform: translateX(-50%);
-  }
-
-  /* -50% kyunki content 2x duplicate hai */
+@keyframes marqueeScrollRTL {
+  0%   { transform: translateX(-25%); }  /* start at copy 2 — always fills viewport */
+  100% { transform: translateX(0); }
 }
 
 /* ── EACH LOGO CARD ── */
@@ -208,18 +219,26 @@ a:hover {
   align-items: center;
   justify-content: center;
   background: #ffffff;
-  border-radius: 10px;
-  padding: 8px 16px;
-  margin: 0 12px;
-  height: 70px;
-  min-width: 120px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  padding: 10px 22px;
+  margin: 0 8px;
+  height: 68px;
+  min-width: 170px;
+  max-width: 220px;
   flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 3px 14px rgba(0, 0, 0, 0.18);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.marquee-inner .logo-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
 }
 
 .marquee-inner .logo-card img {
-  max-height: 50px;
-  max-width: 110px;
+  max-height: 48px;
+  max-width: 160px;
   width: auto;
   height: auto;
   object-fit: contain;

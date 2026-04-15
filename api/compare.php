@@ -11,8 +11,8 @@ $action = $_GET['action'] ?? '';
 if ($action === 'get_marquee_logos') {
     $stmt = $pdo->query("SELECT name, image FROM universities WHERE is_active = 1 AND image IS NOT NULL AND image != ''");
     $logos = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    $data = array_map(function($l) {
-        return ['name'=>$l['name'], 'image'=>e($l['image'])];
+    $data = array_map(function ($l) {
+        return ['name' => $l['name'], 'image' => e($l['image'])];
     }, $logos);
     echo json_encode(['success' => true, 'data' => $data]);
     exit;
@@ -28,11 +28,12 @@ if ($action === 'get_courses') {
         ORDER BY c.name ASC
     ");
     $courses = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
+
     $results = [];
     foreach ($courses as $c) {
         $name = get_display_name($c['name'], $c['display_name']);
-        if ($c['course_level']) $name .= ' (' . $c['course_level'] . ')';
+        if ($c['course_level'])
+            $name .= ' (' . $c['course_level'] . ')';
         $results[] = [
             'id' => $c['id'],
             'text' => $name
@@ -44,7 +45,7 @@ if ($action === 'get_courses') {
 
 // Fetch available modes for a specific course
 if ($action === 'get_modes') {
-    $course_id = (int)($_GET['course_id'] ?? 0);
+    $course_id = (int) ($_GET['course_id'] ?? 0);
     $stmt = $pdo->prepare("
         SELECT DISTINCT m.id, m.mode_name 
         FROM education_modes m 
@@ -60,9 +61,9 @@ if ($action === 'get_modes') {
 
 // Fetch universities that offer the selected course + mode
 if ($action === 'get_filtered_universities') {
-    $course_id = (int)($_GET['course_id'] ?? 0);
-    $mode_id = (int)($_GET['mode_id'] ?? 0);
-    
+    $course_id = (int) ($_GET['course_id'] ?? 0);
+    $mode_id = (int) ($_GET['mode_id'] ?? 0);
+
     $stmt = $pdo->prepare("
         SELECT DISTINCT u.id, u.name, u.display_name, u.image 
         FROM universities u 
@@ -72,7 +73,7 @@ if ($action === 'get_filtered_universities') {
     ");
     $stmt->execute([$course_id, $mode_id]);
     $unis = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
+
     $results = [];
     foreach ($unis as $u) {
         $results[] = [
@@ -87,29 +88,30 @@ if ($action === 'get_filtered_universities') {
 
 // Fetch deep comparison data for Grid
 if ($action === 'get_bulk_comparison') {
-    $course_id = (int)($_GET['course_id'] ?? 0);
-    $mode_id = (int)($_GET['mode_id'] ?? 0);
+    $course_id = (int) ($_GET['course_id'] ?? 0);
+    $mode_id = (int) ($_GET['mode_id'] ?? 0);
     $uni_ids_str = $_GET['uni_ids'] ?? '';
-    
+
     // Parse valid subset of universities
     $uni_ids = array_filter(array_map('intval', explode(',', $uni_ids_str)));
     if (empty($uni_ids) || !$course_id || !$mode_id) {
         echo json_encode(['success' => false, 'error' => 'Invalid parameters']);
         exit;
     }
-    
+
     // Fetch common course data
     $crs_stmt = $pdo->prepare("SELECT name, display_name, course_level, course_duration, program_eligibility FROM courses WHERE id=?");
     $crs_stmt->execute([$course_id]);
     $courseData = $crs_stmt->fetch(PDO::FETCH_ASSOC);
-    if(!$courseData) {
-         echo json_encode(['success' => false, 'error' => 'Course not found']); exit;
+    if (!$courseData) {
+        echo json_encode(['success' => false, 'error' => 'Course not found']);
+        exit;
     }
-    
+
     $courseName = get_display_name($courseData['name'], $courseData['display_name']);
 
     $results = [];
-    
+
     // Fetch mapping and university specific data
     foreach ($uni_ids as $uid) {
         $stmt = $pdo->prepare("
@@ -127,8 +129,14 @@ if ($action === 'get_bulk_comparison') {
         ");
         $stmt->execute([$course_id, $mode_id, $uid]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        
-        if(!$row) continue; // University doesn't map correctly anymore, skip
+
+        if (!$row)
+            continue; // University doesn't map correctly anymore, skip
+
+        // Education Modes — ALL modes from university_education_modes table
+        $edu_stmt = $pdo->prepare("SELECT m.mode_name FROM education_modes m JOIN university_education_modes um ON m.id = um.education_mode_id WHERE um.university_id = ? ORDER BY m.mode_name ASC");
+        $edu_stmt->execute([$uid]);
+        $edu_modes_all = $edu_stmt->fetchAll(PDO::FETCH_COLUMN);
 
         // Exam Modes
         $em_stmt = $pdo->prepare("SELECT m.mode_name FROM exam_modes m JOIN university_exam_modes um ON m.id = um.exam_mode_id WHERE um.university_id = ?");
@@ -139,22 +147,24 @@ if ($action === 'get_bulk_comparison') {
         $acc_stmt = $pdo->prepare("SELECT a.name, a.image FROM accreditations a JOIN university_accreditations ua ON a.id = ua.accreditation_id WHERE ua.university_id = ?");
         $acc_stmt->execute([$uid]);
         $accreditations = $acc_stmt->fetchAll(PDO::FETCH_ASSOC);
-        
+
         $advantages = [];
         if (!empty($row['key_advantages'])) {
             $lines = explode("\n", $row['key_advantages']);
             foreach ($lines as $l) {
                 $l = trim($l);
-                if ($l !== '') $advantages[] = ltrim($l, '-• ');
+                if ($l !== '')
+                    $advantages[] = ltrim($l, '-• ');
             }
         }
-        
+
         $specializations = [];
         if (!empty($row['course_specializations'])) {
-             $lines = explode("\n", $row['course_specializations']);
-             foreach ($lines as $l) {
+            $lines = explode("\n", $row['course_specializations']);
+            foreach ($lines as $l) {
                 $l = trim($l);
-                if ($l !== '') $specializations[] = ltrim($l, '-• ');
+                if ($l !== '')
+                    $specializations[] = ltrim($l, '-• ');
             }
         }
 
@@ -171,7 +181,7 @@ if ($action === 'get_bulk_comparison') {
             'fees' => $row['academic_fees'] ? '₹ ' . number_format($row['academic_fees']) : '—',
             'fees_period' => 'Total', // Fallback, no period in our DB schema inherently 
             'specializations' => $specializations,
-            'education_mode' => $row['mode_name'],
+            'education_mode' => implode(', ', $edu_modes_all) ?: $row['mode_name'],
             'exam_modes' => implode(', ', $exam_modes) ?: '—',
             'emi_facility' => $row['emi_facility'] ? 'Yes' : 'No',
             'advantages' => $advantages,
@@ -184,7 +194,7 @@ if ($action === 'get_bulk_comparison') {
             'brochure_file' => $row['brochure_file'] ?: null
         ];
     }
-    
+
     echo json_encode(['success' => true, 'course_name' => $courseName, 'data' => $results]);
     exit;
 }

@@ -45,9 +45,16 @@ require_once __DIR__ . '/includes/helpers.php';
 
     <!-- HERO SECTION -->
     <div class="hero-section">
+        <!-- Row 1: scrolls Right → Left -->
         <div class="marquee-outer">
-            <div class="marquee-inner" id="marqueeInner">
-                <!-- JS se populate hoga -->
+            <div class="marquee-inner marquee-ltr" id="marqueeRow1">
+                <!-- populated by JS -->
+            </div>
+        </div>
+        <!-- Row 2: scrolls Left → Right -->
+        <div class="marquee-outer">
+            <div class="marquee-inner marquee-rtl" id="marqueeRow2">
+                <!-- populated by JS -->
             </div>
         </div>
     </div>
@@ -269,22 +276,29 @@ require_once __DIR__ . '/includes/helpers.php';
                 let json = await res.json();
 
                 if (json.success && json.data.length > 0) {
-                    const inner = document.getElementById('marqueeInner');
+                    const row1 = document.getElementById('marqueeRow1');
+                    const row2 = document.getElementById('marqueeRow2');
 
-                    // Build one set of cards
+                    // Build one set of logo cards
                     const buildCards = () =>
                         json.data.map(l =>
                             `<div class="logo-card">
-             <img src="${l.image}" alt="${l.name}" loading="lazy">
-           </div>`
+                                <img src="${l.image}" alt="${l.name}" loading="lazy">
+                            </div>`
                         ).join('');
 
-                    // Duplicate for seamless infinite loop (original + clone)
-                    inner.innerHTML = buildCards() + buildCards();
+                    // ✅ 4 copies so the track is always 4× one-set-width.
+                    //    CSS animates only 25% (= 1 set), so both rows are
+                    //    guaranteed full from frame 0 — no blank space visible.
+                    const oneSet = buildCards();
+                    const quadHtml = oneSet + oneSet + oneSet + oneSet;
+                    row1.innerHTML = quadHtml;
+                    row2.innerHTML = quadHtml;
 
-                    // Speed adjust: agar logos kam hain toh slow karo
-                    // 30s default theek hai, but you can tune:
-                    // inner.style.animationDuration = json.data.length < 6 ? '15s' : '30s';
+                    // Speed: scale with logo count so it doesn't feel too fast/slow
+                    const speed = Math.max(20, json.data.length * 3) + 's';
+                    row1.style.animationDuration = speed;
+                    row2.style.animationDuration = speed;
                 }
             } catch (e) {
                 console.warn('Marquee fetch failed:', e);
@@ -631,7 +645,18 @@ require_once __DIR__ . '/includes/helpers.php';
                     </div>`;
             }), unis);
 
-            rowsHtml += buildRow("EDUCATION MODE", "globe", u => cellFn(u, x => `<strong style="color:var(--text);">${x.education_mode}</strong>`), unis);
+            rowsHtml += buildRow("EDUCATION MODE", "globe", u => cellFn(u, x => {
+                if (!x.education_mode || x.education_mode === '—') return '—';
+                // Render each mode as a pill/tag
+                let modes = x.education_mode.split(',').map(m => m.trim()).filter(m => m);
+                if (modes.length === 1) {
+                    return `<strong style="color:var(--text);">${modes[0]}</strong>`;
+                }
+                let pills = modes.map(m =>
+                    `<span style="display:inline-block;padding:3px 10px;border-radius:20px;background:rgba(27,132,255,0.1);color:#1b84ff;font-weight:600;font-size:0.8rem;border:1px solid rgba(27,132,255,0.25);margin:2px;">${m}</span>`
+                ).join('');
+                return `<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:4px;">${pills}</div>`;
+            }), unis);
             rowsHtml += buildRow("EXAM MODE", "edit", u => cellFn(u, x => `<strong>${x.exam_modes}</strong>`), unis);
 
             rowsHtml += buildRow("EMI FACILITY", "credit_card", u => cellFn(u, x => {

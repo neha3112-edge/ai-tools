@@ -180,6 +180,8 @@ $page_subtitle = 'Manage accreditation & approval badges';
     margin-top: 6px;
   }
   .remove-img-label input { accent-color: var(--danger); }
+  .ba-trigger-cell { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .ba-manage-btn { font-size:11px !important; gap:5px; }
 </style>
 </head>
 <body>
@@ -325,7 +327,7 @@ $page_subtitle = 'Manage accreditation & approval badges';
             <tbody>
               <?php if ($all): ?>
                   <?php foreach ($all as $i => $a): ?>
-                    <tr class="<?= ($edit_item && $edit_item['id'] == $a['id']) ? 'edit-row' : '' ?>">
+                    <tr data-ba-row-id="<?= $a['id'] ?>" data-ba-module="accreditations" class="<?= ($edit_item && $edit_item['id'] == $a['id']) ? 'edit-row' : '' ?>">
                       <td data-label="#"> <?= $i + 1 ?> </td>
                       <td data-label="Logo">
                         <?php if (!empty($a['image'])): ?>
@@ -341,11 +343,19 @@ $page_subtitle = 'Manage accreditation & approval badges';
                         <?php endif; ?>
                       </td>
                       <td data-label="Universities">
-                        <?php if ($a['usage_count'] > 0): ?>
-                            <span class="usage-badge"><?= $a['usage_count'] ?> uni<?= $a['usage_count'] > 1 ? 's' : '' ?></span>
-                        <?php else: ?>
-                            <span style="color:var(--text-s);font-size:12px;">None</span>
-                        <?php endif; ?>
+                        <div class="ba-trigger-cell">
+                          <?php if ($a['usage_count'] > 0): ?>
+                            <span class="usage-badge ba-usage-badge"><?= $a['usage_count'] ?> uni<?= $a['usage_count'] > 1 ? 's' : '' ?></span>
+                          <?php else: ?>
+                            <span style="color:var(--text-s);font-size:12px;" class="ba-none-text">None</span>
+                          <?php endif; ?>
+                          <button type="button" class="btn btn-secondary btn-sm ba-manage-btn"
+                            onclick="openBulkModal('accreditations', <?= $a['id'] ?>, <?= htmlspecialchars(json_encode($a['name']), ENT_QUOTES) ?>)"
+                            title="Manage universities">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                            Manage
+                          </button>
+                        </div>
                       </td>
                       <td data-label="Actions">
                         <div class="action-col">
@@ -383,6 +393,7 @@ $page_subtitle = 'Manage accreditation & approval badges';
   </div>
 </main>
 
+<?php require_once __DIR__ . '/../includes/bulk_assoc_modal.php'; ?>
 <?php require_once __DIR__ . '/../includes/layout_foot.php'; ?>
 <script>
 // Image preview — Add form
