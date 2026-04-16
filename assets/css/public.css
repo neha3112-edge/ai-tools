@@ -822,7 +822,6 @@ a:hover {
   background: rgba(0, 0, 0, 0.6);
   z-index: 2000;
   display: flex;
-  align-items: center;
   justify-content: center;
   padding: 1rem;
   opacity: 0;
@@ -850,6 +849,8 @@ a:hover {
   transform: translateY(20px);
   transition: transform 0.2s;
   box-shadow: var(--shadow);
+  height: fit-content;
+  margin-top: 100px;
 }
 
 .uni-modal-bg.active .uni-modal {
@@ -1139,11 +1140,11 @@ a:hover {
   animation: unlockCardIn 0.4s ease;
   /* Sticky: card sticks below the sticky header while blur section is visible */
   position: sticky;
-  top: 150px;
+  top: 200px;
   /* Accounted for header height (approx 120px) + gap */
   pointer-events: auto;
   /* card itself is clickable */
-  margin-top: 16px;
+  margin-top: 100px;
   /* initial gap from top of the blur area */
 }
 
@@ -1207,8 +1208,8 @@ a:hover {
 @media (max-width: 768px) {
   .compare-unlock-card {
     padding: 1.5rem 1.25rem;
-    top: 100px;
-    margin-top: 8px;
+    top: 220px;
+    margin-top: 100px;
   }
 
   .unlock-card-title {

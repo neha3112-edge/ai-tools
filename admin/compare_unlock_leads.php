@@ -142,7 +142,10 @@ $logout_path = 'logout.php';
                   <td data-label="State"><?= e($l['state'] ?: 'N/A') ?></td>
                   <td data-label="Unlocked On"><?= date('d M Y, h:i A', strtotime($l['created_at'])) ?></td>
                   <td data-label="Action">
-                    <div class="action-col" style="justify-content:center;">
+                    <div class="action-col" style="justify-content:center; gap:5px;">
+                      <a href="compare_unlock_lead_view.php?id=<?= $l['id'] ?>" class="btn btn-secondary btn-sm btn-icon" title="View Details">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                      </a>
                       <form method="POST" style="display:inline;">
                         <input type="hidden" name="delete_id" value="<?= $l['id'] ?>">
                         <button type="submit" class="btn btn-danger btn-sm btn-icon" title="Delete Lead" data-confirm="Delete compare unlock lead for '<?= e($l['name']) ?>'? This cannot be undone.">
