@@ -245,6 +245,49 @@ require_once __DIR__ . '/includes/helpers.php';
         </div>
     </div>
 
+    <!-- COMPARE UNLOCK MODAL -->
+    <div class="uni-modal-bg" id="compareUnlockModalBg" style="z-index: 9999;">
+        <div class="uni-modal"
+            style="max-width: 480px; padding: 0; position:relative; overflow:hidden; border-radius: 16px;">
+            <button class="modal-close"
+                style="position: absolute; right: 15px; top: 15px; z-index: 10; background:rgba(255,255,255,0.2); border-radius:50%; width:32px; height:32px; display:flex; align-items:center; justify-content:center;"
+                onclick="closeCompareUnlockModal()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            <!-- Modal Top Banner -->
+            <div
+                style="background: linear-gradient(135deg, #1b84ff 0%, #0052cc 100%); padding: 2rem 2rem 1.5rem; text-align:center; position:relative; overflow:hidden;">
+                <div
+                    style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;background:rgba(255,255,255,0.08);border-radius:50%;">
+                </div>
+                <div
+                    style="position:absolute;bottom:-40px;left:-20px;width:100px;height:100px;background:rgba(255,255,255,0.06);border-radius:50%;">
+                </div>
+                <div style="font-size:2.8rem;margin-bottom:0.5rem;">🔓</div>
+                <h2 style="color:#fff;margin:0;font-size:1.6rem;font-weight:800;">Unlock Full Comparison</h2>
+                <p style="color:rgba(255,255,255,0.85);margin:0.5rem 0 0;font-size:0.95rem;">Get access to 20+
+                    parameters — Completely FREE</p>
+            </div>
+            <!-- Form Area -->
+            <div style="padding: 1.5rem 2rem 2rem;">
+                <?php
+                $lead_form_options = [
+                    'form_id' => 'compareUnlockForm',
+                    'lead_type' => 'compare_unlock',
+                    'heading' => '',
+                    'subheading' => '',
+                    'button_text' => '🔓 Unlock Full Comparison — FREE',
+                    'success_heading' => 'Access Unlocked! 🎉',
+                    'success_message' => 'You can now view the complete comparison. Our academic experts will also reach out to help you choose the best university.'
+                ];
+                require 'includes/lead_form.php';
+                ?>
+            </div>
+        </div>
+    </div>
 
     <script>
         // State variables
@@ -588,8 +631,6 @@ require_once __DIR__ . '/includes/helpers.php';
             for (let j = i + 1; j <= 3; j++) {
                 // Find which box index is truly empty
                 let emptyIdx = [1, 2, 3].find(idx => !selectedUniIds[idx]);
-                // If we find one, we attach openUniModal, otherwise we just stop. 
-                // Actually it's simpler: if activePairs had 2 items, the next column should just trigger modal for the next empty box.
                 if (emptyIdx) {
                     headerRowTokens.push(`
                     <div class="v2-header-cell" style="cursor:pointer; justify-content:center;" onclick="openUniModal(${emptyIdx})">
@@ -638,16 +679,18 @@ require_once __DIR__ . '/includes/helpers.php';
                     </div>`;
             }), unis);
 
-            rowsHtml += buildRow(`${courseShort.toUpperCase()} SPECIALIZATION`, "book", u => cellFn(u, x => {
+            // ── LOCKED ROWS (blurred until user unlocks) ──
+            let lockedRowsHtml = '';
+
+            lockedRowsHtml += buildRow(`${courseShort.toUpperCase()} SPECIALIZATION`, "book", u => cellFn(u, x => {
                 if (!x.specializations || x.specializations.length === 0) return '—';
                 return `<div style="max-height:160px; overflow-y:auto; padding-right:4px;">
                       <ul class="v2-list" style="font-weight:600; font-size:0.85rem; margin:0;">` + x.specializations.map(s => `<li style="margin-bottom:6px;">${s}</li>`).join('') + `</ul>
                     </div>`;
             }), unis);
 
-            rowsHtml += buildRow("EDUCATION MODE", "globe", u => cellFn(u, x => {
+            lockedRowsHtml += buildRow("EDUCATION MODE", "globe", u => cellFn(u, x => {
                 if (!x.education_mode || x.education_mode === '—') return '—';
-                // Render each mode as a pill/tag
                 let modes = x.education_mode.split(',').map(m => m.trim()).filter(m => m);
                 if (modes.length === 1) {
                     return `<strong style="color:var(--text);">${modes[0]}</strong>`;
@@ -657,18 +700,18 @@ require_once __DIR__ . '/includes/helpers.php';
                 ).join('');
                 return `<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:4px;">${pills}</div>`;
             }), unis);
-            rowsHtml += buildRow("EXAM MODE", "edit", u => cellFn(u, x => `<strong>${x.exam_modes}</strong>`), unis);
+            lockedRowsHtml += buildRow("EXAM MODE", "edit", u => cellFn(u, x => `<strong>${x.exam_modes}</strong>`), unis);
 
-            rowsHtml += buildRow("EMI FACILITY", "credit_card", u => cellFn(u, x => {
+            lockedRowsHtml += buildRow("EMI FACILITY", "credit_card", u => cellFn(u, x => {
                 return x.emi_facility === 'Yes' ? `<span class="v2-icon-success" style="font-size:1.8rem; font-weight:400;">✓</span>` : `<span class="v2-icon-danger" style="font-size:1.8rem; font-weight:400;">✕</span>`;
             }), unis);
 
-            rowsHtml += buildRow("ADVANTAGES", "advantages", u => cellFn(u, x => {
+            lockedRowsHtml += buildRow("ADVANTAGES", "advantages", u => cellFn(u, x => {
                 if (!x.advantages || x.advantages.length === 0) return '—';
                 return `<ul class="v2-list" style="padding-left:1.5rem;">` + x.advantages.map(a => `<li style="font-weight:700;color:var(--text); font-size:0.8rem; margin-bottom:0.5rem; line-height:1.3;">${a}</li>`).join('') + `</ul>`;
             }), unis);
 
-            rowsHtml += buildRow("STUDENT REVIEW", "star", u => cellFn(u, x => {
+            lockedRowsHtml += buildRow("STUDENT REVIEW", "star", u => cellFn(u, x => {
                 if (x.rating === 'N/A') return '—';
                 let starsHtml = '';
                 for (let k = 1; k <= 5; k++) {
@@ -681,7 +724,7 @@ require_once __DIR__ . '/includes/helpers.php';
             </div>`;
             }), unis);
 
-            rowsHtml += buildRow("DEGREE CERTIFICATE", "award", u => cellFn(u, x => {
+            lockedRowsHtml += buildRow("DEGREE CERTIFICATE", "award", u => cellFn(u, x => {
                 if (x.sample_certificate) {
                     let imgUrl = getAbsoluteUrl(x.sample_certificate);
                     return `<div class="custom_mob_certificate" style="display:flex; flex-direction:column; align-items:center; gap:0.5rem; border:1px solid var(--border); padding:0.5rem; border-radius:var(--radius-sm); width:120px; margin:0 auto; cursor:pointer;" onclick="openLightbox('${imgUrl}')">
@@ -692,11 +735,11 @@ require_once __DIR__ . '/includes/helpers.php';
                 return '—';
             }), unis);
 
-            rowsHtml += buildRow("PLACEMENT ASSISTANCE", "target", u => cellFn(u, x => {
+            lockedRowsHtml += buildRow("PLACEMENT ASSISTANCE", "target", u => cellFn(u, x => {
                 return x.placement_assistance === 'Yes' ? `<span style="border:2px solid var(--success); color:var(--success); font-weight:800; padding:4px 16px; border-radius:20px; font-size:0.85rem;">YES</span>` : `<span style="border:2px solid var(--danger); color:var(--danger); font-weight:800; padding:4px 16px; border-radius:20px; font-size:0.85rem;">NO</span>`;
             }), unis);
 
-            rowsHtml += buildRow("SCHOLARSHIP", "gift", u => cellFn(u, x => {
+            lockedRowsHtml += buildRow("SCHOLARSHIP", "gift", u => cellFn(u, x => {
                 if (x.fees_discount > 0) {
                     return `<div class="desktop-scholarship">
                             <strong style="font-size:1rem;">Upto ₹${x.fees_discount}</strong>
@@ -719,7 +762,7 @@ require_once __DIR__ . '/includes/helpers.php';
                 return '—';
             }), unis);
 
-            rowsHtml += buildRow("COURSE BROCHURE", "book", u => cellFn(u, x => {
+            lockedRowsHtml += buildRow("COURSE BROCHURE", "book", u => cellFn(u, x => {
                 if (x.brochure_file) {
                     let broUrl = getAbsoluteUrl(x.brochure_file);
                     return `<button class="custom_mob_brochure_styling" onclick="openBrochureModal('${broUrl}')" style="background:#fff; border:2px solid #10b981; border-radius:8px; display:flex; justify-content:center; gap:10px; align-items:center; width:100%; max-width:90%; margin:0 auto; padding:0.5rem; cursor:pointer; color:#10b981;">
@@ -730,21 +773,56 @@ require_once __DIR__ . '/includes/helpers.php';
                 return '—';
             }), unis);
 
-            rowsHtml += buildRow("GET FREE COUNSELING", "phone", u => cellFn(u, x => {
+            lockedRowsHtml += buildRow("GET FREE COUNSELING", "phone", u => cellFn(u, x => {
                 return `<button class="btn btn-primary" onclick="opencounselingModal('${x.uni_name.replace(/'/g, "\\'")}', '${x.uni_image ? x.uni_image : ''}')" style="background:#1b84ff; border-color:#1b84ff; display:flex; justify-content:center; gap:10px; align-items:center; width:100%; max-width:90%; margin:0 auto; padding:10px 20px; cursor:pointer; color:#10b981;">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-                        <span style="font-size:0.7rem; font-weight:700; color:#fff; text-transform:uppercase;">Book Free counseling</span>
+                        <span style="font-size:0.7rem; font-weight:700; color:#fff; text-transform:uppercase;">Book Free Counseling</span>
                      </button>`;
             }), unis);
 
-            rowsHtml += buildRow("", "", u => cellFn(u, x => `<a href="${x.view_link}" class="v2-btn-know" style="background:#ffc107; color:#000; display:flex; justify-content:center; align-items:center; width:90%; target="_blank">Know More</a>`), unis);
+            lockedRowsHtml += buildRow("", "", u => cellFn(u, x => `<a href="${x.view_link}" class="v2-btn-know" style="background:#ffc107; color:#000; display:flex; justify-content:center; align-items:center; width:90%;" target="_blank">Know More</a>`), unis);
 
-            let finalHtml = `
-            <div class="v2-grid" style="grid-template-columns: 260px repeat(3, 1fr); margin-bottom: 2rem;">
-               ${headerRowHTML}
-               ${rowsHtml}
-            </div>
-        `;
+            // Determine if user already unlocked (session-based)
+            let isUnlocked = sessionStorage.getItem('compare_unlocked') === '1';
+
+            // Build locked section HTML (no nested template literals - avoid JS syntax error)
+            let lockedInnerStyle = isUnlocked ? '' : 'filter:blur(6px); user-select:none; pointer-events:none;';
+            let lockedWrapperStyle = isUnlocked ? '' : 'position:relative;';
+
+            let unlockOverlayHtml = '';
+            if (!isUnlocked) {
+                unlockOverlayHtml = '<div class="compare-unlock-overlay" id="compareUnlockOverlay">'
+                    + '<div class="compare-unlock-card">'
+                    + '<div class="unlock-card-title">Unlock <span>20+ More</span><br>Comparison Parameters</div>'
+                    + '<div class="unlock-card-sub">Just Fill the Form &mdash; &amp; Compare FREE of Cost</div>'
+                    + '<button class="unlock-card-btn" onclick="openCompareUnlockModal()">'
+                    + '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:6px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>'
+                    + 'Unlock Now'
+                    + '</button>'
+                    + '</div>'
+                    + '</div>';
+            }
+
+            let lockedSectionHtml = '<div class="compare-locked-wrapper" id="compareLockedWrapper" style="' + lockedWrapperStyle + '">'
+                + '<div class="compare-locked-rows" id="compareLockedRows" style="' + lockedInnerStyle + '">'
+                + '<div class="v2-grid" style="grid-template-columns: 260px repeat(3, 1fr);">'
+                + lockedRowsHtml
+                + '</div>'
+                + '</div>'
+                + unlockOverlayHtml
+                + '</div>';
+
+            let finalHtml = '<div class="v2-sticky-header">'
+                + '<div class="v2-grid" style="grid-template-columns: 260px repeat(3, 1fr);">'
+                + headerRowHTML
+                + '</div></div>'
+                + '<div class="v2-scroll-body">'
+                + '<div class="v2-grid" style="grid-template-columns: 260px repeat(3, 1fr);">'
+                + rowsHtml
+                + '</div>'
+                + lockedSectionHtml
+                + '</div>';
+
             wrap.innerHTML = finalHtml;
             wrap.classList.add('active');
         }
@@ -876,6 +954,57 @@ require_once __DIR__ . '/includes/helpers.php';
 
         function closecounselingModal() {
             document.getElementById('counselingModalBg').classList.remove('active');
+        }
+
+        // ──────────────────────────────────────────────────────────
+        // COMPARE UNLOCK MODAL
+        // ──────────────────────────────────────────────────────────
+        function openCompareUnlockModal() {
+            // Populate course dropdown
+            let cSelects = document.querySelectorAll('#compareUnlockModalBg .dynamic-course-select');
+            cSelects.forEach(cSelect => {
+                cSelect.innerHTML = '<option value="">Select Your Course</option>';
+                allCourses.forEach(c => {
+                    cSelect.add(new Option(c.text, c.text));
+                });
+            });
+            // Reset form state
+            document.getElementById('compareUnlockForm_Area').style.display = 'block';
+            document.getElementById('compareUnlockForm_Success').style.display = 'none';
+            document.getElementById('compareUnlockModalBg').classList.add('active');
+        }
+
+        function closeCompareUnlockModal() {
+            document.getElementById('compareUnlockModalBg').classList.remove('active');
+        }
+
+        // Watch for unlock form success and remove blur
+        document.addEventListener('compareUnlockSuccess', function () {
+            sessionStorage.setItem('compare_unlocked', '1');
+            revealLockedRows();
+            // Auto-close modal after short delay
+            setTimeout(closeCompareUnlockModal, 2000);
+        });
+
+        function revealLockedRows() {
+            let rows = document.getElementById('compareLockedRows');
+            let overlay = document.getElementById('compareUnlockOverlay');
+            let wrapper = document.getElementById('compareLockedWrapper');
+            if (rows) {
+                rows.style.filter = 'none';
+                rows.style.userSelect = '';
+                rows.style.pointerEvents = '';
+                // Animate in
+                rows.style.transition = 'filter 0.6s ease';
+            }
+            if (overlay) {
+                overlay.style.transition = 'opacity 0.4s ease';
+                overlay.style.opacity = '0';
+                setTimeout(() => overlay.remove(), 450);
+            }
+            if (wrapper) {
+                wrapper.style.position = '';
+            }
         }
     </script>
     <script src="<?= BASE_URL ?>/assets/js/lead_form.js"></script>

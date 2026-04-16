@@ -94,6 +94,14 @@ $_logout_url = ADMIN_URL . '/logout.php';
         </svg>
         counseling Leads
       </a>
+      <a href="<?= ADMIN_URL ?>/compare_unlock_leads.php" class="<?= _nav_cls('compare_unlock_leads', $active_page) ?>">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+          stroke-linecap="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+        Compare Unlock Leads
+      </a>
     </div>
     <div class="nav-section">
       <div class="nav-section-label">Settings</div>

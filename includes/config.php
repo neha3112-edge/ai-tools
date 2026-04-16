@@ -3,9 +3,15 @@
 // includes/config.php
 // ============================================================
 define('DB_HOST', 'localhost');
+
+// define('DB_NAME', 'u120175788_ai_tools_db');
+// define('DB_USER', 'u120175788_ai_tools_db');
+// define('DB_PASS', 'AI5484@(*de3DE@174');
+
 define('DB_NAME', 'ai_tools');
-define('DB_USER', 'root');        // change this
-define('DB_PASS', '');            // change this
+define('DB_USER', 'root');
+define('DB_PASS', '');
+
 define('DB_CHARSET', 'utf8mb4');
 
 // ── URL CONSTANTS ──

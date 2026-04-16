@@ -37,6 +37,12 @@ function submitGenericLeadForm(e, formElement) {
             if (typeof pendingBrochureUrl !== 'undefined' && pendingBrochureUrl) {
                 setTimeout(() => window.open(pendingBrochureUrl, '_blank'), 500);
             }
+
+            // Fire unlock event for compare_unlock lead type
+            const leadType = fd.get('lead_type');
+            if (leadType === 'compare_unlock') {
+                document.dispatchEvent(new CustomEvent('compareUnlockSuccess'));
+            }
         } else {
             alert(json.error || 'Something went wrong while submitting.');
         }
@@ -66,6 +72,9 @@ document.addEventListener('click', function(e) {
         }
         if (typeof closecounselingModal === 'function' && document.getElementById('counselingModalBg') && document.getElementById('counselingModalBg').classList.contains('active')) {
             closecounselingModal();
+        }
+        if (typeof closeCompareUnlockModal === 'function' && document.getElementById('compareUnlockModalBg') && document.getElementById('compareUnlockModalBg').classList.contains('active')) {
+            closeCompareUnlockModal();
         }
         
         // Reset local UI State for next time

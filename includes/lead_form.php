@@ -163,5 +163,5 @@ $csrf_token = $_SESSION['lead_csrf_token'];
         <?= e($success_message) ?>
     </p>
     <button type="button" class="btn btn-secondary trigger-modal-close" data-form-id="<?= e($form_id) ?>"
-        style="width: 100%; border-radius: 30px; font-weight: 600; padding: 0.8rem; background: #e2e8f0; color: #1e293b; border: 1px solid #cbd5e1; cursor: pointer;">Close</button>
+        style="width: fit-content; border-radius: 30px; font-weight: 600; padding: 10px 30px;    cursor: pointer;background: #10b981;color: #fff;">Close</button>
 </div>

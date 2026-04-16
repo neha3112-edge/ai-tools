@@ -40,6 +40,9 @@ try {
     } else if ($lead_type === 'counseling') {
         $stmt = $pdo->prepare("INSERT INTO counseling_leads (name, email, country_code, phone, course, state, uni_name, page_url, user_ip, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())");
         $stmt->execute([$name, $email, $country_code, $phone, $course, $state, $uni_name, $page_url, $user_ip]);
+    } else if ($lead_type === 'compare_unlock') {
+        $stmt = $pdo->prepare("INSERT INTO compare_unlock_leads (name, email, country_code, phone, course, state, page_url, user_ip, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())");
+        $stmt->execute([$name, $email, $country_code, $phone, $course, $state, $page_url, $user_ip]);
     } else {
         $stmt = $pdo->prepare("INSERT INTO brochure_leads (name, email, country_code, phone, course, state, page_url, user_ip, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())");
         $stmt->execute([$name, $email, $country_code, $phone, $course, $state, $page_url, $user_ip]);
