@@ -33,7 +33,7 @@ require_once __DIR__ . '/includes/helpers.php';
 
 <body>
 
-    <nav class="public-navbar">
+    <!-- <nav class="public-navbar">
         <div class="brand">
             <img style="width:40px;" src="<?= ADMIN_URL ?>/assets/images/favicon.png">
             SODE AI Tools
@@ -41,7 +41,33 @@ require_once __DIR__ . '/includes/helpers.php';
         <div class="public-nav-links">
             <a href="<?= BASE_URL ?>/compare-universities.php" class="active">Compare Universities</a>
         </div>
+    </nav> -->
+
+    <nav class="public-navbar">
+        <div class="nav-container">
+            <div class="brand">
+                <img src="<?= ADMIN_URL ?>/assets/images/logo.png" alt="Logo">
+            </div>
+
+            <div class="nav-menu" id="navMenu">
+                <button class="close-btn" onclick="toggleMenu()">&times;</button>
+                <a href="https://distanceeducationschool.com/" target="_blank">Home</a>
+                <a href="https://distanceeducationschool.com/about-us/" target="_blank">About</a>
+                <a href="https://distanceeducationschool.com/blogs/" target="_blank">Blogs</a>
+                <a href="https://distanceeducationschool.com/contact-us/" target="_blank">Contact</a>
+                <a class="btn-counselling" onclick="opencounselingModal('General Counseling', '')">Book Free
+                    Counselling</a>
+            </div>
+
+            <div class="menu-toggle" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
     </nav>
+
+    <div class="nav-overlay" id="navOverlay" onclick="toggleMenu()"></div>
 
     <!-- HERO SECTION -->
     <div class="hero-section">
@@ -674,7 +700,7 @@ require_once __DIR__ . '/includes/helpers.php';
                         <div style="color:#4b5563; font-weight:600; font-size:0.8rem;">Total Fees</div>
                     </div>
                     <div class="mobile-fee">
-                        <div style="color:var(--danger); font-weight:800; font-size:1.3rem;">₹ ${x.fees.replace('₹ ', '')}</div>
+                        <div style="color:var(--danger); font-weight:800; font-size:16px;">₹ ${x.fees.replace('₹ ', '')}</div>
                         <div style="color:#4b5563; font-weight:600; font-size:0.8rem;">Total Fees</div>
                     </div>`;
             }), unis);
@@ -812,11 +838,11 @@ require_once __DIR__ . '/includes/helpers.php';
                 + unlockOverlayHtml
                 + '</div>';
 
-            let finalHtml = '<div class="v2-sticky-header">'
+            let finalHtml = '<div class="v2-sticky-header" style="position: sticky; top: 0; z-index: 200;">'
                 + '<div class="v2-grid" style="grid-template-columns: 260px repeat(3, 1fr);">'
                 + headerRowHTML
                 + '</div></div>'
-                + '<div class="v2-scroll-body">'
+                + '<div class="v2-scroll-body" style="overflow: visible;">'
                 + '<div class="v2-grid" style="grid-template-columns: 260px repeat(3, 1fr);">'
                 + rowsHtml
                 + '</div>'
@@ -1007,6 +1033,19 @@ require_once __DIR__ . '/includes/helpers.php';
             }
         }
     </script>
+
+
+    <script>
+        function toggleMenu() {
+            const menu = document.getElementById('navMenu');
+            const overlay = document.getElementById('navOverlay');
+
+            menu.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+    </script>
+
+
     <script src="<?= BASE_URL ?>/assets/js/lead_form.js"></script>
 </body>
 
