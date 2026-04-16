@@ -858,7 +858,10 @@ require_once __DIR__ . '/includes/helpers.php';
             if (!document.getElementById('lightboxBg')) {
                 document.body.insertAdjacentHTML('beforeend', `
             <div class="uni-modal-bg" id="lightboxBg" onclick="closeLightbox(event)" style="z-index:9999;">
-                <div style="max-width:90%; max-height:90%; position:relative;">
+                <div style="max-width:90%; max-height:90%; position:relative; margin-top: 100px;">
+                    <button type="button" class="lightbox-close-btn" onclick="closeLightbox(event, true)">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
                     <img id="lightboxImg" src="${src}" style="max-width:100%; max-height:90vh; border-radius:8px; display:block;">
                 </div>
             </div>`);
@@ -867,8 +870,8 @@ require_once __DIR__ . '/includes/helpers.php';
             }
             setTimeout(() => document.getElementById('lightboxBg').classList.add('active'), 50);
         }
-        window.closeLightbox = function (e) {
-            if (e.target.id === 'lightboxBg') {
+        window.closeLightbox = function (e, force = false) {
+            if (force || e.target.id === 'lightboxBg' || e.target.closest('.lightbox-close-btn')) {
                 document.getElementById('lightboxBg').classList.remove('active');
             }
         }
