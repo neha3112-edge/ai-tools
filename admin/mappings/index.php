@@ -151,10 +151,15 @@ $logout_path = '../logout.php';
                     </td>
                     <td data-label="Fees / Rating">
                       <div style="font-weight:600;font-size:13px;">
-                        <?= $m['academic_fees'] ? '₹' . number_format($m['academic_fees'], 2) : '—' ?>
+                        <?= $m['academic_fees'] ? '₹' . number_format($m['academic_fees'], 0) : '—' ?>
                       </div>
+                      <?php if ($m['fees_discount']): ?>
+                        <div style="font-size:11px;color:var(--success);font-weight:600;">
+                          Scholarship: <?= (float)$m['fees_discount'] ?>%
+                        </div>
+                      <?php endif; ?>
                       <div style="font-size:11px;color:var(--text-s);">
-                        Rating: <?= $m['course_rating'] ? '⭐ ' . e($m['course_rating']) : '—' ?>
+                        Rating: <?= $m['course_rating'] ? '⭐ ' . (float)$m['course_rating'] : '—' ?>
                       </div>
                     </td>
                     <td data-label="Added On"><?= date('d M Y', strtotime($m['created_at'])) ?></td>

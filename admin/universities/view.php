@@ -47,7 +47,7 @@ $accreditations = $accr->fetchAll();
 
 // Courses this university offers (via mappings)
 $courses_stmt = $pdo->prepare("
-    SELECT c.id, c.name, c.display_name, c.course_level, c.course_duration,
+    SELECT c.id, c.name, c.display_name, c.course_level, uc.course_duration,
            uc.academic_fees, uc.fees_discount, uc.course_rating, uc.brochure_file,
            em.mode_name as education_mode, uc.id as mapping_id
     FROM university_courses uc
@@ -497,7 +497,7 @@ $page_subtitle = get_display_name($uni['name'], $uni['display_name']);
 
           <div class="uni-meta-pills">
             <?php if ($uni['rating']): ?>
-              <span class="meta-pill amber">⭐ <strong><?= e($uni['rating']) ?></strong> / 5</span>
+              <span class="meta-pill amber">⭐ <strong><?= (float)$uni['rating'] ?></strong> / 5</span>
             <?php endif; ?>
             <?php if ($uni['nirf_ranking']): ?>
               <span class="meta-pill blue">NIRF <strong>#<?= e($uni['nirf_ranking']) ?></strong></span>
@@ -737,7 +737,7 @@ $page_subtitle = get_display_name($uni['name'], $uni['display_name']);
                     <th>Mode</th>
                     <th>Duration</th>
                     <th>Fees</th>
-                    <th>Discount</th>
+                    <th>Scholarship</th>
                     <th>Rating</th>
                     <th>Brochure</th>
                     <th style="width:90px;">Actions</th>
@@ -765,9 +765,9 @@ $page_subtitle = get_display_name($uni['name'], $uni['display_name']);
                       <td data-label="Fees" style="font-size:13px;font-weight:500;">
                         <?= $c['academic_fees'] ? '₹' . number_format($c['academic_fees'], 0) : '—' ?>
                       </td>
-                      <td data-label="Discount">
+                      <td data-label="Scholarship">
                         <?php if ($c['fees_discount']): ?>
-                          <span class="discount-tag">₹<?= number_format($c['fees_discount'], 0) ?> off</span>
+                          <span class="discount-tag"><?= (float)$c['fees_discount'] ?>%</span>
                         <?php else: ?>
                           <span style="color:var(--text-s);">—</span>
                         <?php endif; ?>

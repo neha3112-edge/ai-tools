@@ -26,23 +26,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors['course_level'] = 'Valid course level (UG or PG) is required.';
     }
 
-    $program_eligibility = trim($_POST['program_eligibility'] ?? '') ?: null;
-    $course_duration = trim($_POST['course_duration'] ?? '') ?: null;
-
     if (empty($errors)) {
         try {
             $stmt = $pdo->prepare("
                 INSERT INTO courses 
-                  (name, display_name, slug, course_level, program_eligibility, course_duration) 
-                VALUES (?, ?, ?, ?, ?, ?)
+                  (name, display_name, slug, course_level) 
+                VALUES (?, ?, ?, ?)
             ");
             $stmt->execute([
                 $name, 
                 $display_name, 
                 $final_slug, 
-                $course_level, 
-                $program_eligibility, 
-                $course_duration
+                $course_level
             ]);
             
             set_flash('success', "Course '{$name}' added successfully.");
@@ -124,18 +119,6 @@ $page_subtitle = 'Fill in the course details below';
               <option value="PG" <?= ($old['course_level']??'') === 'PG' ? 'selected' : '' ?>>PG - Postgraduate</option>
             </select>
             <?php if (isset($errors['course_level'])): ?><span class="form-hint" style="color:var(--danger)"><?= e($errors['course_level']) ?></span><?php endif; ?>
-          </div>
-          
-          <div class="form-group">
-            <label>Course Duration</label>
-            <input name="course_duration" type="text" class="form-control"
-                   placeholder="e.g. 2 Years, 6 Months" value="<?= e($old['course_duration'] ?? '') ?>">
-          </div>
-
-          <div class="form-group full">
-            <label>Program Eligibility</label>
-            <textarea name="program_eligibility" class="form-control" rows="3"
-                      placeholder="e.g. Minimum 50% marks in Graduation from a recognized university."><?= e($old['program_eligibility'] ?? '') ?></textarea>
           </div>
         </div>
       </div>

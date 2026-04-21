@@ -481,7 +481,7 @@ $page_subtitle = 'Fill in the details below';
             <div class="form-group">
               <label>Rating <span style="color:var(--text-s);font-weight:400">(out of 5)</span></label>
               <input name="rating" type="number" step="0.1" min="0" max="5" class="form-control" placeholder="e.g. 4.5"
-                value="<?= e($old['rating'] ?? '') ?>">
+                value="<?= isset($old['rating']) ? (float)$old['rating'] : '' ?>">
             </div>
             <div class="form-group">
               <label>NIRF Ranking</label>

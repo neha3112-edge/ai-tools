@@ -596,7 +596,7 @@ a:hover {
 .brochure-form-group select,
 .brochure-form-group input {
   width: 100%;
-  padding: 0.75rem;
+  padding: 8px 10px;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   font-size: 0.95rem;
@@ -823,6 +823,7 @@ a:hover {
   z-index: 2000;
   display: flex;
   justify-content: center;
+  align-items: center;
   padding: 1rem;
   opacity: 0;
   pointer-events: none;
@@ -876,7 +877,8 @@ a:hover {
   transition: transform 0.2s;
   box-shadow: var(--shadow);
   height: fit-content;
-  margin-top: 100px;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .uni-modal-bg.active .uni-modal {

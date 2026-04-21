@@ -32,7 +32,7 @@ if ($level_filter) {
   $params[] = $level_filter;
 }
 
-$sql = "SELECT id, name, display_name, course_level, course_duration, created_at
+$sql = "SELECT id, name, display_name, course_level, created_at
         FROM courses
         WHERE " . implode(' AND ', $where) . "
         ORDER BY created_at DESC";
@@ -114,7 +114,6 @@ $logout_path = '../logout.php';
               <th style="width:50px;">#</th>
               <th>Course Name</th>
               <th>Level</th>
-              <th>Duration</th>
               <th>Added</th>
               <th style="width:150px;">Actions</th>
             </tr>
@@ -142,8 +141,7 @@ $logout_path = '../logout.php';
                       —
                     <?php endif; ?>
                   </td>
-                  <td data-label="Duration"><?= e($c['course_duration'] ?: '—') ?></td>
-                  <td data-label="Added On"><?= date('d M Y', strtotime($c['created_at'])) ?></td>
+                    <td data-label="Added On"><?= date('d M Y', strtotime($c['created_at'])) ?></td>
                   <td data-label="Actions">
                     <div class="action-col">
                       <a href="view.php?id=<?= $c['id'] ?>" class="btn btn-secondary btn-sm btn-icon" title="View Details">
@@ -164,7 +162,7 @@ $logout_path = '../logout.php';
               <?php endforeach; ?>
             <?php else: ?>
               <tr class="empty-row">
-                <td colspan="6" style="text-align: center; color: var(--text-s); padding: 3rem;">
+                <td colspan="5" style="text-align: center; color: var(--text-s); padding: 3rem;">
                   <div class="empty-state">
                     <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
                       stroke-linecap="round" style="margin-bottom: 1rem; opacity: 0.5;">

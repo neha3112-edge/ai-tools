@@ -157,19 +157,18 @@ $page_subtitle = 'Course-to-University link details';
                         </div>
                     </div>
                     <div class="detail-row">
-                        <div class="detail-label">Fees Discount</div>
+                        <div class="detail-label">Scholarship</div>
                         <div class="detail-value">
                             <?php if ($mapping['fees_discount']): ?>
                                 <span class="discount-tag"
-                                    style="background:rgba(16,185,129,0.15);color:#10b981;padding:2px 8px;border-radius:10px;font-size:12px;font-weight:600;">₹<?= number_format($mapping['fees_discount'], 2) ?>
-                                    off</span>
+                                    style="background:rgba(16,185,129,0.15);color:#10b981;padding:2px 8px;border-radius:10px;font-size:12px;font-weight:600;"><?= (float)$mapping['fees_discount'] ?>%</span>
                             <?php else: ?>—<?php endif; ?>
                         </div>
                     </div>
                     <div class="detail-row">
                         <div class="detail-label">Course Rating</div>
                         <div class="detail-value">
-                            <?= $mapping['course_rating'] ? '⭐ ' . e($mapping['course_rating']) . ' / 5' : '—' ?>
+                            <?= $mapping['course_rating'] ? '⭐ ' . (float)$mapping['course_rating'] . ' / 5' : '—' ?>
                         </div>
                     </div>
                 </div>
@@ -182,6 +181,18 @@ $page_subtitle = 'Course-to-University link details';
                             <div class="detail-label">Course Specializations</div>
                             <div class="detail-value" style="white-space:pre-line;">
                                 <?= $mapping['course_specializations'] ? e($mapping['course_specializations']) : '—' ?>
+                            </div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Course Duration</div>
+                            <div class="detail-value">
+                                <?= $mapping['course_duration'] ? e($mapping['course_duration']) : '—' ?>
+                            </div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Min. Eligibility Percentage</div>
+                            <div class="detail-value">
+                                <?= $mapping['min_eligibility_percentage'] ? e($mapping['min_eligibility_percentage']) . '%' : '—' ?>
                             </div>
                         </div>
                         <div class="detail-row">

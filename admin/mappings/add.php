@@ -40,6 +40,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 
   $specializations = trim($_POST['course_specializations'] ?? '') ?: null;
+  $course_duration = trim($_POST['course_duration'] ?? '') ?: null;
+  $min_eligibility = trim($_POST['min_eligibility_percentage'] ?? '');
+
+  if ($min_eligibility !== '' && (!is_numeric($min_eligibility) || $min_eligibility < 0 || $min_eligibility > 100)) {
+    $errors['min_eligibility_percentage'] = 'Must be a valid percentage (0-100).';
+  }
 
   // Check unique constraint manually
   if ($uni_id && $crs_id && $mode_id) {
@@ -61,8 +67,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
       $stmt = $pdo->prepare("
                 INSERT INTO university_courses 
-                  (university_id, course_id, education_mode_id, academic_fees, fees_discount, course_rating, course_specializations, brochure_file) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                  (university_id, course_id, education_mode_id, academic_fees, fees_discount, course_rating, course_specializations, course_duration, min_eligibility_percentage, brochure_file) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
       $stmt->execute([
         $uni_id,
@@ -72,6 +78,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $discount === '' ? null : $discount,
         $rating === '' ? null : $rating,
         $specializations,
+        $course_duration,
+        $min_eligibility === '' ? null : (int)$min_eligibility,
         $brochure
       ]);
 
@@ -289,9 +297,9 @@ $page_subtitle = 'Link a course to a university';
             </div>
 
             <div class="form-group">
-              <label>Fees Discount (₹)</label>
-              <input name="fees_discount" type="number" step="1" class="form-control" placeholder="e.g. 5000"
-                value="<?= e($old['fees_discount'] ?? '') ?>">
+              <label>Scholarship (%)</label>
+              <input name="fees_discount" type="number" step="0.1" min="0" max="100" class="form-control" placeholder="e.g. 25"
+                value="<?= isset($old['fees_discount']) ? (float)$old['fees_discount'] : '' ?>">
               <?php if (isset($errors['fees_discount'])): ?><span class="form-hint"
                   style="color:var(--danger)"><?= e($errors['fees_discount']) ?></span><?php endif; ?>
             </div>
@@ -299,7 +307,7 @@ $page_subtitle = 'Link a course to a university';
             <div class="form-group">
               <label>Course Rating (Out of 5)</label>
               <input name="course_rating" type="number" step="0.1" min="0" max="5" class="form-control"
-                placeholder="e.g. 4.5" value="<?= e($old['course_rating'] ?? '') ?>">
+                placeholder="e.g. 4.5" value="<?= isset($old['course_rating']) ? (float)$old['course_rating'] : '' ?>">
               <?php if (isset($errors['course_rating'])): ?><span class="form-hint"
                   style="color:var(--danger)"><?= e($errors['course_rating']) ?></span><?php endif; ?>
             </div>
@@ -308,6 +316,20 @@ $page_subtitle = 'Link a course to a university';
               <label>Course Specializations</label>
               <textarea name="course_specializations" class="form-control" rows="4"
                 placeholder="Enter specializations (e.g. Finance, Marketing) as list or paragraph..."><?= e($old['course_specializations'] ?? '') ?></textarea>
+            </div>
+
+            <div class="form-group">
+              <label>Course Duration</label>
+              <input name="course_duration" type="text" class="form-control" placeholder="e.g. 2 Years"
+                value="<?= e($old['course_duration'] ?? '') ?>">
+            </div>
+
+            <div class="form-group">
+              <label>Min. Eligibility Percentage (%)</label>
+              <input name="min_eligibility_percentage" type="number" min="0" max="100" class="form-control" placeholder="e.g. 50"
+                value="<?= e($old['min_eligibility_percentage'] ?? '') ?>">
+              <?php if (isset($errors['min_eligibility_percentage'])): ?><span class="form-hint"
+                  style="color:var(--danger)"><?= e($errors['min_eligibility_percentage']) ?></span><?php endif; ?>
             </div>
 
             <div class="form-group full">

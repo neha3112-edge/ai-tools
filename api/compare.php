@@ -100,7 +100,7 @@ if ($action === 'get_bulk_comparison') {
     }
 
     // Fetch common course data
-    $crs_stmt = $pdo->prepare("SELECT name, display_name, course_level, course_duration, program_eligibility FROM courses WHERE id=?");
+    $crs_stmt = $pdo->prepare("SELECT name, display_name, course_level FROM courses WHERE id=?");
     $crs_stmt->execute([$course_id]);
     $courseData = $crs_stmt->fetch(PDO::FETCH_ASSOC);
     if (!$courseData) {
@@ -115,7 +115,8 @@ if ($action === 'get_bulk_comparison') {
     // Fetch mapping and university specific data
     foreach ($uni_ids as $uid) {
         $stmt = $pdo->prepare("
-            SELECT uc.id as mapping_id, uc.academic_fees, uc.fees_discount, uc.course_rating, uc.course_specializations, uc.brochure_file,
+            SELECT uc.id as mapping_id, uc.academic_fees, uc.fees_discount, uc.course_rating, uc.course_specializations, 
+                   uc.course_duration, uc.min_eligibility_percentage, uc.brochure_file,
                    u.name, u.display_name, u.image, u.rating, u.nirf_ranking, u.year_of_establishment, ut.type_name as university_type,
                    u.campus_location, u.avg_placement_package, u.placement_assistance, u.emi_facility, u.scholarship,
                    u.key_advantages, u.view_university_link, u.sample_certificate,
@@ -177,7 +178,16 @@ if ($action === 'get_bulk_comparison') {
             'established' => $row['year_of_establishment'] ?: '—',
             'uni_type' => $row['university_type'] ?: '—',
             'accreditations' => $accreditations,
-            'eligibility' => $courseData['program_eligibility'] ?: '—',
+            'duration' => $row['course_duration'] ?: '—',
+            'eligibility' => (function() use ($row, $courseData) {
+                if (empty($row['min_eligibility_percentage'])) return '—';
+                $pct = $row['min_eligibility_percentage'];
+                if ($courseData['course_level'] === 'UG') {
+                    return "Minimum {$pct}% Marks in (10+2) from any Recognised Board";
+                } else {
+                    return "Minimum {$pct}% marks in Graduation from a recognized university";
+                }
+            })(),
             'fees' => $row['academic_fees'] ? '₹ ' . number_format($row['academic_fees']) : '—',
             'fees_period' => 'Total', // Fallback, no period in our DB schema inherently 
             'specializations' => $specializations,

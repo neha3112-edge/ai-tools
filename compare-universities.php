@@ -29,6 +29,17 @@ require_once __DIR__ . '/includes/helpers.php';
         const BASE_URL = '<?= rtrim(BASE_URL, '/') ?>';
         const UPLOAD_URL = '<?= rtrim(UPLOAD_URL, '/') ?>';
     </script>
+    <style>
+        .compact-unlock-form .lead-submit-btn {
+            padding: 0.45rem !important;
+            font-size: 0.9rem !important;
+        }
+
+        .compact-unlock-form h2 {
+            font-size: 1.15rem !important;
+            margin-bottom: 0.2rem !important;
+        }
+    </style>
 </head>
 
 <body>
@@ -165,7 +176,7 @@ require_once __DIR__ . '/includes/helpers.php';
     </div>
     <!--  BROCHURE MODAL -->
     <div class="uni-modal-bg" id="brochureModalBg" style="z-index: 9999;">
-        <div class="uni-modal" style="max-width: 450px; padding: 2rem; position:relative;">
+        <div class="uni-modal" style="max-width: 400px; padding: 1rem; position:relative;" class="compact-unlock-form">
             <button class="modal-close" style="position: absolute; right: 15px; top: 15px; z-index: 10;"
                 onclick="closeBrochureModal()">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -189,7 +200,7 @@ require_once __DIR__ . '/includes/helpers.php';
 
     <!-- SCHOLARSHIP MODAL -->
     <div class="uni-modal-bg" id="scholarshipModalBg" style="z-index: 9999;">
-        <div class="uni-modal" style="max-width: 450px; padding: 2rem; position:relative;">
+        <div class="uni-modal" style="max-width: 400px; padding: 1rem; position:relative;" class="compact-unlock-form">
             <button class="modal-close" style="position: absolute; right: 15px; top: 15px; z-index: 10;"
                 onclick="closeScholarshipModal()">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -201,9 +212,9 @@ require_once __DIR__ . '/includes/helpers.php';
             <div id="scholarshipUiTop">
                 <!-- University Header Details will go here -->
                 <div id="sch_uni_header"
-                    style="display:flex; align-items:center; gap: 15px; margin-bottom: 20px; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                    style="display:flex; align-items:center; gap: 10px; margin-bottom: 8px; background: #f8fafc; padding: 6px 10px; border-radius: 8px; border: 1px solid #e2e8f0;">
                     <img id="sch_uni_img" src=""
-                        style="width:50px; height:50px; object-fit:contain; border-radius:50%; background:#fff; border:1px solid #e2e8f0;">
+                        style="width:38px; height:38px; object-fit:contain; border-radius:50%; background:#fff; border:1px solid #e2e8f0;">
                     <div>
                         <h4 id="sch_uni_name" style="margin:0; font-size:1.1rem; color:var(--accent-blue);">University
                             Name</h4>
@@ -212,9 +223,9 @@ require_once __DIR__ . '/includes/helpers.php';
                 </div>
 
                 <h2 id="sch_heading"
-                    style="margin: 0; color: var(--accent-blue); text-align: center; margin-bottom: 0.5rem;font-size:1.6rem; font-weight:800;">
-                    Claim Discount</h2>
-                <p style="text-align: center; color: var(--text-m); margin-bottom: 1.5rem; font-size: 0.95rem;">Join
+                    style="margin: 0; color: var(--accent-blue); text-align: center; margin-bottom: 0.15rem;font-size:1.15rem; font-weight:800;">
+                    Claim Scholarship</h2>
+                <p style="text-align: center; color: var(--text-m); margin-bottom: 0.75rem; font-size: 0.8rem;">Join
                     15,000+ students who secured their future with us.</p>
             </div>
 
@@ -224,7 +235,7 @@ require_once __DIR__ . '/includes/helpers.php';
                 'lead_type' => 'scholarship',
                 'heading' => '', // Using custom JS heading
                 'subheading' => '', // Using custom JS subheading
-                'button_text' => 'Claim Discount',
+                'button_text' => 'Claim Scholarship',
                 'success_heading' => 'Submission Successful!',
                 'success_message' => 'Your scholarship request has been received. Our academic counsellor will review your details and contact you shortly with the exact scholarship amount and the complete application process.'
             ];
@@ -235,7 +246,7 @@ require_once __DIR__ . '/includes/helpers.php';
 
     <!-- counseling MODAL -->
     <div class="uni-modal-bg" id="counselingModalBg" style="z-index: 9999;">
-        <div class="uni-modal" style="max-width: 450px; padding: 2rem; position:relative;">
+        <div class="uni-modal" style="max-width: 400px; padding: 1rem; position:relative;" class="compact-unlock-form">
             <button class="modal-close" style="position: absolute; right: 15px; top: 15px; z-index: 10;"
                 onclick="closecounselingModal()">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -246,9 +257,9 @@ require_once __DIR__ . '/includes/helpers.php';
 
             <div id="counselingUiTop">
                 <div id="mnt_uni_header"
-                    style="display:flex; align-items:center; gap: 15px; margin-bottom: 20px; background: #fffbeb; padding: 15px; border-radius: 8px; border: 1px solid #fde68a;">
+                    style="display:flex; align-items:center; gap: 10px; margin-bottom: 8px; background: #fffbeb; padding: 6px 10px; border-radius: 8px; border: 1px solid #fde68a;">
                     <img id="mnt_uni_img" src=""
-                        style="width:50px; height:50px; object-fit:contain; border-radius:50%; background:#fff; border:1px solid #fde68a;">
+                        style="width:38px; height:38px; object-fit:contain; border-radius:50%; background:#fff; border:1px solid #fde68a;">
                     <div>
                         <h4 id="mnt_uni_name" style="margin:0; font-size:1.1rem; color:#b45309;">University Name</h4>
                         <span style="font-size:0.8rem; color:#d97706;">Official counseling Partner</span>
@@ -274,7 +285,7 @@ require_once __DIR__ . '/includes/helpers.php';
     <!-- COMPARE UNLOCK MODAL -->
     <div class="uni-modal-bg" id="compareUnlockModalBg" style="z-index: 9999;">
         <div class="uni-modal"
-            style="max-width: 480px; padding: 0; position:relative; overflow:hidden; border-radius: 16px;">
+            style="max-width: 420px; padding: 0; position:relative; overflow:hidden; border-radius: 16px;">
             <button class="modal-close"
                 style="position: absolute; right: 15px; top: 15px; z-index: 10; background:rgba(255,255,255,0.2); border-radius:50%; width:32px; height:32px; display:flex; align-items:center; justify-content:center;"
                 onclick="closeCompareUnlockModal()">
@@ -285,20 +296,20 @@ require_once __DIR__ . '/includes/helpers.php';
             </button>
             <!-- Modal Top Banner -->
             <div
-                style="background: linear-gradient(135deg, #1b84ff 0%, #0052cc 100%); padding: 2rem 2rem 1.5rem; text-align:center; position:relative; overflow:hidden;">
+                style="background: linear-gradient(135deg, #1b84ff 0%, #0052cc 100%); padding: 1.25rem 1.5rem 1rem; text-align:center; position:relative; overflow:hidden;">
                 <div
                     style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;background:rgba(255,255,255,0.08);border-radius:50%;">
                 </div>
                 <div
                     style="position:absolute;bottom:-40px;left:-20px;width:100px;height:100px;background:rgba(255,255,255,0.06);border-radius:50%;">
                 </div>
-                <div style="font-size:2.8rem;margin-bottom:0.5rem;">🔓</div>
-                <h2 style="color:#fff;margin:0;font-size:1.6rem;font-weight:800;">Unlock Full Comparison</h2>
-                <p style="color:rgba(255,255,255,0.85);margin:0.5rem 0 0;font-size:0.95rem;">Get access to 20+
+                <div style="font-size:2.2rem;margin-bottom:0.4rem;">🔓</div>
+                <h2 style="color:#fff;margin:0;font-size:1.4rem;font-weight:800;">Unlock Full Comparison</h2>
+                <p style="color:rgba(255,255,255,0.85);margin:0.4rem 0 0;font-size:0.85rem;">Get access to 20+
                     parameters — Completely FREE</p>
             </div>
             <!-- Form Area -->
-            <div style="padding: 1.5rem 2rem 2rem;">
+            <div style="padding: 1rem 1.5rem 1.5rem;" class="compact-unlock-form">
                 <?php
                 $lead_form_options = [
                     'form_id' => 'compareUnlockForm',
@@ -681,6 +692,7 @@ require_once __DIR__ . '/includes/helpers.php';
             rowsHtml += buildRow("LOCATION", "location", u => cellFn(u, x => `<strong style="color:var(--text);">${x.location}</strong>`), unis);
             rowsHtml += buildRow("ESTABLISHED YEAR", "calendar", u => cellFn(u, x => `<strong>${x.established}</strong>`), unis);
             rowsHtml += buildRow("UNIVERSITY TYPE", "building", u => cellFn(u, x => `<strong>${x.uni_type}</strong>`), unis);
+            rowsHtml += buildRow("COURSE DURATION", "calendar", u => cellFn(u, x => `<strong>${x.duration}</strong>`), unis);
 
             rowsHtml += buildRow("ACCREDITATIONS & APPROVALS", "check_shield", u => cellFn(u, x => {
                 if (!x.accreditations || x.accreditations.length === 0) return '—';
@@ -697,11 +709,11 @@ require_once __DIR__ . '/includes/helpers.php';
             rowsHtml += buildRow(`${courseShort.toUpperCase()} FEES STRUCTURE`, "rupee", u => cellFn(u, x => {
                 return `<div class="desktop-fee">
                         <div style="color:var(--danger); font-weight:800; font-size:1.3rem;">₹ ${x.fees.replace('₹ ', '')}</div>
-                        <div style="color:#4b5563; font-weight:600; font-size:0.8rem;">Total Fees</div>
+                        <div style="color:#4b5563; font-weight:600; font-size:0.8rem;">Per Semester</div>
                     </div>
                     <div class="mobile-fee">
                         <div style="color:var(--danger); font-weight:800; font-size:16px;">₹ ${x.fees.replace('₹ ', '')}</div>
-                        <div style="color:#4b5563; font-weight:600; font-size:0.8rem;">Total Fees</div>
+                        <div style="color:#4b5563; font-weight:600; font-size:0.8rem;">Per Semester</div>
                     </div>`;
             }), unis);
 
@@ -739,14 +751,24 @@ require_once __DIR__ . '/includes/helpers.php';
 
             lockedRowsHtml += buildRow("STUDENT REVIEW", "star", u => cellFn(u, x => {
                 if (x.rating === 'N/A') return '—';
+                let rating = parseFloat(x.rating);
                 let starsHtml = '';
                 for (let k = 1; k <= 5; k++) {
-                    if (k <= Math.round(x.rating)) starsHtml += `<span style="color:#facc15; font-size:1.3rem;">★</span>`;
-                    else starsHtml += `<span style="color:#cbd5e1; font-size:1.3rem;">★</span>`;
+                    if (k <= Math.floor(rating)) {
+                        starsHtml += `<span style="color:#facc15; font-size:1.3rem;">★</span>`; // Full
+                    } else if (k - 0.5 <= rating) {
+                        // Half Star
+                        starsHtml += `<span style="position:relative; display:inline-block; font-size:1.3rem; color:#cbd5e1; user-select:none;">
+                            ★
+                            <span style="position:absolute; top:0; left:0; width:50%; overflow:hidden; color:#facc15;">★</span>
+                        </span>`;
+                    } else {
+                        starsHtml += `<span style="color:#cbd5e1; font-size:1.3rem;">★</span>`; // Empty
+                    }
                 }
                 return `<div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
-                <strong style="font-size:1.1rem;">${x.rating}/5</strong>
-                <div>${starsHtml}</div>
+                <strong style="font-size:1.1rem;">${parseFloat(x.rating)}/5</strong>
+                <div style="display:flex; align-items:center;">${starsHtml}</div>
             </div>`;
             }), unis);
 
@@ -767,22 +789,23 @@ require_once __DIR__ . '/includes/helpers.php';
 
             lockedRowsHtml += buildRow("SCHOLARSHIP", "gift", u => cellFn(u, x => {
                 if (x.fees_discount > 0) {
+                    let disc = parseFloat(x.fees_discount);
                     return `<div class="desktop-scholarship">
-                            <strong style="font-size:1rem;">Upto ₹${x.fees_discount}</strong>
-                            <button class="btn btn-success" onclick="openScholarshipModal('${x.uni_name.replace(/'/g, "\\'")}', '${x.uni_image ? x.uni_image : ''}', '₹${x.fees_discount}')" style="padding:0.4rem 1rem; border-radius:30px; font-size:0.85rem; height:auto;">Claim Now</button>
+                            <strong style="font-size:1rem;">Upto ${disc}%</strong>
+                            <button class="btn btn-success" onclick="openScholarshipModal('${x.uni_name.replace(/'/g, "\\'")}', '${x.uni_image ? x.uni_image : ''}', '${disc}%')" style="padding:0.4rem 1rem; border-radius:30px; font-size:0.85rem; height:auto;">Claim Now</button>
                          </div>
                          <div class="mobile-scholarship">
-                            <strong style="font-size:0.9rem;">Upto ₹${x.fees_discount}</strong>
-                            <button class="btn btn-success" onclick="openScholarshipModal('${x.uni_name.replace(/'/g, "\\'")}', '${x.uni_image ? x.uni_image : ''}', '₹${x.fees_discount}')" style="padding:0.4rem 1rem; border-radius:30px; font-size:0.8rem; height:auto;">Claim Now</button>
+                            <strong style="font-size:0.9rem;">Upto ${disc}%</strong>
+                            <button class="btn btn-success" onclick="openScholarshipModal('${x.uni_name.replace(/'/g, "\\'")}', '${x.uni_image ? x.uni_image : ''}', '${disc}%')" style="padding:0.4rem 1rem; border-radius:30px; font-size:0.8rem; height:auto;">Claim Now</button>
                          </div>`;
                 } else if (x.scholarship === 'Available') {
                     return `<div class="desktop-scholarship">
                             <strong style="font-size:1rem;">Available</strong>
-                            <button class="btn btn-success" onclick="openScholarshipModal('${x.uni_name.replace(/'/g, "\\'")}', '${x.uni_image ? x.uni_image : ''}', 'Available Discount')" style="padding:0.4rem 1rem; border-radius:30px; font-size:0.85rem; height:auto;">Claim Now</button>
+                            <button class="btn btn-success" onclick="openScholarshipModal('${x.uni_name.replace(/'/g, "\\'")}', '${x.uni_image ? x.uni_image : ''}', 'Scholarship')" style="padding:0.4rem 1rem; border-radius:30px; font-size:0.85rem; height:auto;">Claim Now</button>
                          </div>
                          <div class="mobile-scholarship">
                             <strong style="font-size:0.9rem;">Available</strong>
-                            <button class="btn btn-success" onclick="openScholarshipModal('${x.uni_name.replace(/'/g, "\\'")}', '${x.uni_image ? x.uni_image : ''}', 'Available Discount')" style="padding:0.4rem 1rem; border-radius:30px; font-size:0.8rem; height:auto;">Claim Now</button>
+                            <button class="btn btn-success" onclick="openScholarshipModal('${x.uni_name.replace(/'/g, "\\'")}', '${x.uni_image ? x.uni_image : ''}', 'Scholarship')" style="padding:0.4rem 1rem; border-radius:30px; font-size:0.8rem; height:auto;">Claim Now</button>
                          </div>`;
                 }
                 return '—';
@@ -920,7 +943,7 @@ require_once __DIR__ . '/includes/helpers.php';
             }
 
             // Custom heading behavior
-            document.getElementById('sch_heading').innerText = `Claim ${discountStr} Discount`;
+            document.getElementById('sch_heading').innerText = `Claim ${discountStr} Scholarship`;
 
             // Sync up generic states
             document.getElementById('scholarshipUiTop').style.display = 'block';

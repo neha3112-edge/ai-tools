@@ -42,15 +42,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors['course_level'] = 'Valid course level (UG or PG) is required.';
     }
 
-    $program_eligibility = trim($_POST['program_eligibility'] ?? '') ?: null;
-    $course_duration = trim($_POST['course_duration'] ?? '') ?: null;
-
     if (empty($errors)) {
         try {
             $update = $pdo->prepare("
                 UPDATE courses SET
-                  name=?, display_name=?, slug=?, course_level=?, 
-                  program_eligibility=?, course_duration=?
+                  name=?, display_name=?, slug=?, course_level=?
                 WHERE id=?
             ");
             $update->execute([
@@ -58,8 +54,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $display_name, 
                 $final_slug, 
                 $course_level, 
-                $program_eligibility, 
-                $course_duration,
                 $id
             ]);
             
@@ -143,17 +137,6 @@ $page_subtitle = $course['name'];
               <option value="PG" <?= ($old['course_level']??'') === 'PG' ? 'selected' : '' ?>>PG - Postgraduate</option>
             </select>
             <?php if (isset($errors['course_level'])): ?><span class="form-hint" style="color:var(--danger)"><?= e($errors['course_level']) ?></span><?php endif; ?>
-          </div>
-          
-          <div class="form-group">
-            <label>Course Duration</label>
-            <input name="course_duration" type="text" class="form-control"
-                   value="<?= e($old['course_duration'] ?? '') ?>">
-          </div>
-
-          <div class="form-group full">
-            <label>Program Eligibility</label>
-            <textarea name="program_eligibility" class="form-control" rows="3"><?= e($old['program_eligibility'] ?? '') ?></textarea>
           </div>
         </div>
       </div>

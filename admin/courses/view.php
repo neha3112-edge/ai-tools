@@ -123,19 +123,6 @@ $page_subtitle = get_display_name($course['name'], $course['display_name']);
         </div>
       </div>
 
-      <div class="detail-card">
-        <div class="section-title">Course Information</div>
-        <div class="detail-grid">
-          <div class="detail-group">
-            <div class="detail-label">Course Duration</div>
-            <div class="detail-value"><?= e($course['course_duration'] ?: '—') ?></div>
-          </div>
-          <div class="detail-group" style="grid-column: 1 / -1;">
-            <div class="detail-label">Program Eligibility</div>
-            <div class="detail-value" style="white-space: pre-wrap; line-height: 1.6;"><?= e($course['program_eligibility'] ?: '—') ?></div>
-          </div>
-        </div>
-      </div>
 
       <div class="detail-card">
         <div class="section-title">System Info</div>

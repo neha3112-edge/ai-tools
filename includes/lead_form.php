@@ -46,13 +46,13 @@ $csrf_token = $_SESSION['lead_csrf_token'];
 ?>
 <div id="<?= e($form_id) ?>_Area">
     <?php if ($heading): ?>
-        <h2 style="margin: 0; color: var(--accent-blue); text-align: center; font-size:1.5rem;">
+        <h2 style="margin: 0; color: var(--accent-blue); text-align: center; font-size:1.3rem; padding-top:10px;">
             <?= e($heading) ?>
         </h2>
     <?php endif; ?>
     <?php if ($subheading): ?>
         <p
-            style="text-align: center; color: var(--text-m); margin-bottom: 1.5rem; margin-top:0px; font-weight: 500; font-size: 0.95rem;">
+            style="text-align: center; color: var(--text-m); margin-bottom: 1.5rem; margin-top:0px; font-weight: 500; font-size: 0.85rem;">
             <?= e($subheading) ?>
         </p>
     <?php endif; ?>
@@ -144,7 +144,7 @@ $csrf_token = $_SESSION['lead_csrf_token'];
         </div>
 
         <button type="submit" class="btn btn-success lead-submit-btn"
-            style="width: 100%; text-align:center; border-radius: var(--radius-sm); font-size: 1.1rem; font-weight: 600; padding: 0.8rem; background: #10b981;display: flex;align-items: center;justify-content: center;">
+            style="width: 100%; text-align:center; border-radius: var(--radius-sm); font-size: 1rem; font-weight: 600; padding: 6px 20px; background: #10b981;display: flex;align-items: center;justify-content: center;">
             <?= e($button_text) ?>
         </button>
     </form>
