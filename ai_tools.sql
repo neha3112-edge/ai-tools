@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.2
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1:3306
--- Generation Time: Apr 21, 2026 at 09:56 AM
--- Server version: 11.8.6-MariaDB-log
--- PHP Version: 7.2.34
+-- Host: 127.0.0.1:3307
+-- Generation Time: May 11, 2026 at 11:47 AM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.0.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `u120175788_ai_tools_db`
+-- Database: `ai_tools`
 --
 
 -- --------------------------------------------------------
@@ -137,7 +137,8 @@ INSERT INTO `compare_unlock_leads` (`id`, `name`, `email`, `country_code`, `phon
 (10, 'Rachit Aggarwal', 'rachitaggarwal1202@gmail.com', '+91', '7678559902', 'MBA (PG)', 'Uttar Pradesh', 'https://degree4u.com/ai-tools/compare-universities.php', '2405:201:403b:90c9:a71d:1e44:35f3:263f', '2026-04-16 11:47:36'),
 (11, 'Shyam Sunder', 'shyam@edgetechnosoft.com', '+91', '9999999999', 'BA (UG)', 'Nagaland', 'https://degree4u.com/ai-tools/compare-universities.php', '2401:4900:8847:b9cc:b1ab:c3c8:fcb6:b3f6', '2026-04-17 06:26:16'),
 (12, 'Shyam Sunder', 'shyam@edgetechnosoft.com', '+91', '9898787879', 'BCA (UG)', 'Nagaland', 'https://degree4u.com/ai-tools/compare-universities.php', '2401:4900:8845:15f9:bcf7:6587:dbc8:3bd3', '2026-04-20 09:01:47'),
-(13, 'Shyam Sunder', 'shyam@edgetechnosoft.com', '+91', '9898767675', 'BA (UG)', 'Mizoram', 'https://degree4u.com/ai-tools/compare-universities.php', '2401:4900:8845:15f9:310d:3209:2c6e:d5ce', '2026-04-21 08:38:52');
+(13, 'Shyam Sunder', 'shyam@edgetechnosoft.com', '+91', '9898767675', 'BA (UG)', 'Mizoram', 'https://degree4u.com/ai-tools/compare-universities.php', '2401:4900:8845:15f9:310d:3209:2c6e:d5ce', '2026-04-21 08:38:52'),
+(14, 'rachit test', 'mlkenio@gmail.com', '+91', '9822822882', 'MCA (PG)', 'Assam', 'http://localhost/ai-tools/compare-universities.php', '127.0.0.1', '2026-04-21 16:30:54');
 
 -- --------------------------------------------------------
 
@@ -180,8 +181,6 @@ CREATE TABLE `courses` (
   `display_name` varchar(255) DEFAULT NULL,
   `slug` varchar(255) DEFAULT NULL,
   `course_level` enum('UG','PG') NOT NULL,
-  `program_eligibility` text DEFAULT NULL,
-  `course_duration` varchar(100) DEFAULT NULL,
   `is_active` tinyint(1) NOT NULL DEFAULT 1,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
@@ -191,13 +190,13 @@ CREATE TABLE `courses` (
 -- Dumping data for table `courses`
 --
 
-INSERT INTO `courses` (`id`, `name`, `display_name`, `slug`, `course_level`, `program_eligibility`, `course_duration`, `is_active`, `created_at`, `updated_at`) VALUES
-(1, 'test course', 'Test course display name', 'test-course', 'UG', 'Test Eligibility\r\nTest Eligibility 2\r\nTest Eligibility 3', '3 Years', 0, '2026-04-03 07:38:15', '2026-04-09 11:07:38'),
-(2, 'BA', NULL, 'ba', 'UG', 'Minimum 50% marks in Graduation from a recognized university', '3 Years', 1, '2026-04-09 11:28:41', '2026-04-09 11:28:41'),
-(3, 'MCA', NULL, 'mca', 'PG', 'Minimum 50% marks in Graduation from a recognized university', '2 Years', 1, '2026-04-09 11:29:19', '2026-04-09 11:29:19'),
-(4, 'MBA', NULL, 'mba', 'PG', 'Minimum 50% marks in Graduation from a recognized university', '2 Years', 1, '2026-04-09 11:30:06', '2026-04-09 11:30:06'),
-(5, 'MA', NULL, 'ma', 'PG', 'Minimum 50% marks in Graduation from a recognized university', '2 Years', 1, '2026-04-09 11:30:32', '2026-04-09 11:30:32'),
-(6, 'BCA', NULL, 'bca', 'UG', 'Minimum 50% marks in Graduation from a recognized university', '3 Years', 1, '2026-04-09 11:30:53', '2026-04-09 11:30:53');
+INSERT INTO `courses` (`id`, `name`, `display_name`, `slug`, `course_level`, `is_active`, `created_at`, `updated_at`) VALUES
+(1, 'test course', 'Test course display name', 'test-course', 'UG', 0, '2026-04-03 07:38:15', '2026-04-09 11:07:38'),
+(2, 'BA', NULL, 'ba', 'UG', 1, '2026-04-09 11:28:41', '2026-04-09 11:28:41'),
+(3, 'MCA', NULL, 'mca', 'PG', 1, '2026-04-09 11:29:19', '2026-04-09 11:29:19'),
+(4, 'MBA', NULL, 'mba', 'PG', 1, '2026-04-09 11:30:06', '2026-04-09 11:30:06'),
+(5, 'MA', NULL, 'ma', 'PG', 1, '2026-04-09 11:30:32', '2026-04-09 11:30:32'),
+(6, 'BCA', NULL, 'bca', 'UG', 1, '2026-04-09 11:30:53', '2026-04-09 11:30:53');
 
 -- --------------------------------------------------------
 
@@ -301,10 +300,10 @@ CREATE TABLE `universities` (
 --
 
 INSERT INTO `universities` (`id`, `name`, `display_name`, `slug`, `image`, `sample_certificate`, `rating`, `nirf_ranking`, `year_of_establishment`, `university_type_id`, `campus_location`, `avg_placement_package`, `placement_assistance`, `emi_facility`, `scholarship`, `key_advantages`, `view_university_link`, `is_active`, `created_at`, `updated_at`) VALUES
-(1, 'Mangalayatan University Online', NULL, 'mangalayatan-university-online', '/ai-tools/assets/uploads/images/69e07781902268.69807336_1776318337.webp', '/ai-tools/assets/uploads/certificates/69ce5d00e0ce43.13923990_1775131904.webp', 4.9, NULL, '2006', 2, 'Aligarh', '6 LPA', 1, 0, 1, 'Dedicated LMS with interactive tools\r\nGirl Child Benefit Scholarships\r\nCurriculum aligned with industry requirements', 'https://distanceeducationschool.com/mangalayatan-university/', 1, '2026-04-02 12:10:32', '2026-04-16 05:45:37'),
+(1, 'Mangalayatan University Online', NULL, 'mangalayatan-university-online', '/ai-tools/assets/uploads/images/69e07781902268.69807336_1776318337.webp', '/ai-tools/assets/uploads/certificates/69ce5d00e0ce43.13923990_1775131904.webp', 4.8, NULL, '2006', 2, 'Aligarh', '6 LPA', 1, 0, 1, 'Dedicated LMS with interactive tools\r\nGirl Child Benefit Scholarships\r\nCurriculum aligned with industry requirements', 'https://distanceeducationschool.com/mangalayatan-university/', 1, '2026-04-02 12:10:32', '2026-04-21 11:34:36'),
 (2, 'Sikkim Manipal University Online', NULL, 'sikkim-manipal-university-online', '/ai-tools/assets/uploads/images/69e0777a3ef492.58836449_1776318330.webp', '/ai-tools/assets/uploads/certificates/69d789eb8591d2.37501355_1775733227.webp', 5.0, NULL, '1995', 2, 'Sikkim', NULL, 1, 1, 1, 'Strong Alumni Network\r\nMentorship & Feedback Guidance\r\nComprehensive Curriculum', 'https://distanceeducationschool.com/sikkim-manipal-university/', 1, '2026-04-09 11:13:47', '2026-04-16 05:45:30'),
 (3, 'Lovely Professional University Distance', NULL, 'lovely-professional-university-distance', '/ai-tools/assets/uploads/images/69e0777397d535.34927888_1776318323.webp', '/ai-tools/assets/uploads/certificates/69d78bade82cc6.13116975_1775733677.webp', 5.0, 31, '2005', 2, 'Phagwara', '8 LPA', 1, 1, 1, 'Smart Digital Learning Ecosystem\r\nLearn on Your Schedule\r\nMerit-Based Scholarships', 'https://degree4u.com/university/lovely-professional-university-distance/', 1, '2026-04-09 11:21:17', '2026-04-16 05:45:23'),
-(4, 'Amity University Online', NULL, 'amity-university', '/ai-tools/assets/uploads/images/69e0776d435de8.46610788_1776318317.webp', '/ai-tools/assets/uploads/certificates/69d78c5adec491.47569236_1775733850.webp', 5.0, 32, '2005', 2, 'Noida', '3-6 LPA', 1, 1, 1, 'AI-Professor AMI\r\nAMIGO LMS Platform\r\n1:1 Industry Mentorship\r\nInnovative Workshops & Industry Visits', 'https://degree4u.com/university/amity-university-online/', 1, '2026-04-09 11:24:10', '2026-04-16 05:45:17'),
+(4, 'Amity University Online', NULL, 'amity-university', '/ai-tools/assets/uploads/images/69e0776d435de8.46610788_1776318317.webp', '/ai-tools/assets/uploads/certificates/69d78c5adec491.47569236_1775733850.webp', 4.5, 32, '2005', 2, 'Noida', '3-6 LPA', 1, 1, 1, 'AI-Professor AMI\r\nAMIGO LMS Platform\r\n1:1 Industry Mentorship\r\nInnovative Workshops & Industry Visits', 'https://degree4u.com/university/amity-university-online/', 1, '2026-04-09 11:24:10', '2026-04-21 10:14:06'),
 (5, 'Manipal University Online', NULL, 'manipal-university-online', '/ai-tools/assets/uploads/images/69e077657f2367.51084653_1776318309.webp', '/ai-tools/assets/uploads/certificates/69d78cdc939087.23889349_1775733980.webp', 5.0, 58, '2011', 2, 'Jaipur', '5 LPA', 1, 0, 1, NULL, 'https://degree4u.com/university/manipal-university-online/', 1, '2026-04-09 11:25:02', '2026-04-16 05:45:09');
 
 -- --------------------------------------------------------
@@ -332,13 +331,6 @@ INSERT INTO `university_accreditations` (`id`, `university_id`, `accreditation_i
 (89, 5, 8, NULL),
 (90, 5, 9, NULL),
 (91, 5, 4, NULL),
-(92, 4, 3, NULL),
-(93, 4, 5, NULL),
-(94, 4, 7, NULL),
-(95, 4, 8, NULL),
-(96, 4, 9, NULL),
-(97, 4, 4, NULL),
-(98, 4, 11, NULL),
 (99, 3, 3, NULL),
 (100, 3, 5, NULL),
 (101, 3, 10, NULL),
@@ -352,11 +344,18 @@ INSERT INTO `university_accreditations` (`id`, `university_id`, `accreditation_i
 (109, 2, 8, NULL),
 (110, 2, 9, NULL),
 (111, 2, 4, NULL),
-(112, 1, 3, NULL),
-(113, 1, 5, NULL),
-(114, 1, 7, NULL),
-(115, 1, 10, NULL),
-(116, 1, 4, NULL);
+(117, 4, 3, NULL),
+(118, 4, 5, NULL),
+(119, 4, 7, NULL),
+(120, 4, 8, NULL),
+(121, 4, 9, NULL),
+(122, 4, 4, NULL),
+(123, 4, 11, NULL),
+(149, 1, 3, NULL),
+(150, 1, 5, NULL),
+(151, 1, 7, NULL),
+(152, 1, 10, NULL),
+(153, 1, 4, NULL);
 
 -- --------------------------------------------------------
 
@@ -370,6 +369,8 @@ CREATE TABLE `university_courses` (
   `course_id` int(10) UNSIGNED NOT NULL,
   `education_mode_id` tinyint(3) UNSIGNED NOT NULL,
   `academic_fees` decimal(10,2) DEFAULT NULL,
+  `course_duration` varchar(100) DEFAULT NULL,
+  `min_eligibility_percentage` int(3) DEFAULT NULL,
   `fees_discount` decimal(10,2) DEFAULT NULL,
   `course_rating` decimal(3,1) DEFAULT NULL,
   `course_specializations` text DEFAULT NULL,
@@ -383,15 +384,15 @@ CREATE TABLE `university_courses` (
 -- Dumping data for table `university_courses`
 --
 
-INSERT INTO `university_courses` (`id`, `university_id`, `course_id`, `education_mode_id`, `academic_fees`, `fees_discount`, `course_rating`, `course_specializations`, `brochure_file`, `is_active`, `created_at`, `updated_at`) VALUES
-(2, 1, 2, 2, 50000.00, 2000.00, 4.0, 'Human Resource Management\r\nFinance\r\nMarketing\r\nSystems and Operations Management\r\nGeneral Management\r\nLogistics and Supply Chain Management', '/ai-tools/assets/uploads/brochures/69d791280be603.98342550_1775735080.pdf', 1, '2026-04-09 11:42:14', '2026-04-09 11:44:40'),
-(3, 1, 6, 2, 30000.00, 2000.00, 5.0, 'UI/UX\r\nCloud Computing\r\nData Science\r\nNetwork and Cyber Security\r\nAnimation and VFX\r\nBlockchain\r\nWeb design and Security\r\nMultimedia / Animation and Gaming\r\nEthical Hacking\r\nDatabase Management System', '/ai-tools/assets/uploads/brochures/69d79415d21131.14914612_1775735829.pdf', 1, '2026-04-09 11:57:09', '2026-04-09 11:57:09'),
-(4, 5, 6, 2, 70000.00, 5000.00, 5.0, NULL, NULL, 1, '2026-04-09 11:59:50', '2026-04-09 11:59:50'),
-(5, 4, 4, 2, 200000.00, 10000.00, 5.0, 'Finance & Accounting Management\r\nMarketing & Sales Management\r\nHuman Resource Management\r\nData Science\r\nEntrepreneurship & Leadership Management\r\nInformation Technology Management\r\nInternational Business Management', '/ai-tools/assets/uploads/brochures/69d8956320a935.77783403_1775801699.pdf', 1, '2026-04-09 12:01:23', '2026-04-10 06:14:59'),
-(6, 3, 3, 1, 80000.00, 15000.00, 4.5, NULL, NULL, 1, '2026-04-09 12:02:58', '2026-04-09 12:34:21'),
-(7, 2, 4, 2, 90000.00, 3000.00, 4.9, NULL, NULL, 1, '2026-04-09 12:03:39', '2026-04-10 05:50:03'),
-(8, 2, 4, 1, 0.00, 0.00, 0.0, NULL, NULL, 1, '2026-04-10 05:49:46', '2026-04-10 05:49:46'),
-(9, 1, 4, 2, 30000.00, 2000.00, 4.0, 'Test Spec.', NULL, 1, '2026-04-16 10:20:48', '2026-04-16 10:20:48');
+INSERT INTO `university_courses` (`id`, `university_id`, `course_id`, `education_mode_id`, `academic_fees`, `course_duration`, `min_eligibility_percentage`, `fees_discount`, `course_rating`, `course_specializations`, `brochure_file`, `is_active`, `created_at`, `updated_at`) VALUES
+(2, 1, 2, 2, 50000.00, '3 Years', 60, 20.00, NULL, 'Human Resource Management\r\nFinance\r\nMarketing\r\nSystems and Operations Management\r\nGeneral Management\r\nLogistics and Supply Chain Management', '/ai-tools/assets/uploads/brochures/69d791280be603.98342550_1775735080.pdf', 1, '2026-04-09 11:42:14', '2026-04-21 12:28:16'),
+(3, 1, 6, 2, 30000.00, NULL, NULL, 2000.00, 5.0, 'UI/UX\r\nCloud Computing\r\nData Science\r\nNetwork and Cyber Security\r\nAnimation and VFX\r\nBlockchain\r\nWeb design and Security\r\nMultimedia / Animation and Gaming\r\nEthical Hacking\r\nDatabase Management System', '/ai-tools/assets/uploads/brochures/69d79415d21131.14914612_1775735829.pdf', 1, '2026-04-09 11:57:09', '2026-04-09 11:57:09'),
+(4, 5, 6, 2, 70000.00, NULL, NULL, 5000.00, 5.0, NULL, NULL, 1, '2026-04-09 11:59:50', '2026-04-09 11:59:50'),
+(5, 4, 4, 2, 200000.00, '24 Months', 40, 10000.00, 5.0, 'Finance & Accounting Management\r\nMarketing & Sales Management\r\nHuman Resource Management\r\nData Science\r\nEntrepreneurship & Leadership Management\r\nInformation Technology Management\r\nInternational Business Management', '/ai-tools/assets/uploads/brochures/69d8956320a935.77783403_1775801699.pdf', 1, '2026-04-09 12:01:23', '2026-04-21 11:01:43'),
+(6, 3, 3, 1, 80000.00, NULL, NULL, 15000.00, 4.5, NULL, NULL, 1, '2026-04-09 12:02:58', '2026-04-09 12:34:21'),
+(7, 2, 4, 2, 90000.00, NULL, NULL, 3000.00, 4.9, NULL, NULL, 1, '2026-04-09 12:03:39', '2026-04-10 05:50:03'),
+(8, 2, 4, 1, 0.00, NULL, NULL, 0.00, 0.0, NULL, NULL, 1, '2026-04-10 05:49:46', '2026-04-10 05:49:46'),
+(9, 1, 4, 2, 30000.00, NULL, NULL, 2000.00, 4.0, 'Test Spec.', NULL, 1, '2026-04-16 10:20:48', '2026-04-16 10:20:48');
 
 -- --------------------------------------------------------
 
@@ -410,14 +411,14 @@ CREATE TABLE `university_education_modes` (
 
 INSERT INTO `university_education_modes` (`university_id`, `education_mode_id`) VALUES
 (1, 2),
-(2, 2),
-(3, 2),
-(4, 2),
-(5, 2),
 (1, 3),
+(2, 2),
 (2, 3),
+(3, 2),
 (3, 3),
+(4, 2),
 (4, 3),
+(5, 2),
 (5, 3);
 
 -- --------------------------------------------------------
@@ -437,14 +438,14 @@ CREATE TABLE `university_exam_modes` (
 
 INSERT INTO `university_exam_modes` (`university_id`, `exam_mode_id`) VALUES
 (1, 1),
-(2, 1),
-(3, 1),
-(4, 1),
-(5, 1),
 (1, 2),
+(2, 1),
 (2, 2),
+(3, 1),
 (3, 2),
+(4, 1),
 (4, 2),
+(5, 1),
 (5, 2);
 
 -- --------------------------------------------------------
@@ -609,7 +610,7 @@ ALTER TABLE `brochure_leads`
 -- AUTO_INCREMENT for table `compare_unlock_leads`
 --
 ALTER TABLE `compare_unlock_leads`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `counseling_leads`
@@ -651,7 +652,7 @@ ALTER TABLE `universities`
 -- AUTO_INCREMENT for table `university_accreditations`
 --
 ALTER TABLE `university_accreditations`
-  MODIFY `id` smallint(5) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=117;
+  MODIFY `id` smallint(5) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=154;
 
 --
 -- AUTO_INCREMENT for table `university_courses`

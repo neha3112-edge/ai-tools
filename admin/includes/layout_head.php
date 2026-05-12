@@ -1173,4 +1173,66 @@
       grid-template-columns: 1fr 1fr;
     }
   }
+
+  /* ── BULK SELECT & DELETE ── */
+  .bulk-cb {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--accent);
+    cursor: pointer;
+    vertical-align: middle;
+  }
+
+  tr.bulk-selected td {
+    background: rgba(79, 110, 247, 0.08) !important;
+  }
+
+  body.light tr.bulk-selected td {
+    background: rgba(79, 110, 247, 0.06) !important;
+  }
+
+  .bulk-bar {
+    position: fixed;
+    bottom: -80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--surface);
+    border: 1px solid var(--border-h);
+    border-radius: 14px;
+    padding: 0.65rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+    z-index: 999;
+    transition: bottom 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    backdrop-filter: blur(12px);
+  }
+
+  .bulk-bar.visible {
+    bottom: 24px;
+  }
+
+  body.light .bulk-bar {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  }
+
+  .bulk-bar .bulk-count {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+  }
+
+  .bulk-bar .bulk-count span {
+    color: var(--accent);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px;
+  }
+
+  .bulk-bar .btn {
+    font-size: 13px;
+    padding: 0.45rem 1rem;
+    white-space: nowrap;
+  }
 </style>

@@ -216,4 +216,87 @@ window.closeLightbox = function(e) {
   document.body.style.overflow = '';
   setTimeout(() => { document.getElementById('lightboxImage').src = ''; }, 300);
 };
+
+// ── BULK SELECT & DELETE ──
+(function() {
+  const selectAll = document.getElementById('bulkSelectAll');
+  const bulkBar = document.getElementById('bulkBar');
+  const bulkForm = document.getElementById('bulkDeleteForm');
+  if (!selectAll || !bulkBar || !bulkForm) return;
+
+  const bulkCountEl = document.getElementById('bulkCount');
+  const bulkIdsInput = document.getElementById('bulkDeleteIds');
+
+  function getRowCheckboxes() {
+    return document.querySelectorAll('.bulk-row-cb');
+  }
+
+  function updateBulkState() {
+    const cbs = getRowCheckboxes();
+    let checked = 0;
+    let ids = [];
+    cbs.forEach(cb => {
+      if (cb.checked) {
+        checked++;
+        ids.push(cb.value);
+        cb.closest('tr').classList.add('bulk-selected');
+      } else {
+        cb.closest('tr').classList.remove('bulk-selected');
+      }
+    });
+
+    // Update select-all state
+    selectAll.checked = cbs.length > 0 && checked === cbs.length;
+    selectAll.indeterminate = checked > 0 && checked < cbs.length;
+
+    // Update floating bar
+    if (checked > 0) {
+      bulkBar.classList.add('visible');
+      bulkCountEl.innerHTML = '<span>' + checked + '</span> selected';
+      bulkIdsInput.value = ids.join(',');
+    } else {
+      bulkBar.classList.remove('visible');
+      bulkIdsInput.value = '';
+    }
+  }
+
+  selectAll.addEventListener('change', function() {
+    const cbs = getRowCheckboxes();
+    cbs.forEach(cb => { cb.checked = selectAll.checked; });
+    updateBulkState();
+  });
+
+  document.addEventListener('change', function(e) {
+    if (e.target && e.target.classList.contains('bulk-row-cb')) {
+      updateBulkState();
+    }
+  });
+
+  // Bulk delete button triggers modal
+  const bulkDeleteTrigger = document.getElementById('bulkDeleteTrigger');
+  if (bulkDeleteTrigger) {
+    bulkDeleteTrigger.addEventListener('click', function() {
+      const cbs = getRowCheckboxes();
+      let checked = 0;
+      cbs.forEach(cb => { if (cb.checked) checked++; });
+      if (checked === 0) return;
+
+      document.getElementById('deleteModalSummary').textContent =
+        'Delete ' + checked + ' selected record(s)? This action cannot be undone.';
+      currentDeleteForm = bulkForm;
+      document.getElementById('systemDeleteModal').classList.add('active');
+    });
+  }
+
+  // Deselect all button
+  const bulkDeselectBtn = document.getElementById('bulkDeselectBtn');
+  if (bulkDeselectBtn) {
+    bulkDeselectBtn.addEventListener('click', function() {
+      selectAll.checked = false;
+      getRowCheckboxes().forEach(cb => { cb.checked = false; });
+      updateBulkState();
+    });
+  }
+})();
 </script>
+

@@ -23,6 +23,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
   redirect(ADMIN_URL . '/masters/modes.php');
 }
 
+// Handle bulk delete
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['bulk_delete_ids'])) {
+  $ids = array_filter(array_map('intval', explode(',', $_POST['bulk_delete_ids'])));
+  if ($ids) {
+    $deleted = 0; $skipped = 0;
+    foreach ($ids as $did) {
+      $used = $pdo->prepare("SELECT COUNT(*) FROM university_education_modes WHERE education_mode_id=?");
+      $used->execute([$did]);
+      if ($used->fetchColumn() > 0) { $skipped++; continue; }
+      $pdo->prepare("DELETE FROM education_modes WHERE id=?")->execute([$did]);
+      $deleted++;
+    }
+    if ($deleted > 0) set_flash('success', $deleted . ' mode(s) deleted.' . ($skipped ? " $skipped skipped (in use)." : ''));
+    elseif ($skipped > 0) set_flash('error', 'All selected modes are assigned to universities. Cannot delete.');
+  }
+  redirect(ADMIN_URL . '/masters/modes.php');
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add') {
   $name = trim($_POST['name'] ?? '');
   if (!$name) {
@@ -184,6 +202,7 @@ $page_subtitle = 'Distance, Online, Distance & Online etc.';
             <table>
               <thead>
                 <tr>
+                  <th style="width:40px;"><input type="checkbox" class="bulk-cb" id="bulkSelectAll" title="Select All"></th>
                   <th>#</th>
                   <th>Mode Name</th>
                   <th>Universities</th>
@@ -194,6 +213,7 @@ $page_subtitle = 'Distance, Online, Distance & Online etc.';
                 <?php if ($all):
                   foreach ($all as $i => $m): ?>
                     <tr data-ba-row-id="<?= $m['id'] ?>" data-ba-module="education_modes" class="<?= ($edit_item && $edit_item['id'] == $m['id']) ? 'edit-row' : '' ?>">
+                      <td><input type="checkbox" class="bulk-cb bulk-row-cb" value="<?= $m['id'] ?>"></td>
                       <td style="color:var(--text-s);"><?= $i + 1 ?></td>
                       <td><span class="cell-name"><?= e($m['mode_name']) ?></span></td>
                       <td>
@@ -249,6 +269,19 @@ $page_subtitle = 'Distance, Online, Distance & Online etc.';
         </div>
       </div>
     </div>
+
+    <!-- Bulk Delete Bar -->
+    <div class="bulk-bar" id="bulkBar">
+      <div class="bulk-count" id="bulkCount"><span>0</span> selected</div>
+      <button type="button" class="btn btn-secondary btn-sm" id="bulkDeselectBtn">Deselect</button>
+      <button type="button" class="btn btn-danger btn-sm" id="bulkDeleteTrigger">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+        Delete Selected
+      </button>
+    </div>
+    <form method="POST" id="bulkDeleteForm" style="display:none;">
+      <input type="hidden" name="bulk_delete_ids" id="bulkDeleteIds" value="">
+    </form>
   </main>
   <?php require_once __DIR__ . '/../includes/bulk_assoc_modal.php'; ?>
   <?php require_once __DIR__ . '/../includes/layout_foot.php'; ?>

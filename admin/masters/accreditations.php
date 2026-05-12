@@ -29,6 +29,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
   redirect(ADMIN_URL . '/masters/accreditations.php');
 }
 
+// Handle bulk delete
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['bulk_delete_ids'])) {
+  $ids = array_filter(array_map('intval', explode(',', $_POST['bulk_delete_ids'])));
+  if ($ids) {
+    $deleted = 0; $skipped = 0;
+    foreach ($ids as $did) {
+      $used = $pdo->prepare("SELECT COUNT(*) FROM university_accreditations WHERE accreditation_id=?");
+      $used->execute([$did]);
+      if ($used->fetchColumn() > 0) { $skipped++; continue; }
+      $row = $pdo->prepare("SELECT image FROM accreditations WHERE id=?");
+      $row->execute([$did]);
+      delete_file($row->fetchColumn());
+      $pdo->prepare("DELETE FROM accreditations WHERE id=?")->execute([$did]);
+      $deleted++;
+    }
+    if ($deleted > 0) set_flash('success', $deleted . ' accreditation(s) deleted.' . ($skipped ? " $skipped skipped (in use)." : ''));
+    elseif ($skipped > 0) set_flash('error', 'All selected are assigned to universities. Cannot delete.');
+  }
+  redirect(ADMIN_URL . '/masters/accreditations.php');
+}
+
 // ── ADD ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add') {
   $name = trim($_POST['name'] ?? '');
@@ -317,6 +338,7 @@ $page_subtitle = 'Manage accreditation & approval badges';
           <table>
             <thead>
               <tr>
+                <th style="width:40px;"><input type="checkbox" class="bulk-cb" id="bulkSelectAll" title="Select All"></th>
                 <th style="width:44px;">#</th>
                 <th style="width:52px;">Logo</th>
                 <th>Name</th>
@@ -328,6 +350,7 @@ $page_subtitle = 'Manage accreditation & approval badges';
               <?php if ($all): ?>
                   <?php foreach ($all as $i => $a): ?>
                     <tr data-ba-row-id="<?= $a['id'] ?>" data-ba-module="accreditations" class="<?= ($edit_item && $edit_item['id'] == $a['id']) ? 'edit-row' : '' ?>">
+                      <td><input type="checkbox" class="bulk-cb bulk-row-cb" value="<?= $a['id'] ?>"></td>
                       <td data-label="#"> <?= $i + 1 ?> </td>
                       <td data-label="Logo">
                         <?php if (!empty($a['image'])): ?>
@@ -390,6 +413,19 @@ $page_subtitle = 'Manage accreditation & approval badges';
       </div>
 
     </div><!-- /master-wrap -->
+
+    <!-- Bulk Delete Bar -->
+    <div class="bulk-bar" id="bulkBar">
+      <div class="bulk-count" id="bulkCount"><span>0</span> selected</div>
+      <button type="button" class="btn btn-secondary btn-sm" id="bulkDeselectBtn">Deselect</button>
+      <button type="button" class="btn btn-danger btn-sm" id="bulkDeleteTrigger">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+        Delete Selected
+      </button>
+    </div>
+    <form method="POST" id="bulkDeleteForm" style="display:none;">
+      <input type="hidden" name="bulk_delete_ids" id="bulkDeleteIds" value="">
+    </form>
   </div>
 </main>
 

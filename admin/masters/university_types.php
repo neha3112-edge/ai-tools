@@ -24,6 +24,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
   redirect(ADMIN_URL . '/masters/university_types.php');
 }
 
+// Handle bulk delete
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['bulk_delete_ids'])) {
+  $ids = array_filter(array_map('intval', explode(',', $_POST['bulk_delete_ids'])));
+  if ($ids) {
+    $deleted = 0;
+    $skipped = 0;
+    foreach ($ids as $did) {
+      $used = $pdo->prepare("SELECT COUNT(*) FROM universities WHERE university_type_id=?");
+      $used->execute([$did]);
+      if ($used->fetchColumn() > 0) { $skipped++; continue; }
+      $pdo->prepare("DELETE FROM university_types WHERE id=?")->execute([$did]);
+      $deleted++;
+    }
+    if ($deleted > 0) set_flash('success', $deleted . ' type(s) deleted.' . ($skipped ? " $skipped skipped (in use)." : ''));
+    elseif ($skipped > 0) set_flash('error', 'All selected types are assigned to universities. Cannot delete.');
+  }
+  redirect(ADMIN_URL . '/masters/university_types.php');
+}
+
 // Handle Add
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add') {
   $name = trim($_POST['name'] ?? '');
@@ -153,6 +172,7 @@ $logout_path = '../../logout.php';
               <table>
                 <thead>
                   <tr>
+                    <th style="width:40px;"><input type="checkbox" class="bulk-cb" id="bulkSelectAll" title="Select All"></th>
                     <th style="width:50px;">#</th>
                     <th>Type Name</th>
                     <th>Usage Count</th>
@@ -163,7 +183,8 @@ $logout_path = '../../logout.php';
                   <?php if ($types): ?>
                     <?php foreach ($types as $i => $t): ?>
                       <tr data-ba-row-id="<?= $t['id'] ?>" data-ba-module="university_types" <?= $edit_item && $edit_item['id'] == $t['id'] ? 'style="background:rgba(37,99,235,0.05);"' : '' ?>>
-                        <td data-label="#"> <?= $i + 1 ?> </td>
+                         <td><input type="checkbox" class="bulk-cb bulk-row-cb" value="<?= $t['id'] ?>"></td>
+                         <td data-label="#"> <?= $i + 1 ?> </td>
                         <td data-label="Type Name" style="font-weight:600;color:var(--text);"><?= e($t['type_name']) ?></td>
                          <td data-label="Usage Count">
                           <div class="ba-trigger-cell">
@@ -198,7 +219,7 @@ $logout_path = '../../logout.php';
                        </tr>
                     <?php endforeach; ?>
                   <?php else: ?>
-                    <tr><td colspan="4" class="empty-state">No types found. Add your first university type.</td></tr>
+                    <tr><td colspan="5" class="empty-state">No types found. Add your first university type.</td></tr>
                   <?php endif; ?>
                 </tbody>
               </table>
@@ -207,6 +228,19 @@ $logout_path = '../../logout.php';
         </div>
       </div>
     </div>
+
+    <!-- Bulk Delete Bar -->
+    <div class="bulk-bar" id="bulkBar">
+      <div class="bulk-count" id="bulkCount"><span>0</span> selected</div>
+      <button type="button" class="btn btn-secondary btn-sm" id="bulkDeselectBtn">Deselect</button>
+      <button type="button" class="btn btn-danger btn-sm" id="bulkDeleteTrigger">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+        Delete Selected
+      </button>
+    </div>
+    <form method="POST" id="bulkDeleteForm" style="display:none;">
+      <input type="hidden" name="bulk_delete_ids" id="bulkDeleteIds" value="">
+    </form>
   </main>
   
   <?php require_once __DIR__ . '/../includes/bulk_assoc_modal.php'; ?>

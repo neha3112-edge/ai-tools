@@ -18,6 +18,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
     redirect(ADMIN_URL . '/scholarship_leads.php');
 }
 
+// Handle bulk hard-delete
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['bulk_delete_ids'])) {
+    try {
+        $ids = array_filter(array_map('intval', explode(',', $_POST['bulk_delete_ids'])));
+        if ($ids) {
+            $placeholders = implode(',', array_fill(0, count($ids), '?'));
+            $pdo->prepare("DELETE FROM scholarship_leads WHERE id IN ($placeholders)")->execute($ids);
+            set_flash('success', count($ids) . ' lead(s) deleted successfully.');
+        }
+    } catch (PDOException $e) {
+        set_flash('error', 'Could not delete the selected records.');
+    }
+    redirect(ADMIN_URL . '/scholarship_leads.php');
+}
+
 $search = trim($_GET['search'] ?? '');
 $where = ["1 = 1"];
 $params = [];
@@ -100,6 +115,7 @@ $logout_path = 'logout.php';
           <table>
           <thead>
             <tr>
+              <th style="width:40px;"><input type="checkbox" class="bulk-cb" id="bulkSelectAll" title="Select All"></th>
               <th style="width:50px;">#</th>
               <th>Name</th>
               <th>Contact Info</th>
@@ -113,6 +129,7 @@ $logout_path = 'logout.php';
             <?php if ($leads): ?>
               <?php foreach ($leads as $i => $l): ?>
                 <tr>
+                  <td><input type="checkbox" class="bulk-cb bulk-row-cb" value="<?= $l['id'] ?>"></td>
                   <td data-label="#"> <?= $i + 1 ?> </td>
                   <td data-label="Name">
                       <div class="cell-name"><?= e($l['name']) ?></div>
@@ -146,7 +163,7 @@ $logout_path = 'logout.php';
               <?php endforeach; ?>
             <?php else: ?>
               <tr>
-                <td colspan="7" class="empty-state">
+                <td colspan="8" class="empty-state">
                   <div class="empty-icon">🎓</div>
                   <h4>No leads found</h4>
                   <p>When users claim scholarships, their details will appear here.</p>
@@ -157,6 +174,19 @@ $logout_path = 'logout.php';
           </table>
         </div>
       </div>
+
+      <!-- Bulk Delete Bar -->
+      <div class="bulk-bar" id="bulkBar">
+        <div class="bulk-count" id="bulkCount"><span>0</span> selected</div>
+        <button type="button" class="btn btn-secondary btn-sm" id="bulkDeselectBtn">Deselect</button>
+        <button type="button" class="btn btn-danger btn-sm" id="bulkDeleteTrigger">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+          Delete Selected
+        </button>
+      </div>
+      <form method="POST" id="bulkDeleteForm" style="display:none;">
+        <input type="hidden" name="bulk_delete_ids" id="bulkDeleteIds" value="">
+      </form>
     </div>
   </main>
   

@@ -7,11 +7,31 @@ require_once '../../includes/auth.php';
 require_once '../../includes/helpers.php';
 require_login();
 
-// Handle soft-delete
+// Handle single hard-delete
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
-  $stmt = $pdo->prepare("UPDATE university_courses SET is_active=0 WHERE id=?");
-  $stmt->execute([(int) $_POST['delete_id']]);
-  set_flash('success', 'Mapping deleted successfully.');
+  $did = (int) $_POST['delete_id'];
+  // Cleanup brochure file
+  $row = $pdo->prepare("SELECT brochure_file FROM university_courses WHERE id=?");
+  $row->execute([$did]);
+  $bf = $row->fetchColumn();
+  if ($bf) delete_file($bf);
+  $pdo->prepare("DELETE FROM university_courses WHERE id=?")->execute([$did]);
+  set_flash('success', 'Mapping deleted permanently.');
+  redirect(ADMIN_URL . '/mappings/index.php');
+}
+
+// Handle bulk hard-delete
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['bulk_delete_ids'])) {
+  $ids = array_filter(array_map('intval', explode(',', $_POST['bulk_delete_ids'])));
+  if ($ids) {
+    $placeholders = implode(',', array_fill(0, count($ids), '?'));
+    // Cleanup brochure files
+    $rows = $pdo->prepare("SELECT brochure_file FROM university_courses WHERE id IN ($placeholders) AND brochure_file IS NOT NULL AND brochure_file != ''");
+    $rows->execute($ids);
+    foreach ($rows->fetchAll(PDO::FETCH_COLUMN) as $bf) { delete_file($bf); }
+    $pdo->prepare("DELETE FROM university_courses WHERE id IN ($placeholders)")->execute($ids);
+    set_flash('success', count($ids) . ' mapping(s) deleted permanently.');
+  }
   redirect(ADMIN_URL . '/mappings/index.php');
 }
 
@@ -123,6 +143,7 @@ $logout_path = '../logout.php';
           <table>
             <thead>
               <tr>
+                <th style="width:40px;"><input type="checkbox" class="bulk-cb" id="bulkSelectAll" title="Select All"></th>
                 <th style="width:50px;">#</th>
                 <th>University</th>
                 <th>Course</th>
@@ -136,6 +157,7 @@ $logout_path = '../logout.php';
               <?php if ($mappings): ?>
                 <?php foreach ($mappings as $i => $m): ?>
                   <tr>
+                    <td><input type="checkbox" class="bulk-cb bulk-row-cb" value="<?= $m['id'] ?>"></td>
                     <td data-label="#"> <?= $i + 1 ?> </td>
                     <td data-label="University">
                       <div class="cell-name"><?= e(get_display_name($m['u_name'], $m['u_disp'])) ?></div>
@@ -199,7 +221,7 @@ $logout_path = '../logout.php';
                 <?php endforeach; ?>
               <?php else: ?>
                 <tr class="empty-row">
-                  <td colspan="7" style="text-align: center; color: var(--text-s); padding: 3rem;">
+                  <td colspan="8" style="text-align: center; color: var(--text-s); padding: 3rem;">
                     <div class="empty-state">
                       <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
                         stroke-linecap="round" style="margin-bottom: 1rem; opacity: 0.5;">
@@ -215,6 +237,19 @@ $logout_path = '../logout.php';
           </table>
         </div>
       </div>
+
+      <!-- Bulk Delete Bar -->
+      <div class="bulk-bar" id="bulkBar">
+        <div class="bulk-count" id="bulkCount"><span>0</span> selected</div>
+        <button type="button" class="btn btn-secondary btn-sm" id="bulkDeselectBtn">Deselect</button>
+        <button type="button" class="btn btn-danger btn-sm" id="bulkDeleteTrigger">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+          Delete Selected
+        </button>
+      </div>
+      <form method="POST" id="bulkDeleteForm" style="display:none;">
+        <input type="hidden" name="bulk_delete_ids" id="bulkDeleteIds" value="">
+      </form>
     </div>
   </main>
 

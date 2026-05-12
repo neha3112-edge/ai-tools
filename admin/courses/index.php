@@ -7,11 +7,31 @@ require_once '../../includes/auth.php';
 require_once '../../includes/helpers.php';
 require_login();
 
-// Handle soft-delete
+// Handle single hard-delete
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
-  $stmt = $pdo->prepare("UPDATE courses SET is_active=0 WHERE id=?");
-  $stmt->execute([(int) $_POST['delete_id']]);
-  set_flash('success', 'Course deleted successfully.');
+  $did = (int) $_POST['delete_id'];
+  // Cleanup brochure files from associated mappings before cascade
+  $bro_stmt = $pdo->prepare("SELECT brochure_file FROM university_courses WHERE course_id=? AND brochure_file IS NOT NULL AND brochure_file != ''");
+  $bro_stmt->execute([$did]);
+  foreach ($bro_stmt->fetchAll(PDO::FETCH_COLUMN) as $bf) { delete_file($bf); }
+  $pdo->prepare("DELETE FROM courses WHERE id=?")->execute([$did]);
+  set_flash('success', 'Course deleted permanently.');
+  redirect(ADMIN_URL . '/courses/index.php');
+}
+
+// Handle bulk hard-delete
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['bulk_delete_ids'])) {
+  $ids = array_filter(array_map('intval', explode(',', $_POST['bulk_delete_ids'])));
+  if ($ids) {
+    foreach ($ids as $cid) {
+      $bro_stmt = $pdo->prepare("SELECT brochure_file FROM university_courses WHERE course_id=? AND brochure_file IS NOT NULL AND brochure_file != ''");
+      $bro_stmt->execute([$cid]);
+      foreach ($bro_stmt->fetchAll(PDO::FETCH_COLUMN) as $bf) { delete_file($bf); }
+    }
+    $placeholders = implode(',', array_fill(0, count($ids), '?'));
+    $pdo->prepare("DELETE FROM courses WHERE id IN ($placeholders)")->execute($ids);
+    set_flash('success', count($ids) . ' course(s) deleted permanently.');
+  }
   redirect(ADMIN_URL . '/courses/index.php');
 }
 
@@ -111,6 +131,7 @@ $logout_path = '../logout.php';
           <table>
           <thead>
             <tr>
+              <th style="width:40px;"><input type="checkbox" class="bulk-cb" id="bulkSelectAll" title="Select All"></th>
               <th style="width:50px;">#</th>
               <th>Course Name</th>
               <th>Level</th>
@@ -122,6 +143,7 @@ $logout_path = '../logout.php';
             <?php if ($courses): ?>
               <?php foreach ($courses as $i => $c): ?>
                 <tr>
+                  <td><input type="checkbox" class="bulk-cb bulk-row-cb" value="<?= $c['id'] ?>"></td>
                   <td data-label="#"> <?= $i + 1 ?> </td>
                   <td data-label="Course Name">
                     <div>
@@ -162,7 +184,7 @@ $logout_path = '../logout.php';
               <?php endforeach; ?>
             <?php else: ?>
               <tr class="empty-row">
-                <td colspan="5" style="text-align: center; color: var(--text-s); padding: 3rem;">
+                <td colspan="6" style="text-align: center; color: var(--text-s); padding: 3rem;">
                   <div class="empty-state">
                     <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
                       stroke-linecap="round" style="margin-bottom: 1rem; opacity: 0.5;">
@@ -178,6 +200,19 @@ $logout_path = '../logout.php';
         </table>
         </div>
       </div>
+
+      <!-- Bulk Delete Bar -->
+      <div class="bulk-bar" id="bulkBar">
+        <div class="bulk-count" id="bulkCount"><span>0</span> selected</div>
+        <button type="button" class="btn btn-secondary btn-sm" id="bulkDeselectBtn">Deselect</button>
+        <button type="button" class="btn btn-danger btn-sm" id="bulkDeleteTrigger">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+          Delete Selected
+        </button>
+      </div>
+      <form method="POST" id="bulkDeleteForm" style="display:none;">
+        <input type="hidden" name="bulk_delete_ids" id="bulkDeleteIds" value="">
+      </form>
     </div>
   </main>
 
