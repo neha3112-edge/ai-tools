@@ -298,5 +298,123 @@ window.closeLightbox = function(e) {
     });
   }
 })();
+
+// ── PAGINATION ──
+(function () {
+  const tableEl = document.querySelector('[data-paginate]');
+  if (!tableEl) return;
+
+  const wrapEl = document.getElementById('paginationWrap');
+  if (!wrapEl) return;
+
+  const tbody = tableEl.querySelector('tbody');
+  if (!tbody) return;
+
+  // Gather data rows (skip empty-state rows)
+  function getDataRows() {
+    return Array.from(tbody.querySelectorAll('tr')).filter(r => !r.classList.contains('empty-row') && r.querySelector('td[colspan]') === null);
+  }
+
+  let perPage = parseInt(wrapEl.dataset.perpage || '10');
+  let currentPage = 1;
+
+  function totalPages(rows) {
+    return Math.max(1, Math.ceil(rows.length / perPage));
+  }
+
+  function goTo(page) {
+    const rows = getDataRows();
+    const tp = totalPages(rows);
+    currentPage = Math.max(1, Math.min(page, tp));
+
+    const start = (currentPage - 1) * perPage;
+    const end = start + perPage;
+
+    rows.forEach((r, i) => {
+      r.style.display = (i >= start && i < end) ? '' : 'none';
+    });
+
+    renderControls(rows.length, tp);
+    updateRecordCount(rows.length, start, Math.min(end, rows.length));
+  }
+
+  function updateRecordCount(total, from, to) {
+    const infoEl = document.getElementById('paginationInfo');
+    if (infoEl) {
+      infoEl.textContent = total === 0
+        ? 'No records found'
+        : `Showing ${from + 1}–${to} of ${total} record${total !== 1 ? 's' : ''}`;
+    }
+    // Also update page-header count if present
+    const headerCount = document.querySelector('.page-header p');
+    if (headerCount) {
+      headerCount.textContent = total + ' record(s) found';
+    }
+  }
+
+  function pageButtons(tp) {
+    // Always show: first, last, current, current±1, with "..." where needed
+    const pages = [];
+    const delta = 1; // neighbours around current
+    const range = [];
+    for (let p = Math.max(2, currentPage - delta); p <= Math.min(tp - 1, currentPage + delta); p++) {
+      range.push(p);
+    }
+    pages.push(1);
+    if (range.length && range[0] > 2) pages.push('...');
+    range.forEach(p => pages.push(p));
+    if (range.length && range[range.length - 1] < tp - 1) pages.push('...');
+    if (tp > 1) pages.push(tp);
+    return pages;
+  }
+
+  function renderControls(total, tp) {
+    const ctrlEl = document.getElementById('paginationControls');
+    if (!ctrlEl) return;
+
+    let html = '';
+
+    // Prev
+    html += `<button class="pg-btn" onclick="__pg(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>`;
+
+    pageButtons(tp).forEach(p => {
+      if (p === '...') {
+        html += `<button class="pg-btn pg-dots" disabled>···</button>`;
+      } else {
+        html += `<button class="pg-btn ${p === currentPage ? 'pg-btn-active' : ''}" onclick="__pg(${p})">${p}</button>`;
+      }
+    });
+
+    // Next
+    html += `<button class="pg-btn" onclick="__pg(${currentPage + 1})" ${currentPage === tp ? 'disabled' : ''}>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>`;
+
+    ctrlEl.innerHTML = html;
+  }
+
+  window.__pg = function (page) {
+    goTo(page);
+    // Scroll table top gently
+    const panel = tableEl.closest('.panel');
+    if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  };
+
+  // Per-page change
+  const perPageSel = document.getElementById('pgPerPage');
+  if (perPageSel) {
+    perPageSel.value = perPage;
+    perPageSel.addEventListener('change', function () {
+      perPage = parseInt(this.value);
+      currentPage = 1;
+      goTo(1);
+    });
+  }
+
+  // Init
+  goTo(1);
+})();
 </script>
 

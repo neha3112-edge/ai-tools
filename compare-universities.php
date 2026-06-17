@@ -692,6 +692,7 @@ require_once __DIR__ . '/includes/helpers.php';
             rowsHtml += buildRow("LOCATION", "location", u => cellFn(u, x => `<strong style="color:var(--text);">${x.location}</strong>`), unis);
             rowsHtml += buildRow("ESTABLISHED YEAR", "calendar", u => cellFn(u, x => `<strong>${x.established}</strong>`), unis);
             rowsHtml += buildRow("UNIVERSITY TYPE", "building", u => cellFn(u, x => `<strong>${x.uni_type}</strong>`), unis);
+            rowsHtml += buildRow("NIRF RANKING", "target", u => cellFn(u, x => x.nirf_ranking ? `<strong style="font-size:1.1rem;">#${x.nirf_ranking}</strong>` : '—'), unis);
             rowsHtml += buildRow("COURSE DURATION", "calendar", u => cellFn(u, x => `<strong>${x.duration}</strong>`), unis);
 
             rowsHtml += buildRow("ACCREDITATIONS & APPROVALS", "check_shield", u => cellFn(u, x => {

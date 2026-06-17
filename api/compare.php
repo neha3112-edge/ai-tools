@@ -177,6 +177,7 @@ if ($action === 'get_bulk_comparison') {
             'location' => $row['campus_location'] ?: '—',
             'established' => $row['year_of_establishment'] ?: '—',
             'uni_type' => $row['university_type'] ?: '—',
+            'nirf_ranking' => $row['nirf_ranking'] ?: null,
             'accreditations' => $accreditations,
             'duration' => $row['course_duration'] ?: '—',
             'eligibility' => (function() use ($row, $courseData) {

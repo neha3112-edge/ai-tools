@@ -128,7 +128,7 @@ $logout_path = '../logout.php';
       <!-- Table -->
       <div class="panel">
         <div class="table-responsive">
-          <table>
+          <table data-paginate>
           <thead>
             <tr>
               <th style="width:40px;"><input type="checkbox" class="bulk-cb" id="bulkSelectAll" title="Select All"></th>
@@ -198,6 +198,20 @@ $logout_path = '../logout.php';
             <?php endif; ?>
           </tbody>
         </table>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination-wrap" id="paginationWrap" data-perpage="10">
+        <span class="pagination-info" id="paginationInfo"></span>
+        <div class="pagination-controls" id="paginationControls"></div>
+        <div class="pg-perpage-wrap">
+          <select class="pg-perpage-select" id="pgPerPage">
+            <option value="10">10 / page</option>
+            <option value="25">25 / page</option>
+            <option value="50">50 / page</option>
+            <option value="100">100 / page</option>
+          </select>
         </div>
       </div>
 

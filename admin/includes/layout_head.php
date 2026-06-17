@@ -1235,4 +1235,113 @@
     padding: 0.45rem 1rem;
     white-space: nowrap;
   }
+
+  /* ── PAGINATION ── */
+  .pagination-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding: 1rem 0 0.25rem;
+  }
+
+  .pagination-info {
+    font-size: 12px;
+    color: var(--text-s);
+  }
+
+  .pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .pg-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 32px;
+    padding: 0 6px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-m);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.18s;
+    user-select: none;
+    font-family: inherit;
+    line-height: 1;
+  }
+
+  .pg-btn:hover:not(:disabled):not(.pg-btn-active) {
+    background: var(--surface-h);
+    border-color: var(--border-h);
+    color: var(--text);
+  }
+
+  .pg-btn.pg-btn-active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    font-weight: 700;
+  }
+
+  .pg-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .pg-btn.pg-dots {
+    border: none;
+    background: transparent;
+    cursor: default;
+    letter-spacing: 2px;
+    color: var(--text-s);
+  }
+
+  .pg-perpage-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-s);
+  }
+
+  .pg-perpage-select {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 12px;
+    font-family: inherit;
+    font-weight: 500;
+    padding: 4px 24px 4px 8px;
+    height: 32px;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%236b7280' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    outline: none;
+    transition: border-color 0.18s;
+  }
+
+  .pg-perpage-select:focus {
+    border-color: var(--accent);
+  }
+
+  @media (max-width: 640px) {
+    .pagination-wrap {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .pagination-controls {
+      flex-wrap: wrap;
+    }
+  }
 </style>
