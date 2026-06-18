@@ -186,10 +186,11 @@ require_once __DIR__ . '/includes/helpers.php';
             </button>
             <?php
             $lead_form_options = [
-                'form_id' => 'brochureFormGlobal',
-                'heading' => 'Download Brochure',
-                'subheading' => 'Academic Experts will assist you!',
-                'button_text' => 'Download Brochure',
+                'form_id'         => 'brochureFormGlobal',
+                'form_name'       => 'DES_Compare_Brochure_Form',
+                'heading'         => 'Download Brochure',
+                'subheading'      => 'Academic Experts will assist you!',
+                'button_text'     => 'Download Brochure',
                 'success_heading' => 'Thank You!',
                 'success_message' => 'Your request has been successfully submitted. Your brochure will open in a new tab momentarily. Our academic experts will contact you soon.'
             ];
@@ -231,11 +232,12 @@ require_once __DIR__ . '/includes/helpers.php';
 
             <?php
             $lead_form_options = [
-                'form_id' => 'scholarshipFormGlobal',
-                'lead_type' => 'scholarship',
-                'heading' => '', // Using custom JS heading
-                'subheading' => '', // Using custom JS subheading
-                'button_text' => 'Claim Scholarship',
+                'form_id'         => 'scholarshipFormGlobal',
+                'form_name'       => 'DES_Compare_Scholarship_Form',
+                'lead_type'       => 'scholarship',
+                'heading'         => '', // Using custom JS heading
+                'subheading'      => '', // Using custom JS subheading
+                'button_text'     => 'Claim Scholarship',
                 'success_heading' => 'Submission Successful!',
                 'success_message' => 'Your scholarship request has been received. Our academic counsellor will review your details and contact you shortly with the exact scholarship amount and the complete application process.'
             ];
@@ -269,11 +271,12 @@ require_once __DIR__ . '/includes/helpers.php';
 
             <?php
             $lead_form_options = [
-                'form_id' => 'counselingFormGlobal',
-                'lead_type' => 'counseling',
-                'heading' => 'Book 1:1 Counselling with Our Experts',
-                'subheading' => 'Get personalized guidance from industry experts to shape your academic journey.',
-                'button_text' => 'Book Now',
+                'form_id'         => 'counselingFormGlobal',
+                'form_name'       => 'DES_Compare_Counseling_Form',
+                'lead_type'       => 'counseling',
+                'heading'         => 'Book 1:1 Counselling with Our Experts',
+                'subheading'      => 'Get personalized guidance from industry experts to shape your academic journey.',
+                'button_text'     => 'Book Now',
                 'success_heading' => 'Booking Successful!',
                 'success_message' => 'Your counseling session request has been received. Our expert counsellor will reach out directly to coordinate the best time for your 1:1 session.'
             ];
@@ -312,11 +315,12 @@ require_once __DIR__ . '/includes/helpers.php';
             <div style="padding: 1rem 1.5rem 1.5rem;" class="compact-unlock-form">
                 <?php
                 $lead_form_options = [
-                    'form_id' => 'compareUnlockForm',
-                    'lead_type' => 'compare_unlock',
-                    'heading' => '',
-                    'subheading' => '',
-                    'button_text' => '🔓 Unlock Full Comparison — FREE',
+                    'form_id'         => 'compareUnlockForm',
+                    'form_name'       => 'DES_Compare_Unlock_Form',
+                    'lead_type'       => 'compare_unlock',
+                    'heading'         => '',
+                    'subheading'      => '',
+                    'button_text'     => '🔓 Unlock Full Comparison — FREE',
                     'success_heading' => 'Access Unlocked! 🎉',
                     'success_message' => 'You can now view the complete comparison. Our academic experts will also reach out to help you choose the best university.'
                 ];
@@ -944,7 +948,11 @@ require_once __DIR__ . '/includes/helpers.php';
             }
 
             // Custom heading behavior
-            document.getElementById('sch_heading').innerText = `Claim ${discountStr} Scholarship`;
+            // discountStr is either '20%' (with percent) or 'Scholarship' (no discount set)
+            const headingText = discountStr.includes('%')
+                ? `Claim Upto ${discountStr} Scholarship`
+                : `Claim Scholarship`;
+            document.getElementById('sch_heading').innerText = headingText;
 
             // Sync up generic states
             document.getElementById('scholarshipUiTop').style.display = 'block';

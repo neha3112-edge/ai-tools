@@ -2,6 +2,13 @@
    SODE AI Tools - Public Frontend Styles (V2)
 ========================================================= */
 
+@font-face {
+  font-family: 'Twemoji Country Flags';
+  /* Unicode range for regional indicator symbols */
+  unicode-range: U+1F1E6-1F1FF;
+  src: url('https://cdn.jsdelivr.net/npm/country-flag-emoji-polyfill@0.1/dist/TwemojiCountryFlags.woff2') format('woff2');
+}
+
 :root {
   --bg: #f4f7f9;
   --surface: #ffffff;
@@ -24,7 +31,7 @@
   --radius: 12px;
   --radius-sm: 8px;
 
-  --font-main: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-main: 'Twemoji Country Flags', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
   --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.1);
@@ -43,6 +50,10 @@ body {
   color: var(--text);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+}
+
+input, select, textarea, button, option {
+  font-family: inherit;
 }
 
 a {
