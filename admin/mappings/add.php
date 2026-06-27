@@ -5,7 +5,7 @@ session_start();
 require_once '../../includes/db.php';
 require_once '../../includes/auth.php';
 require_once '../../includes/helpers.php';
-require_login();
+require_permission('mappings.add');
 
 $errors = [];
 $old = $_POST;

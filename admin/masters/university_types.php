@@ -5,13 +5,17 @@ session_start();
 require_once '../../includes/db.php';
 require_once '../../includes/auth.php';
 require_once '../../includes/helpers.php';
-require_login();
+require_permission('university_types.view');
 
 $errors = [];
 $edit_item = null;
 
 // Handle Delete
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
+  if (!has_team_action('Delete')) {
+    set_flash('error', 'You do not have permission to delete records.');
+    redirect(ADMIN_URL . '/masters/university_types.php');
+  }
   $did = (int) $_POST['delete_id'];
   $used = $pdo->prepare("SELECT COUNT(*) FROM universities WHERE university_type_id=?");
   $used->execute([$did]);
@@ -26,6 +30,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
 
 // Handle bulk delete
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['bulk_delete_ids'])) {
+  if (!has_team_action('Delete')) {
+    set_flash('error', 'You do not have permission to delete records.');
+    redirect(ADMIN_URL . '/masters/university_types.php');
+  }
   $ids = array_filter(array_map('intval', explode(',', $_POST['bulk_delete_ids'])));
   if ($ids) {
     $deleted = 0;
@@ -45,6 +53,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['bulk_delete_ids'])) 
 
 // Handle Add
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add') {
+  if (!has_team_action('Create')) {
+    set_flash('error', 'You do not have permission to add master items.');
+    redirect(ADMIN_URL . '/masters/university_types.php');
+  }
   $name = trim($_POST['name'] ?? '');
   if (!$name) {
     $errors['add_name'] = 'Name is required.';
@@ -63,6 +75,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add')
 
 // Handle Update
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'edit') {
+  if (!has_team_action('Update')) {
+    set_flash('error', 'You do not have permission to edit master items.');
+    redirect(ADMIN_URL . '/masters/university_types.php');
+  }
   $eid = (int) $_POST['edit_id'];
   $name = trim($_POST['name'] ?? '');
   if (!$name) {
@@ -84,16 +100,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'edit'
 
 // Populate edit item if requested
 if (isset($_GET['edit'])) {
+  if (!has_team_action('Update')) {
+    set_flash('error', 'You do not have permission to edit master items.');
+    redirect(ADMIN_URL . '/masters/university_types.php');
+  }
   $stmt = $pdo->prepare("SELECT * FROM university_types WHERE id=?");
   $stmt->execute([(int) $_GET['edit']]);
   $edit_item = $stmt->fetch();
 }
 
-$types = $pdo->query("
+// Determine pagination
+$page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+$limit = 10;
+$offset = (int)(($page - 1) * $limit);
+
+$total_count = (int)$pdo->query("SELECT COUNT(*) FROM university_types")->fetchColumn();
+$total_pages = ceil($total_count / $limit);
+
+$stmt = $pdo->prepare("
     SELECT t.*, (SELECT COUNT(*) FROM universities u WHERE u.university_type_id = t.id) as used_count
     FROM university_types t
     ORDER BY t.type_name ASC
-")->fetchAll();
+    LIMIT :limit OFFSET :offset
+");
+$stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+$stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+$stmt->execute();
+$types = $stmt->fetchAll();
 
 $active_page = 'university_types';
 $page_title = 'University Types';
@@ -134,17 +167,22 @@ $logout_path = '../../logout.php';
           <p><?= count($types) ?> record(s) found</p>
         </div>
       </div>
+      <?php 
+      $can_create = has_team_action('Create');
+      $can_update = has_team_action('Update');
+      ?>
       <div class="split-layout">
+        <?php if ($can_create || $can_update): ?>
         <div class="split-form">
           <div class="panel">
-            <?php if ($edit_item): ?>
+            <?php if ($edit_item && $can_update): ?>
               <div class="panel-header" style="color:var(--accent);">Edit Type</div>
               <form method="POST" action="university_types.php">
                 <input type="hidden" name="action" value="edit">
                 <input type="hidden" name="edit_id" value="<?= $edit_item['id'] ?>">
                 <div class="form-group">
                   <label>Type Name <span class="required">*</span></label>
-                  <input type="text" name="name" class="form-control" value="<?= e($edit_item['type_name'] ?? '') ?>">
+                  <input type="text" name="name" class="form-control" value="<?= e($edit_item['type_name'] ?? '') ?>" autofocus>
                   <?php if (isset($errors['edit_name'])): ?><span class="helper-text" style="color:var(--danger);"><?= $errors['edit_name'] ?></span><?php endif; ?>
                 </div>
                 <div style="display:flex;gap:0.5rem;margin-top:1.5rem;">
@@ -152,27 +190,33 @@ $logout_path = '../../logout.php';
                   <a href="university_types.php" class="btn btn-secondary" style="flex:1;text-align:center;">Cancel</a>
                 </div>
               </form>
-            <?php else: ?>
+            <?php elseif (!$edit_item && $can_create): ?>
               <div class="panel-header">Add New Type</div>
               <form method="POST">
                 <input type="hidden" name="action" value="add">
                 <div class="form-group">
                   <label>Type Name <span class="required">*</span></label>
-                  <input type="text" name="name" class="form-control" placeholder="e.g. Deemed, Autonomous" value="<?= e($_POST['name'] ?? '') ?>">
+                  <input type="text" name="name" class="form-control" placeholder="e.g. Deemed, Autonomous" value="<?= e($_POST['name'] ?? '') ?>" autofocus>
                   <?php if (isset($errors['add_name'])): ?><span class="helper-text" style="color:var(--danger);"><?= $errors['add_name'] ?></span><?php endif; ?>
                 </div>
                 <button type="submit" class="btn btn-primary" style="width:100%;margin-top:0.5rem;">Add Type</button>
               </form>
+            <?php else: ?>
+              <div class="panel-header">Access Restricted</div>
+              <p style="color:var(--text-s);">You do not have permission to perform this action.</p>
             <?php endif; ?>
           </div>
         </div>
-        <div class="split-table">
+        <?php endif; ?>
+        <div class="split-table" style="<?= (!$can_create && !$can_update) ? 'width: 100%; flex: 1;' : '' ?>">
           <div class="panel" style="padding:0;">
             <div class="table-responsive">
               <table>
                 <thead>
                   <tr>
+                    <?php if (has_team_action('Delete')): ?>
                     <th style="width:40px;"><input type="checkbox" class="bulk-cb" id="bulkSelectAll" title="Select All"></th>
+                    <?php endif; ?>
                     <th style="width:50px;">#</th>
                     <th>Type Name</th>
                     <th>Usage Count</th>
@@ -183,7 +227,9 @@ $logout_path = '../../logout.php';
                   <?php if ($types): ?>
                     <?php foreach ($types as $i => $t): ?>
                       <tr data-ba-row-id="<?= $t['id'] ?>" data-ba-module="university_types" <?= $edit_item && $edit_item['id'] == $t['id'] ? 'style="background:rgba(37,99,235,0.05);"' : '' ?>>
-                         <td><input type="checkbox" class="bulk-cb bulk-row-cb" value="<?= $t['id'] ?>"></td>
+                          <?php if (has_team_action('Delete')): ?>
+                          <td><input type="checkbox" class="bulk-cb bulk-row-cb" value="<?= $t['id'] ?>"></td>
+                          <?php endif; ?>
                          <td data-label="#"> <?= $i + 1 ?> </td>
                         <td data-label="Type Name" style="font-weight:600;color:var(--text);"><?= e($t['type_name']) ?></td>
                          <td data-label="Usage Count">
@@ -193,6 +239,7 @@ $logout_path = '../../logout.php';
                             <?php else: ?>
                               <span class="badge ba-none-text">Unused</span>
                             <?php endif; ?>
+                            <?php if (has_team_action('Update')): ?>
                             <button
                               type="button"
                               class="btn btn-secondary btn-sm ba-manage-btn"
@@ -201,34 +248,41 @@ $logout_path = '../../logout.php';
                               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                               Manage
                             </button>
+                            <?php endif; ?>
                           </div>
                          </td>
                         <td data-label="Actions" style="text-align:right;">
                           <div class="action-col" style="justify-content:flex-end;">
+                            <?php if (has_team_action('Update')): ?>
                             <a href="?edit=<?= $t['id'] ?>" class="btn btn-secondary btn-sm btn-icon" title="Edit">
                               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                             </a>
+                            <?php endif; ?>
+                            <?php if (has_team_action('Delete')): ?>
                             <form method="POST" style="display:inline;">
                               <input type="hidden" name="delete_id" value="<?= $t['id'] ?>">
                               <button type="submit" class="btn btn-danger btn-sm btn-icon" title="Delete" <?= $t['used_count'] > 0 ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : '' ?> data-confirm="Delete '<?= e($t['type_name']) ?>'?">
                                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
                               </button>
                             </form>
+                            <?php endif; ?>
                           </div>
                         </td>
                        </tr>
                     <?php endforeach; ?>
                   <?php else: ?>
-                    <tr><td colspan="5" class="empty-state">No types found. Add your first university type.</td></tr>
+                    <tr><td colspan="<?= has_team_action('Delete') ? 5 : 4 ?>" class="empty-state">No types found. Add your first university type.</td></tr>
                   <?php endif; ?>
                 </tbody>
               </table>
             </div>
-          </div>
+            </div>
+            <?= render_pagination($total_count, 10, $page) ?>
         </div>
       </div>
     </div>
 
+    <?php if (has_team_action('Delete')): ?>
     <!-- Bulk Delete Bar -->
     <div class="bulk-bar" id="bulkBar">
       <div class="bulk-count" id="bulkCount"><span>0</span> selected</div>
@@ -241,6 +295,7 @@ $logout_path = '../../logout.php';
     <form method="POST" id="bulkDeleteForm" style="display:none;">
       <input type="hidden" name="bulk_delete_ids" id="bulkDeleteIds" value="">
     </form>
+    <?php endif; ?>
   </main>
   
   <?php require_once __DIR__ . '/../includes/bulk_assoc_modal.php'; ?>

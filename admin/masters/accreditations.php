@@ -5,13 +5,17 @@ session_start();
 require_once '../../includes/db.php';
 require_once '../../includes/auth.php';
 require_once '../../includes/helpers.php';
-require_login();
+require_permission('accreditations.view');
 
 $errors = [];
 $edit_item = null;
 
 // ── DELETE ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
+  if (!has_team_action('Delete')) {
+    set_flash('error', 'You do not have permission to delete records.');
+    redirect(ADMIN_URL . '/masters/accreditations.php');
+  }
   $did = (int) $_POST['delete_id'];
   $used = $pdo->prepare("SELECT COUNT(*) FROM university_accreditations WHERE accreditation_id=?");
   $used->execute([$did]);
@@ -31,6 +35,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
 
 // Handle bulk delete
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['bulk_delete_ids'])) {
+  if (!has_team_action('Delete')) {
+    set_flash('error', 'You do not have permission to delete records.');
+    redirect(ADMIN_URL . '/masters/accreditations.php');
+  }
   $ids = array_filter(array_map('intval', explode(',', $_POST['bulk_delete_ids'])));
   if ($ids) {
     $deleted = 0; $skipped = 0;
@@ -52,6 +60,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['bulk_delete_ids'])) 
 
 // ── ADD ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add') {
+  if (!has_team_action('Create')) {
+    set_flash('error', 'You do not have permission to add master items.');
+    redirect(ADMIN_URL . '/masters/accreditations.php');
+  }
   $name = trim($_POST['name'] ?? '');
   if (!$name) {
     $errors['add_name'] = 'Name is required.';
@@ -79,6 +91,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add')
 
 // ── EDIT ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'edit') {
+  if (!has_team_action('Update')) {
+    set_flash('error', 'You do not have permission to edit master items.');
+    redirect(ADMIN_URL . '/masters/accreditations.php');
+  }
   $eid = (int) $_POST['edit_id'];
   $name = trim($_POST['name'] ?? '');
 
@@ -130,18 +146,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'edit'
 
 // ── OPEN EDIT from GET ──
 if (isset($_GET['edit'])) {
+  if (!has_team_action('Update')) {
+    set_flash('error', 'You do not have permission to edit master items.');
+    redirect(ADMIN_URL . '/masters/accreditations.php');
+  }
   $stmt = $pdo->prepare("SELECT * FROM accreditations WHERE id=?");
   $stmt->execute([(int) $_GET['edit']]);
   $edit_item = $stmt->fetch() ?: null;
 }
 
-// ── FETCH ALL ──
-$all = $pdo->query(
-  "SELECT a.*, COUNT(ua.university_id) as usage_count
+// Determine pagination
+$page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+$limit = 10;
+$offset = (int)(($page - 1) * $limit);
+
+$total_count = (int)$pdo->query("SELECT COUNT(*) FROM accreditations")->fetchColumn();
+$total_pages = ceil($total_count / $limit);
+
+$stmt = $pdo->prepare("SELECT a.*, COUNT(ua.university_id) as usage_count
      FROM accreditations a
      LEFT JOIN university_accreditations ua ON ua.accreditation_id = a.id
-     GROUP BY a.id ORDER BY a.name ASC"
-)->fetchAll();
+     GROUP BY a.id ORDER BY a.name ASC
+     LIMIT :limit OFFSET :offset");
+$stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+$stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+$stmt->execute();
+$all = $stmt->fetchAll();
 
 $active_page = 'accreditations';
 $page_title = 'Accreditations';
@@ -221,11 +251,16 @@ $page_subtitle = 'Manage accreditation & approval badges';
       </div>
     </div>
 
-    <div class="master-wrap">
+      <?php 
+      $can_create = has_team_action('Create');
+      $can_update = has_team_action('Update');
+      ?>
+      <div class="master-wrap" style="<?= (!$can_create && !$can_update) ? 'grid-template-columns: 1fr;' : '' ?>">
 
-      <!-- ── LEFT: Form ── -->
-      <div>
-        <?php if (!$edit_item): ?>
+        <?php if ($can_create || $can_update): ?>
+        <!-- ── LEFT: Form ── -->
+        <div>
+          <?php if (!$edit_item && $can_create): ?>
           <!-- ADD FORM -->
           <div class="section-title">Add New Accreditation</div>
           <div class="form-card">
@@ -265,7 +300,7 @@ $page_subtitle = 'Manage accreditation & approval badges';
             </form>
           </div>
 
-        <?php else: ?>
+          <?php elseif ($edit_item && $can_update): ?>
           <!-- EDIT FORM -->
           <div class="section-title">Edit Accreditation</div>
           <div class="form-card" style="border-color:var(--accent);">
@@ -318,17 +353,21 @@ $page_subtitle = 'Manage accreditation & approval badges';
               </div>
             </form>
           </div>
-        <?php endif; ?>
+          <?php else: ?>
+            <div class="section-title">Access Restricted</div>
+            <div class="form-card">You do not have permission to perform this action.</div>
+          <?php endif; ?>
 
-        <!-- Info note -->
-        <div style="margin-top:1rem;padding:.875rem;background:var(--surface-h);border:1px solid var(--border);border-radius:var(--radius-sm);">
-          <p style="font-size:12px;color:var(--text-s);line-height:1.6;">
-            <strong style="color:var(--text-m);">Note:</strong>
-            Accreditations assigned to universities cannot be deleted.
-            Unassign them from universities first.
-          </p>
+          <!-- Info note -->
+          <div style="margin-top:1rem;padding:.875rem;background:var(--surface-h);border:1px solid var(--border);border-radius:var(--radius-sm);">
+            <p style="font-size:12px;color:var(--text-s);line-height:1.6;">
+              <strong style="color:var(--text-m);">Note:</strong>
+              Accreditations assigned to universities cannot be deleted.
+              Unassign them from universities first.
+            </p>
+          </div>
         </div>
-      </div>
+        <?php endif; ?>
 
       <!-- ── RIGHT: Table ── -->
       <div>
@@ -338,7 +377,9 @@ $page_subtitle = 'Manage accreditation & approval badges';
           <table>
             <thead>
               <tr>
+                <?php if (has_team_action('Delete')): ?>
                 <th style="width:40px;"><input type="checkbox" class="bulk-cb" id="bulkSelectAll" title="Select All"></th>
+                <?php endif; ?>
                 <th style="width:44px;">#</th>
                 <th style="width:52px;">Logo</th>
                 <th>Name</th>
@@ -350,7 +391,9 @@ $page_subtitle = 'Manage accreditation & approval badges';
               <?php if ($all): ?>
                   <?php foreach ($all as $i => $a): ?>
                     <tr data-ba-row-id="<?= $a['id'] ?>" data-ba-module="accreditations" class="<?= ($edit_item && $edit_item['id'] == $a['id']) ? 'edit-row' : '' ?>">
+                      <?php if (has_team_action('Delete')): ?>
                       <td><input type="checkbox" class="bulk-cb bulk-row-cb" value="<?= $a['id'] ?>"></td>
+                      <?php endif; ?>
                       <td data-label="#"> <?= $i + 1 ?> </td>
                       <td data-label="Logo">
                         <?php if (!empty($a['image'])): ?>
@@ -372,19 +415,24 @@ $page_subtitle = 'Manage accreditation & approval badges';
                           <?php else: ?>
                             <span style="color:var(--text-s);font-size:12px;" class="ba-none-text">None</span>
                           <?php endif; ?>
+                          <?php if (has_team_action('Update')): ?>
                           <button type="button" class="btn btn-secondary btn-sm ba-manage-btn"
                             onclick="openBulkModal('accreditations', <?= $a['id'] ?>, <?= htmlspecialchars(json_encode($a['name']), ENT_QUOTES) ?>)"
                             title="Manage universities">
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                             Manage
                           </button>
+                          <?php endif; ?>
                         </div>
                       </td>
                       <td data-label="Actions">
                         <div class="action-col">
+                          <?php if (has_team_action('Update')): ?>
                           <a href="?edit=<?= $a['id'] ?>" class="btn btn-secondary btn-sm btn-icon" title="Edit">
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                           </a>
+                          <?php endif; ?>
+                          <?php if (has_team_action('Delete')): ?>
                           <form method="POST" style="display:inline;">
                             <input type="hidden" name="delete_id" value="<?= $a['id'] ?>">
                             <button type="button"
@@ -394,12 +442,13 @@ $page_subtitle = 'Manage accreditation & approval badges';
                               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
                             </button>
                           </form>
+                          <?php endif; ?>
                         </div>
                       </td>
                     </tr>
                   <?php endforeach; ?>
               <?php else: ?>
-                  <tr><td colspan="5">
+                  <tr><td colspan="<?= has_team_action('Delete') ? 6 : 5 ?>">
                     <div class="empty-state">
                       <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                       <p>No accreditations yet. Add one on the left.</p>
@@ -409,11 +458,13 @@ $page_subtitle = 'Manage accreditation & approval badges';
             </tbody>
           </table>
           </div>
-        </div>
+          </div>
+          <?= render_pagination($total_count, 10, $page) ?>
       </div>
 
     </div><!-- /master-wrap -->
 
+    <?php if (has_team_action('Delete')): ?>
     <!-- Bulk Delete Bar -->
     <div class="bulk-bar" id="bulkBar">
       <div class="bulk-count" id="bulkCount"><span>0</span> selected</div>
@@ -426,6 +477,7 @@ $page_subtitle = 'Manage accreditation & approval badges';
     <form method="POST" id="bulkDeleteForm" style="display:none;">
       <input type="hidden" name="bulk_delete_ids" id="bulkDeleteIds" value="">
     </form>
+    <?php endif; ?>
   </div>
 </main>
 

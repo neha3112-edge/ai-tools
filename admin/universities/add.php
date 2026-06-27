@@ -5,7 +5,7 @@ session_start();
 require_once '../../includes/db.php';
 require_once '../../includes/auth.php';
 require_once '../../includes/helpers.php';
-require_login();
+require_permission('universities.add');
 
 $edu_modes = $pdo->query("SELECT * FROM education_modes ORDER BY id")->fetchAll();
 $exam_modes_all = $pdo->query("SELECT * FROM exam_modes ORDER BY id")->fetchAll();

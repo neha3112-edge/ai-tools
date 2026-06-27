@@ -6,7 +6,21 @@ require_once '../includes/db.php';
 require_once '../includes/auth.php';
 
 if (is_logged_in()) {
-  header('Location: ' . ADMIN_URL . '/dashboard.php');
+  if (has_permission('dashboard.view')) {
+    header('Location: ' . ADMIN_URL . '/dashboard.php');
+  } else {
+    if (has_permission('universities.view')) {
+      header('Location: ' . ADMIN_URL . '/universities/index.php');
+    } elseif (has_permission('courses.view')) {
+      header('Location: ' . ADMIN_URL . '/courses/index.php');
+    } elseif (has_permission('mappings.view')) {
+      header('Location: ' . ADMIN_URL . '/mappings/index.php');
+    } elseif (has_permission('leads.view')) {
+      header('Location: ' . ADMIN_URL . '/leads.php');
+    } else {
+      header('Location: ' . ADMIN_URL . '/rbac/access-denied.php');
+    }
+  }
   exit;
 }
 
@@ -24,8 +38,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($admin && password_verify($password, $admin['password'])) {
       $_SESSION['admin_id'] = $admin['id'];
       $_SESSION['admin_name'] = $admin['name'];
-      $_SESSION['admin_role'] = $admin['role'];
-      header('Location: ' . ADMIN_URL . '/dashboard.php');
+      $_SESSION['is_superadmin'] = (int)$admin['is_superadmin'];
+      
+      resolve_user_permissions();
+
+      if (has_permission('dashboard.view')) {
+        header('Location: ' . ADMIN_URL . '/dashboard.php');
+      } else {
+        if (has_permission('universities.view')) {
+          header('Location: ' . ADMIN_URL . '/universities/index.php');
+        } elseif (has_permission('courses.view')) {
+          header('Location: ' . ADMIN_URL . '/courses/index.php');
+        } elseif (has_permission('mappings.view')) {
+          header('Location: ' . ADMIN_URL . '/mappings/index.php');
+        } elseif (has_permission('leads.view')) {
+          header('Location: ' . ADMIN_URL . '/leads.php');
+        } else {
+          header('Location: ' . ADMIN_URL . '/rbac/access-denied.php');
+        }
+      }
       exit;
     } else {
       $error = 'Invalid email or password.';

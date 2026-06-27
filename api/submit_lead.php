@@ -1,10 +1,9 @@
 <?php
 // ============================================================
 // api/submit_lead.php
-// Saves lead to DB, then fires CRM + Brevo + Gallabox calls.
+// Fires CRM + Brevo + Gallabox calls without saving to local DB.
 // ============================================================
 require_once dirname(__DIR__) . '/includes/config.php';
-require_once dirname(__DIR__) . '/includes/db.php';
 
 session_start();
 header('Content-Type: application/json');
@@ -62,31 +61,7 @@ if (!empty($_SESSION['lead_csrf_token']) && !hash_equals($_SESSION['lead_csrf_to
     exit;
 }
 
-// ── 5. SAVE TO DATABASE ───────────────────────────────────────────────────
-try {
-    if ($lead_type === 'scholarship') {
-        $stmt = $pdo->prepare("INSERT INTO scholarship_leads (name, email, country_code, phone, course, state, uni_name, page_url, user_ip, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())");
-        $stmt->execute([$name, $email, $country_code, $phone, $course, $state, $uni_name, $page_url, $user_ip]);
-    } elseif ($lead_type === 'counseling') {
-        $stmt = $pdo->prepare("INSERT INTO counseling_leads (name, email, country_code, phone, course, state, uni_name, page_url, user_ip, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())");
-        $stmt->execute([$name, $email, $country_code, $phone, $course, $state, $uni_name, $page_url, $user_ip]);
-    } elseif ($lead_type === 'compare_unlock') {
-        $stmt = $pdo->prepare("INSERT INTO compare_unlock_leads (name, email, country_code, phone, course, state, page_url, user_ip, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())");
-        $stmt->execute([$name, $email, $country_code, $phone, $course, $state, $page_url, $user_ip]);
-    } else {
-        $stmt = $pdo->prepare("INSERT INTO brochure_leads (name, email, country_code, phone, course, state, page_url, user_ip, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())");
-        $stmt->execute([$name, $email, $country_code, $phone, $course, $state, $page_url, $user_ip]);
-    }
-} catch (PDOException $e) {
-    if ($e->getCode() == '42S02') {
-        echo json_encode(['success' => false, 'error' => 'Database table is missing.']);
-    } else {
-        echo json_encode(['success' => false, 'error' => 'Failed to save. Please try again later.']);
-    }
-    exit;
-}
-
-// DB save succeeded — respond to browser immediately
+// Respond to browser immediately
 echo json_encode(['success' => true]);
 
 // Flush output so user gets the response while we fire integrations

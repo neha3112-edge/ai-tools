@@ -5,10 +5,14 @@ session_start();
 require_once '../../includes/db.php';
 require_once '../../includes/auth.php';
 require_once '../../includes/helpers.php';
-require_login();
+require_permission('mappings.view');
 
 // Handle single hard-delete
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
+  if (!has_team_action('Delete')) {
+    set_flash('danger', 'You do not have permission to delete records.');
+    redirect(ADMIN_URL . '/mappings/index.php');
+  }
   $did = (int) $_POST['delete_id'];
   // Cleanup brochure file
   $row = $pdo->prepare("SELECT brochure_file FROM university_courses WHERE id=?");
@@ -22,6 +26,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
 
 // Handle bulk hard-delete
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['bulk_delete_ids'])) {
+  if (!has_team_action('Delete')) {
+    set_flash('danger', 'You do not have permission to delete records.');
+    redirect(ADMIN_URL . '/mappings/index.php');
+  }
   $ids = array_filter(array_map('intval', explode(',', $_POST['bulk_delete_ids'])));
   if ($ids) {
     $placeholders = implode(',', array_fill(0, count($ids), '?'));
@@ -102,6 +110,7 @@ $logout_path = '../logout.php';
           <h3>Course Mappings</h3>
           <p><?= count($mappings) ?> record(s) found</p>
         </div>
+        <?php if (has_permission('mappings.add')): ?>
         <a href="add.php" class="btn btn-primary">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
             stroke-linecap="round">
@@ -110,6 +119,7 @@ $logout_path = '../logout.php';
           </svg>
           Map Course
         </a>
+        <?php endif; ?>
       </div>
 
       <!-- Search & Filter -->
@@ -143,7 +153,9 @@ $logout_path = '../logout.php';
           <table data-paginate>
             <thead>
               <tr>
+                <?php if (has_team_action('Delete')): ?>
                 <th style="width:40px;"><input type="checkbox" class="bulk-cb" id="bulkSelectAll" title="Select All"></th>
+                <?php endif; ?>
                 <th style="width:50px;">#</th>
                 <th>University</th>
                 <th>Course</th>
@@ -157,7 +169,9 @@ $logout_path = '../logout.php';
               <?php if ($mappings): ?>
                 <?php foreach ($mappings as $i => $m): ?>
                   <tr>
+                    <?php if (has_team_action('Delete')): ?>
                     <td><input type="checkbox" class="bulk-cb bulk-row-cb" value="<?= $m['id'] ?>"></td>
+                    <?php endif; ?>
                     <td data-label="#"> <?= $i + 1 ?> </td>
                     <td data-label="University">
                       <div class="cell-name"><?= e(get_display_name($m['u_name'], $m['u_disp'])) ?></div>
@@ -195,6 +209,7 @@ $logout_path = '../logout.php';
                             <circle cx="12" cy="12" r="3" />
                           </svg>
                         </a>
+                        <?php if (has_permission('mappings.edit')): ?>
                         <a href="edit.php?id=<?= $m['id'] ?>" class="btn btn-secondary btn-sm btn-icon" title="Edit">
                           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                             stroke-linecap="round">
@@ -202,6 +217,8 @@ $logout_path = '../logout.php';
                             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                           </svg>
                         </a>
+                        <?php endif; ?>
+                        <?php if (has_team_action('Delete')): ?>
                         <form method="POST" style="display:inline;">
                           <input type="hidden" name="delete_id" value="<?= $m['id'] ?>">
                           <button type="submit" class="btn btn-danger btn-sm btn-icon" title="Delete"
@@ -215,13 +232,14 @@ $logout_path = '../logout.php';
                             </svg>
                           </button>
                         </form>
+                        <?php endif; ?>
                       </div>
                     </td>
                   </tr>
                 <?php endforeach; ?>
               <?php else: ?>
                 <tr class="empty-row">
-                  <td colspan="8" style="text-align: center; color: var(--text-s); padding: 3rem;">
+                  <td colspan="<?= has_team_action('Delete') ? 8 : 7 ?>" style="text-align: center; color: var(--text-s); padding: 3rem;">
                     <div class="empty-state">
                       <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
                         stroke-linecap="round" style="margin-bottom: 1rem; opacity: 0.5;">
@@ -252,6 +270,7 @@ $logout_path = '../logout.php';
         </div>
       </div>
 
+      <?php if (has_team_action('Delete')): ?>
       <!-- Bulk Delete Bar -->
       <div class="bulk-bar" id="bulkBar">
         <div class="bulk-count" id="bulkCount"><span>0</span> selected</div>
@@ -264,6 +283,7 @@ $logout_path = '../logout.php';
       <form method="POST" id="bulkDeleteForm" style="display:none;">
         <input type="hidden" name="bulk_delete_ids" id="bulkDeleteIds" value="">
       </form>
+      <?php endif; ?>
     </div>
   </main>
 

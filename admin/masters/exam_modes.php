@@ -5,12 +5,16 @@ session_start();
 require_once '../../includes/db.php';
 require_once '../../includes/auth.php';
 require_once '../../includes/helpers.php';
-require_login();
+require_permission('exam_modes.view');
 
 $errors = [];
 $edit_item = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
+  if (!has_team_action('Delete')) {
+    set_flash('error', 'You do not have permission to delete records.');
+    redirect(ADMIN_URL . '/masters/exam_modes.php');
+  }
   $did = (int) $_POST['delete_id'];
   $used = $pdo->prepare("SELECT COUNT(*) FROM university_exam_modes WHERE exam_mode_id=?");
   $used->execute([$did]);
@@ -25,6 +29,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
 
 // Handle bulk delete
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['bulk_delete_ids'])) {
+  if (!has_team_action('Delete')) {
+    set_flash('error', 'You do not have permission to delete records.');
+    redirect(ADMIN_URL . '/masters/exam_modes.php');
+  }
   $ids = array_filter(array_map('intval', explode(',', $_POST['bulk_delete_ids'])));
   if ($ids) {
     $deleted = 0; $skipped = 0;
@@ -42,6 +50,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['bulk_delete_ids'])) 
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add') {
+  if (!has_team_action('Create')) {
+    set_flash('error', 'You do not have permission to add master items.');
+    redirect(ADMIN_URL . '/masters/exam_modes.php');
+  }
   $name = trim($_POST['name'] ?? '');
   if (!$name) {
     $errors['add_name'] = 'Name is required.';
@@ -59,6 +71,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add')
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'edit') {
+  if (!has_team_action('Update')) {
+    set_flash('error', 'You do not have permission to edit master items.');
+    redirect(ADMIN_URL . '/masters/exam_modes.php');
+  }
   $eid = (int) $_POST['edit_id'];
   $name = trim($_POST['name'] ?? '');
   if (!$name) {
@@ -79,14 +95,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'edit'
 }
 
 if (isset($_GET['edit'])) {
+  if (!has_team_action('Update')) {
+    set_flash('error', 'You do not have permission to edit master items.');
+    redirect(ADMIN_URL . '/masters/exam_modes.php');
+  }
   $stmt = $pdo->prepare("SELECT * FROM exam_modes WHERE id=?");
   $stmt->execute([(int) $_GET['edit']]);
   $edit_item = $stmt->fetch() ?: null;
 }
 
-$all = $pdo->query("SELECT m.*, COUNT(um.university_id) as usage_count
+// Determine pagination
+$page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+$limit = 10;
+$offset = (int)(($page - 1) * $limit);
+
+$total_count = (int)$pdo->query("SELECT COUNT(*) FROM exam_modes")->fetchColumn();
+$total_pages = ceil($total_count / $limit);
+
+$stmt = $pdo->prepare("SELECT m.*, COUNT(um.university_id) as usage_count
     FROM exam_modes m LEFT JOIN university_exam_modes um ON um.exam_mode_id=m.id
-    GROUP BY m.id ORDER BY m.mode_name ASC")->fetchAll();
+    GROUP BY m.id ORDER BY m.mode_name ASC
+    LIMIT :limit OFFSET :offset");
+$stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+$stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+$stmt->execute();
+$all = $stmt->fetchAll();
 
 $active_page = 'exam_modes';
 $page_title = 'Exam Modes';
@@ -140,9 +173,14 @@ $page_subtitle = 'Online, Offline, Proctored etc.';
           <p>Manage available exam modes for universities</p>
         </div>
       </div>
-      <div class="master-wrap">
+      <?php 
+      $can_create = has_team_action('Create');
+      $can_update = has_team_action('Update');
+      ?>
+      <div class="master-wrap" style="<?= (!$can_create && !$can_update) ? 'grid-template-columns: 1fr;' : '' ?>">
+        <?php if ($can_create || $can_update): ?>
         <div>
-          <?php if (!$edit_item): ?>
+          <?php if (!$edit_item && $can_create): ?>
             <div class="section-title">Add New</div>
             <div class="form-card">
               <form method="POST">
@@ -157,7 +195,7 @@ $page_subtitle = 'Online, Offline, Proctored etc.';
                 <button type="submit" class="btn btn-primary" style="width:100%;">Add Exam Mode</button>
               </form>
             </div>
-          <?php else: ?>
+          <?php elseif ($edit_item && $can_update): ?>
             <div class="section-title">Edit Mode</div>
             <div class="form-card" style="border-color:var(--accent);">
               <form method="POST">
@@ -176,15 +214,21 @@ $page_subtitle = 'Online, Offline, Proctored etc.';
                 </div>
               </form>
             </div>
+          <?php else: ?>
+            <div class="section-title">Access Restricted</div>
+            <div class="form-card">You do not have permission to perform this action.</div>
           <?php endif; ?>
         </div>
+        <?php endif; ?>
         <div>
           <div class="section-title"><?= count($all) ?> Exam Modes</div>
           <div class="panel">
             <table>
               <thead>
                 <tr>
+                  <?php if (has_team_action('Delete')): ?>
                   <th style="width:40px;"><input type="checkbox" class="bulk-cb" id="bulkSelectAll" title="Select All"></th>
+                  <?php endif; ?>
                   <th>#</th>
                   <th>Mode Name</th>
                   <th>Universities</th>
@@ -195,24 +239,31 @@ $page_subtitle = 'Online, Offline, Proctored etc.';
                 <?php if ($all):
                   foreach ($all as $i => $m): ?>
                     <tr data-ba-row-id="<?= $m['id'] ?>" data-ba-module="exam_modes">
+                      <?php if (has_team_action('Delete')): ?>
                       <td><input type="checkbox" class="bulk-cb bulk-row-cb" value="<?= $m['id'] ?>"></td>
+                      <?php endif; ?>
                       <td style="color:var(--text-s);"><?= $i + 1 ?></td>
                       <td><span class="cell-name"><?= e($m['mode_name']) ?></span></td>
                       <td>
                         <div class="ba-trigger-cell">
-                          <?= $m['usage_count'] > 0
-                            ? '<span class="usage-badge ba-usage-badge">' . $m['usage_count'] . ' uni' . ($m['usage_count'] > 1 ? 's' : '') . '</span>'
-                            : '<span style="color:var(--text-s);font-size:12px;" class="ba-none-text">None</span>' ?>
+                          <?php if ($m['usage_count'] > 0): ?>
+                            <span class="usage-badge ba-usage-badge"><?= $m['usage_count'] ?> uni<?= $m['usage_count'] > 1 ? 's' : '' ?></span>
+                          <?php else: ?>
+                            <span style="color:var(--text-s);font-size:12px;" class="ba-none-text">None</span>
+                          <?php endif; ?>
+                          <?php if (has_team_action('Update')): ?>
                           <button type="button" class="btn btn-secondary btn-sm ba-manage-btn"
                             onclick="openBulkModal('exam_modes', <?= $m['id'] ?>, <?= htmlspecialchars(json_encode($m['mode_name']), ENT_QUOTES) ?>)"
                             title="Manage universities">
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                             Manage
                           </button>
+                          <?php endif; ?>
                         </div>
                       </td>
                       <td>
                         <div class="action-col">
+                          <?php if (has_team_action('Update')): ?>
                           <a href="?edit=<?= $m['id'] ?>" class="btn btn-secondary btn-sm btn-icon" title="Edit">
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                               stroke-width="2" stroke-linecap="round">
@@ -220,6 +271,8 @@ $page_subtitle = 'Online, Offline, Proctored etc.';
                               <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                             </svg>
                           </a>
+                          <?php endif; ?>
+                          <?php if (has_team_action('Delete')): ?>
                           <form method="POST" style="display:inline;">
                             <input type="hidden" name="delete_id" value="<?= $m['id'] ?>">
                             <button type="button" class="btn btn-danger btn-sm btn-icon" title="Delete"
@@ -233,12 +286,13 @@ $page_subtitle = 'Online, Offline, Proctored etc.';
                               </svg>
                             </button>
                           </form>
+                          <?php endif; ?>
                         </div>
                       </td>
                     </tr>
                   <?php endforeach; else: ?>
                   <tr>
-                    <td colspan="4">
+                    <td colspan="<?= has_team_action('Delete') ? 5 : 4 ?>">
                       <div class="empty-state">
                         <p>No exam modes yet.</p>
                       </div>
@@ -248,10 +302,12 @@ $page_subtitle = 'Online, Offline, Proctored etc.';
               </tbody>
             </table>
           </div>
+          <?= render_pagination($total_count, 10, $page) ?>
         </div>
       </div>
     </div>
 
+    <?php if (has_team_action('Delete')): ?>
     <!-- Bulk Delete Bar -->
     <div class="bulk-bar" id="bulkBar">
       <div class="bulk-count" id="bulkCount"><span>0</span> selected</div>
@@ -264,6 +320,7 @@ $page_subtitle = 'Online, Offline, Proctored etc.';
     <form method="POST" id="bulkDeleteForm" style="display:none;">
       <input type="hidden" name="bulk_delete_ids" id="bulkDeleteIds" value="">
     </form>
+    <?php endif; ?>
   </main>
   <?php require_once __DIR__ . '/../includes/bulk_assoc_modal.php'; ?>
   <?php require_once __DIR__ . '/../includes/layout_foot.php'; ?>

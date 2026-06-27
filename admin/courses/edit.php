@@ -4,7 +4,7 @@ session_name(ADMIN_SESSION_NAME); session_start();
 require_once '../../includes/db.php';
 require_once '../../includes/auth.php';
 require_once '../../includes/helpers.php';
-require_login();
+require_permission('courses.edit');
 
 $id = (int)($_GET['id'] ?? 0);
 if (!$id) {

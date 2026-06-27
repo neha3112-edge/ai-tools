@@ -5,10 +5,14 @@ session_start();
 require_once '../../includes/db.php';
 require_once '../../includes/auth.php';
 require_once '../../includes/helpers.php';
-require_login();
+require_permission('universities.view');
 
 // Handle single hard-delete
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
+  if (!has_team_action('Delete')) {
+    set_flash('danger', 'You do not have permission to delete records.');
+    redirect(ADMIN_URL . '/universities/index.php');
+  }
   $did = (int) $_POST['delete_id'];
   // Cleanup uploaded files before deleting
   $row = $pdo->prepare("SELECT image, sample_certificate FROM universities WHERE id=?");
@@ -29,6 +33,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
 
 // Handle bulk hard-delete
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['bulk_delete_ids'])) {
+  if (!has_team_action('Delete')) {
+    set_flash('danger', 'You do not have permission to delete records.');
+    redirect(ADMIN_URL . '/universities/index.php');
+  }
   $ids = array_filter(array_map('intval', explode(',', $_POST['bulk_delete_ids'])));
   if ($ids) {
     $placeholders = implode(',', array_fill(0, count($ids), '?'));
@@ -108,6 +116,7 @@ $logout_path = '../logout.php';
           <h3>All Universities</h3>
           <p><?= count($universities) ?> record(s) found</p>
         </div>
+        <?php if (has_permission('universities.add')): ?>
         <a href="add.php" class="btn btn-primary">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
             stroke-linecap="round">
@@ -116,6 +125,7 @@ $logout_path = '../logout.php';
           </svg>
           Add University
         </a>
+        <?php endif; ?>
       </div>
 
       <!-- Search & Filter -->
@@ -148,7 +158,9 @@ $logout_path = '../logout.php';
           <table data-paginate>
             <thead>
               <tr>
+                <?php if (has_team_action('Delete')): ?>
                 <th style="width:40px;"><input type="checkbox" class="bulk-cb" id="bulkSelectAll" title="Select All"></th>
+                <?php endif; ?>
                 <th style="width:50px;">#</th>
                 <th>University</th>
                 <th>Type</th>
@@ -163,7 +175,9 @@ $logout_path = '../logout.php';
               <?php if ($universities): ?>
                 <?php foreach ($universities as $i => $u): ?>
                   <tr>
+                    <?php if (has_team_action('Delete')): ?>
                     <td><input type="checkbox" class="bulk-cb bulk-row-cb" value="<?= $u['id'] ?>"></td>
+                    <?php endif; ?>
                     <td data-label="#"> <?= $i + 1 ?> </td>
                     <td data-label="University">
                       <div style="display:flex;align-items:center;gap:10px;">
@@ -194,22 +208,26 @@ $logout_path = '../logout.php';
                         <a href="view.php?id=<?= $u['id'] ?>" class="btn btn-secondary btn-sm btn-icon" title="View Details">
                           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z" /><circle cx="12" cy="12" r="3" /></svg>
                         </a>
-                        <a href="edit.php?id=<?= $u['id'] ?>" class="btn btn-secondary btn-sm btn-icon" title="Edit">
-                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
-                        </a>
-                        <form method="POST" style="display:inline;">
-                          <input type="hidden" name="delete_id" value="<?= $u['id'] ?>">
-                          <button type="submit" class="btn btn-danger btn-sm btn-icon" title="Delete" data-confirm="Delete '<?= e($u['name']) ?>'? This cannot be undone.">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /><path d="M10 11v6M14 11v6" /><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" /></svg>
-                          </button>
-                        </form>
+                         <?php if (has_permission('universities.edit')): ?>
+                         <a href="edit.php?id=<?= $u['id'] ?>" class="btn btn-secondary btn-sm btn-icon" title="Edit">
+                           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
+                         </a>
+                         <?php endif; ?>
+                         <?php if (has_team_action('Delete')): ?>
+                         <form method="POST" style="display:inline;">
+                           <input type="hidden" name="delete_id" value="<?= $u['id'] ?>">
+                           <button type="submit" class="btn btn-danger btn-sm btn-icon" title="Delete" data-confirm="Delete '<?= e($u['name']) ?>'? This cannot be undone.">
+                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /><path d="M10 11v6M14 11v6" /><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" /></svg>
+                           </button>
+                         </form>
+                         <?php endif; ?>
                       </div>
                     </td>
                   </tr>
                 <?php endforeach; ?>
               <?php else: ?>
                 <tr>
-                  <td colspan="9">
+                  <td colspan="<?= has_team_action('Delete') ? 9 : 8 ?>">
                     <div class="empty-state">
                       <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
                         stroke-linecap="round">
@@ -239,6 +257,7 @@ $logout_path = '../logout.php';
         </div>
       </div>
 
+      <?php if (has_team_action('Delete')): ?>
       <!-- Bulk Delete Bar -->
       <div class="bulk-bar" id="bulkBar">
         <div class="bulk-count" id="bulkCount"><span>0</span> selected</div>
@@ -251,6 +270,7 @@ $logout_path = '../logout.php';
       <form method="POST" id="bulkDeleteForm" style="display:none;">
         <input type="hidden" name="bulk_delete_ids" id="bulkDeleteIds" value="">
       </form>
+      <?php endif; ?>
     </div>
   </main>
 

@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.2
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1:3306
--- Generation Time: Jun 18, 2026 at 09:22 AM
--- Server version: 11.8.6-MariaDB-log
--- PHP Version: 7.2.34
+-- Host: 127.0.0.1:3307
+-- Generation Time: Jun 27, 2026 at 09:41 AM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.0.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `u120175788_ai_tools_db`
+-- Database: `ai_tools`
 --
 
 -- --------------------------------------------------------
@@ -47,7 +47,7 @@ INSERT INTO `accreditations` (`id`, `name`, `image`) VALUES
 (10, 'NAAC A++', '/ai-tools/assets/uploads/accreditations/69d78b5dd0aeb6.76866809_1775733597.webp'),
 (11, 'WES', '/ai-tools/assets/uploads/accreditations/69d78b8a166903.15954328_1775733642.webp'),
 (12, 'THE', '/ai-tools/assets/uploads/accreditations/6a311ff058eee1.96871744_1781604336.webp'),
-(13, 'NAB', '/ai-tools/assets/uploads/accreditations/6a31202c2d5143.02332566_1781604396.webp'),
+(13, 'NBA', '/ai-tools/assets/uploads/accreditations/6a33d58bc8a5d5.99257550_1781781899.webp'),
 (14, 'WURI', '/ai-tools/assets/uploads/accreditations/6a3229e7709ea0.24768469_1781672423.webp'),
 (15, 'IIRF', '/ai-tools/assets/uploads/accreditations/6a322ad846baf9.05699704_1781672664.webp');
 
@@ -62,6 +62,12 @@ CREATE TABLE `admins` (
   `name` varchar(150) NOT NULL,
   `email` varchar(200) NOT NULL,
   `password` varchar(255) NOT NULL,
+  `plain_password` varchar(255) DEFAULT NULL,
+  `team_id` int(10) UNSIGNED DEFAULT NULL,
+  `role_id` int(10) UNSIGNED DEFAULT NULL,
+  `country_code` varchar(10) DEFAULT '+91',
+  `phone` varchar(20) DEFAULT NULL,
+  `is_superadmin` tinyint(1) NOT NULL DEFAULT 0,
   `role` enum('superadmin','admin') NOT NULL DEFAULT 'admin',
   `is_active` tinyint(1) NOT NULL DEFAULT 1,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
@@ -72,87 +78,11 @@ CREATE TABLE `admins` (
 -- Dumping data for table `admins`
 --
 
-INSERT INTO `admins` (`id`, `name`, `email`, `password`, `role`, `is_active`, `created_at`, `updated_at`) VALUES
-(1, 'Rachit', 'admin@sode.com', '$2y$10$WqprT7QfaYgNkw5C6O0Dj.3kykRbxh988ajqy2urzqJgon1xWN0X2', 'admin', 1, '2026-04-02 07:55:16', '2026-04-14 12:10:49');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `brochure_leads`
---
-
-CREATE TABLE `brochure_leads` (
-  `id` int(11) NOT NULL,
-  `name` varchar(150) NOT NULL,
-  `email` varchar(150) NOT NULL,
-  `country_code` varchar(10) NOT NULL DEFAULT '+91',
-  `phone` varchar(50) NOT NULL,
-  `course` varchar(150) NOT NULL,
-  `state` varchar(100) NOT NULL,
-  `page_url` varchar(255) DEFAULT NULL,
-  `user_ip` varchar(45) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `brochure_leads`
---
-
-INSERT INTO `brochure_leads` (`id`, `name`, `email`, `country_code`, `phone`, `course`, `state`, `page_url`, `user_ip`, `created_at`) VALUES
-(6, 'Rachit final test', 'emnrf3@gmail.com', '+91', '9364647622', 'BBA (UG)', 'Arunachal Pradesh', 'http://localhost/ai-tools/compare-universities.php', '127.0.0.1', '2026-05-12 09:50:07');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `compare_unlock_leads`
---
-
-CREATE TABLE `compare_unlock_leads` (
-  `id` int(11) NOT NULL,
-  `name` varchar(150) NOT NULL,
-  `email` varchar(200) NOT NULL,
-  `country_code` varchar(10) DEFAULT '+91',
-  `phone` varchar(20) NOT NULL,
-  `course` varchar(200) DEFAULT NULL,
-  `state` varchar(100) DEFAULT NULL,
-  `page_url` text DEFAULT NULL,
-  `user_ip` varchar(50) DEFAULT NULL,
-  `created_at` datetime NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `compare_unlock_leads`
---
-
-INSERT INTO `compare_unlock_leads` (`id`, `name`, `email`, `country_code`, `phone`, `course`, `state`, `page_url`, `user_ip`, `created_at`) VALUES
-(15, 'Rachit final test', 'nfrfui@gmail.com', '+91', '9376446422', 'BBA (UG)', 'Assam', 'http://localhost/ai-tools/compare-universities.php', '127.0.0.1', '2026-05-12 15:18:49');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `counseling_leads`
---
-
-CREATE TABLE `counseling_leads` (
-  `id` int(11) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `email` varchar(255) NOT NULL,
-  `country_code` varchar(10) NOT NULL DEFAULT '+91',
-  `phone` varchar(50) NOT NULL,
-  `course` varchar(255) NOT NULL,
-  `state` varchar(100) NOT NULL,
-  `uni_name` varchar(255) DEFAULT NULL,
-  `page_url` text DEFAULT NULL,
-  `user_ip` varchar(45) NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `counseling_leads`
---
-
-INSERT INTO `counseling_leads` (`id`, `name`, `email`, `country_code`, `phone`, `course`, `state`, `uni_name`, `page_url`, `user_ip`, `created_at`) VALUES
-(4, 'Rachit final test', 'cern@gmail.com', '+91', '9335533222', 'BBA (UG)', 'Arunachal Pradesh', 'Shoolini University Online', 'http://localhost/ai-tools/compare-universities.php', '127.0.0.1', '2026-05-12 09:50:48');
+INSERT INTO `admins` (`id`, `name`, `email`, `password`, `plain_password`, `team_id`, `role_id`, `country_code`, `phone`, `is_superadmin`, `role`, `is_active`, `created_at`, `updated_at`) VALUES
+(1, 'Rachit', 'support@edgetechnosoft.com', '$2y$10$3/4J9hb8pgSEhIP6i8arXOnCScvS6wQU9XbdyLrFgc5kYJhGHa49W', 'Epnd#N5k2d2HN*p*E)b3RIkW', 1, NULL, '+91', '9873088907', 1, 'superadmin', 1, '2026-04-02 07:55:16', '2026-06-22 09:34:29'),
+(4, 'Dev Manager', 'test@gmail.com', '$2y$10$PnYt9mM47TplZOiUcDg48.bTFKe9OiKEL6TwrOFAPWpUXqGmSMh2a', '123456', 1, 5, '+91', '', 0, 'admin', 1, '2026-06-20 07:47:33', '2026-06-22 10:39:49'),
+(5, 'Support Manager', 'test2@gmail.com', '$2y$10$hYdhGKIKcKwWjBz2RKBUCen/o6Ml6QknMV3W5X//D.oSSeJ2GWm2.', '123456', 3, 5, '+91', '', 0, 'admin', 1, '2026-06-20 07:52:39', '2026-06-22 10:39:54'),
+(6, 'Testing Manager', 'test3@gmail.com', '$2y$10$2bt3IsvRYeH5w9Z9j.2ynOHR4J6iFyueov7s5nN7R0Cyl.pRERLTC', '123456', 2, 5, '+91', '', 0, 'admin', 1, '2026-06-20 07:53:20', '2026-06-27 06:45:58');
 
 -- --------------------------------------------------------
 
@@ -178,57 +108,57 @@ CREATE TABLE `courses` (
 INSERT INTO `courses` (`id`, `name`, `display_name`, `slug`, `course_level`, `is_active`, `created_at`, `updated_at`) VALUES
 (9, 'Master of Business Administration', 'MBA', 'master-of-business-administration', 'PG', 1, '2026-06-16 05:34:15', '2026-06-16 05:34:15'),
 (10, 'Master of Computer Applications', 'MCA', 'master-of-computer-applications', 'PG', 1, '2026-06-16 05:53:12', '2026-06-16 05:53:12'),
-(11, 'Master of Business Administration Dual', 'MBA Dual', 'master-of-business-administration-dual', 'PG', 1, '2026-06-16 06:46:54', '2026-06-16 06:46:54'),
-(12, 'Master of Computer Applications Collaboration', 'MCA Collaboration', 'master-of-computer-applications-collaboration', 'PG', 1, '2026-06-16 07:03:59', '2026-06-16 07:03:59'),
-(13, 'Master of Commerce', 'MCOM', 'master-of-commerce', 'PG', 1, '2026-06-16 07:07:20', '2026-06-16 07:07:20'),
+(11, 'Master of Business Administration Dual', 'MBA Dual', 'master-of-business-administration-dual', 'PG', 1, '2026-06-16 06:46:54', '2026-06-19 09:15:36'),
+(12, 'Master of Computer Applications Collaboration', 'MCA Collaboration', 'master-of-computer-applications-collaboration', 'PG', 1, '2026-06-16 07:03:59', '2026-06-19 09:15:21'),
+(13, 'Master of Commerce', 'MCOM', 'master-of-commerce', 'PG', 1, '2026-06-16 07:07:20', '2026-06-18 13:02:00'),
 (14, 'Master of Arts in Journalism and Mass Communication', 'MAJMC', 'master-of-arts-in-journalism-and-mass-communication', 'PG', 1, '2026-06-16 07:31:32', '2026-06-16 07:31:32'),
-(15, 'Master of Arts  PPG', 'MA PPG', 'master-of-arts-ppg', 'PG', 1, '2026-06-16 07:39:13', '2026-06-16 10:24:24'),
-(16, 'Master of Science Data Science', 'MSC Data Science', 'master-of-science-data-sci', 'PG', 1, '2026-06-16 07:50:05', '2026-06-16 10:14:49'),
+(15, 'Master of Arts  PPG', 'MA PPG', 'master-of-arts-ppg', 'PG', 1, '2026-06-16 07:39:13', '2026-06-19 09:15:45'),
+(16, 'Master of Science Data Science', 'MSC in Data Science', 'master-of-science-data-sci', 'PG', 1, '2026-06-16 07:50:05', '2026-06-19 06:51:59'),
 (17, 'Bachelor of Arts', 'BA', 'bachelor-of-arts', 'UG', 1, '2026-06-16 07:54:47', '2026-06-16 07:54:47'),
-(18, 'Bachelor of Commerce', 'BCOM', 'bachelor-of-commerce', 'UG', 1, '2026-06-16 08:43:22', '2026-06-16 08:43:22'),
+(18, 'Bachelor of Commerce', 'BCOM', 'bachelor-of-commerce', 'UG', 1, '2026-06-16 08:43:22', '2026-06-18 13:02:31'),
 (19, 'Bachelor of Business Administration', 'BBA', 'bachelor-of-business-administration', 'UG', 1, '2026-06-16 08:51:02', '2026-06-16 08:51:02'),
 (20, 'Bachelor of Computer Applications', 'BCA', 'bachelor-of-computer-applications', 'UG', 1, '2026-06-16 09:10:58', '2026-06-16 09:10:58'),
-(21, 'Bachelor of Computer Applications Collab', 'BCA Collab', 'bachelor-of-computer-applications-collab', 'UG', 1, '2026-06-16 09:16:17', '2026-06-16 09:16:17'),
-(22, 'Bachelor of Arts JMC', 'BA JMC', 'bachelor-of-arts-jmc', 'UG', 1, '2026-06-16 09:24:22', '2026-06-16 10:23:55'),
-(23, 'Bachelor of Commerce (Hons)', 'BCOM (Hons)', 'bachelor-of-commerce-hons', 'UG', 1, '2026-06-16 11:09:18', '2026-06-17 09:54:21'),
-(24, 'Master of Business Administration MBA Premium', 'MBA Premium', 'master-of-business-administration-mba-premium', 'PG', 1, '2026-06-16 11:28:23', '2026-06-16 11:28:23'),
-(25, 'Master of Arts in English', 'MA English', 'master-of-arts-english', 'PG', 1, '2026-06-16 11:57:43', '2026-06-17 06:24:35'),
-(26, 'Master of Arts Sociology', 'MA Sociology', 'master-of-arts-sociology', 'PG', 1, '2026-06-16 12:29:48', '2026-06-17 06:23:01'),
-(27, 'Master of Arts in Political Science', 'MA Political Science', 'master-of-arts-pol-sci', 'PG', 1, '2026-06-17 05:30:59', '2026-06-17 06:23:53'),
-(28, 'Master of Arts in Sociology', 'MA Sociology', 'master-of-arts-sociolo', 'PG', 1, '2026-06-17 05:33:12', '2026-06-17 06:22:14'),
-(29, 'Master of Arts in Economics', 'MA Economics', 'master-of-arts-in-economics', 'PG', 1, '2026-06-17 06:15:31', '2026-06-17 06:15:31'),
-(30, 'Master of Science in Maths', 'MSC Maths', 'master-of-science-maths', 'PG', 1, '2026-06-17 06:18:20', '2026-06-17 06:26:02'),
-(31, 'Master of Arts History', 'MA History', 'master-of-arts-history', 'PG', 1, '2026-06-17 07:21:52', '2026-06-17 07:21:52'),
+(21, 'Bachelor of Computer Applications Collaboration', 'BCA in Collaboration', 'bachelor-of-computer-applications-collab', 'UG', 1, '2026-06-16 09:16:17', '2026-06-19 06:51:35'),
+(22, 'Bachelor of Arts in Journalism and Mass Communication', 'BAJMC', 'bachelor-of-arts-jmc', 'UG', 1, '2026-06-16 09:24:22', '2026-06-19 09:14:55'),
+(23, 'Bachelor of Commerce (Hons)', 'BCOM (Hons)', 'bachelor-of-commerce-hons', 'UG', 1, '2026-06-16 11:09:18', '2026-06-19 09:13:36'),
+(24, 'Master of Business Administration MBA Premium', 'MBA Premium', 'master-of-business-administration-mba-premium', 'PG', 1, '2026-06-16 11:28:23', '2026-06-19 09:13:22'),
+(25, 'Master of Arts in English', 'MA in English', 'master-of-arts-english', 'PG', 1, '2026-06-16 11:57:43', '2026-06-19 06:46:09'),
+(26, 'Master of Arts Sociology', 'MA in Sociology', 'master-of-arts-sociology', 'PG', 1, '2026-06-16 12:29:48', '2026-06-19 06:46:02'),
+(27, 'Master of Arts in Political Science', 'MA in Political Science', 'master-of-arts-pol-sci', 'PG', 1, '2026-06-17 05:30:59', '2026-06-19 06:45:55'),
+(28, 'Master of Arts in Sociology', 'MA in Sociology', 'master-of-arts-sociolo', 'PG', 1, '2026-06-17 05:33:12', '2026-06-19 06:45:45'),
+(29, 'Master of Arts in Economics', 'MA in Economics', 'master-of-arts-in-economics', 'PG', 1, '2026-06-17 06:15:31', '2026-06-19 06:45:32'),
+(30, 'Master of Science in Maths', 'MSC  in Maths', 'master-of-science-maths', 'PG', 1, '2026-06-17 06:18:20', '2026-06-19 06:45:23'),
+(31, 'Master of Arts History', 'MA in History', 'master-of-arts-history', 'PG', 1, '2026-06-17 07:21:52', '2026-06-19 06:44:02'),
 (32, 'Diploma in Business Administration', 'DBA', 'diploma-in-business-administration', 'UG', 1, '2026-06-17 07:45:00', '2026-06-17 07:45:00'),
 (33, 'Diploma in Computer Applications', 'DCA', 'diploma-in-computer-applications', 'UG', 1, '2026-06-17 07:45:40', '2026-06-17 07:45:40'),
-(34, 'Master of Business Administration Plus', 'MBA Plus', 'master-of-business-administration-plus', 'PG', 1, '2026-06-17 08:53:58', '2026-06-17 08:53:58'),
-(35, 'Master of Arts in Education', 'MA Education', 'master-of-arts-in-education', 'PG', 1, '2026-06-17 09:06:09', '2026-06-17 09:06:09'),
-(36, 'Master of Arts in Public Administration', 'MA Public Administration', 'master-of-arts-in-public-administration', 'PG', 1, '2026-06-17 09:07:47', '2026-06-17 09:07:47'),
-(37, 'Master of Arts in Mass Communication', 'MA Mass Communication', 'master-of-arts-in-mass-communication', 'PG', 1, '2026-06-17 09:36:08', '2026-06-17 09:36:08'),
-(38, 'BBA Business Analytics KPMG', 'BBA Business Analytics KPMG', 'bba-business-analytics-kpmg', 'UG', 1, '2026-06-17 10:44:01', '2026-06-17 10:55:14'),
-(39, 'MBA Business Analytics KPMG', 'MBA Business Analytics KPMG', 'mba-business-analytics-kpmg', 'PG', 1, '2026-06-17 10:54:28', '2026-06-17 10:54:28'),
-(40, 'Master of Arts in Islamic', 'MA Islamic', 'master-of-arts-in-islamic', 'PG', 1, '2026-06-17 11:20:59', '2026-06-17 11:20:59'),
-(41, 'Master of Arts in Political', 'MA Political', 'master-of-arts-in-political', 'PG', 1, '2026-06-17 11:21:37', '2026-06-17 11:21:37'),
-(42, 'MBA digital finance& accounting analytics', 'MBA digital finance& accounting analytics', 'mba-digital-finance-accounting-analytics', 'PG', 1, '2026-06-17 12:19:49', '2026-06-17 12:19:49'),
-(43, 'MBA international finance  ACCA', 'MBA international finance  ACCA', 'mba-international-finance-acca', 'PG', 1, '2026-06-17 12:20:02', '2026-06-17 12:20:02'),
-(44, 'Master of Commerce in Public Accounting', 'MCom Public Accounting', 'master-of-commerce-in-public-accounting', 'PG', 1, '2026-06-17 12:47:37', '2026-06-17 12:47:37'),
-(45, 'MBA Data Science and Analytics', 'MBA Data Science and Analytics', 'mba-data-science-and-analytics', 'PG', 1, '2026-06-17 12:54:53', '2026-06-17 12:54:53'),
+(34, 'Master of Business Administration Plus', 'MBA Plus', 'master-of-business-administration-plus', 'PG', 1, '2026-06-17 08:53:58', '2026-06-19 09:12:57'),
+(35, 'Master of Arts in Education', 'MA in Education', 'master-of-arts-in-education', 'PG', 1, '2026-06-17 09:06:09', '2026-06-19 06:42:16'),
+(36, 'Master of Arts in Public Administration', 'MA in Public Administration', 'master-of-arts-in-public-administration', 'PG', 1, '2026-06-17 09:07:47', '2026-06-19 06:42:08'),
+(37, 'Master of Arts in Mass Communication', 'MA in Mass Communication', 'master-of-arts-in-mass-communication', 'PG', 1, '2026-06-17 09:36:08', '2026-06-19 06:41:57'),
+(38, 'Bachelor of Business Administration Business Analytics KPMG', 'BBA in  Business Analytics KPMG', 'bba-business-analytics-kpmg', 'UG', 1, '2026-06-17 10:44:01', '2026-06-19 06:41:15'),
+(39, 'Master of Business Administration Business Analytics KPMG', 'MBA in Business Analytics KPMG', 'mba-business-analytics-kpmg', 'PG', 1, '2026-06-17 10:54:28', '2026-06-19 06:41:36'),
+(40, 'Master of Arts in Islamic', 'MA in Islamic', 'master-of-arts-in-islamic', 'PG', 1, '2026-06-17 11:20:59', '2026-06-19 06:38:25'),
+(41, 'Master of Arts in Political', 'MA in Political', 'master-of-arts-in-political', 'PG', 1, '2026-06-17 11:21:37', '2026-06-19 06:38:18'),
+(42, 'Master of Business Administration Digital Finance& Accounting Analytics', 'MBA in Digital Finance & Accounting Analytics', 'mba-digital-finance-accounting-analytics', 'PG', 1, '2026-06-17 12:19:49', '2026-06-19 06:32:05'),
+(43, 'Master of Business Administration International Finance  ACCA', 'MBA in  International Finance  ACCA', 'mba-international-finance-acca', 'PG', 1, '2026-06-17 12:20:02', '2026-06-19 06:33:13'),
+(44, 'Master of Commerce in Public Accounting', 'MCOM in Public Accounting', 'master-of-commerce-in-public-accounting', 'PG', 1, '2026-06-17 12:47:37', '2026-06-19 06:32:48'),
+(45, 'Master of Business Administration Data Science and Analytics', 'MBA in Data Science and Analytics', 'mba-data-science-and-analytics', 'PG', 1, '2026-06-17 12:54:53', '2026-06-19 06:30:40'),
 (46, 'Master of Arts', 'MA', 'master-of-arts', 'PG', 1, '2026-06-18 05:38:23', '2026-06-18 05:38:23'),
-(47, 'Bachelor of Computer Applications Computer Science', 'BCA Computer Science', 'bachelor-of-computer-applications-computer-science', 'UG', 1, '2026-06-18 06:15:42', '2026-06-18 06:15:42'),
-(48, 'Bachelor of Computer Applications data Science', 'BCA  data Science', 'bachelor-of-computer-applications-data-science', 'UG', 1, '2026-06-18 06:16:43', '2026-06-18 06:16:43'),
-(49, 'Bachelor of Computer Applications AI', 'BCA AI', 'bachelor-of-computer-applications-ai', 'UG', 1, '2026-06-18 06:18:08', '2026-06-18 06:18:19'),
-(50, 'Bachelor of Computer Applications Cyber', 'BCA Cyber', 'bachelor-of-computer-applications-cyber', 'UG', 1, '2026-06-18 06:19:29', '2026-06-18 06:19:29'),
-(51, 'Bachelor of Computer Applications cloud comp', 'BCA Cloud Comp', 'bachelor-of-computer-applications-cloud-comp', 'UG', 1, '2026-06-18 06:20:11', '2026-06-18 06:20:11'),
-(52, 'Master of Business Administration in Human Resource Management', 'MBA Human Resource Management', 'master-of-business-administration-in-human-resource-management', 'PG', 1, '2026-06-18 06:30:37', '2026-06-18 06:30:37'),
-(53, 'Master of Business Administration Finance', 'MBA Finance', 'master-of-business-administration-finance', 'PG', 1, '2026-06-18 06:33:06', '2026-06-18 06:33:06'),
-(54, 'Master of Business Administration Marketing', 'MBA Marketing', 'master-of-business-administration-marketing', 'PG', 1, '2026-06-18 06:34:11', '2026-06-18 06:34:11'),
-(55, 'Master of Business Administration General', 'MBA  General', 'master-of-business-administration-general', 'PG', 1, '2026-06-18 06:40:03', '2026-06-18 06:40:03'),
+(47, 'Bachelor of Computer Applications Computer Science', 'BCA in Computer Science', 'bachelor-of-computer-applications-computer-science', 'UG', 1, '2026-06-18 06:15:42', '2026-06-19 06:25:16'),
+(48, 'Bachelor of Computer Applications Data Science', 'BCA in  Data Science', 'bachelor-of-computer-applications-data-science', 'UG', 1, '2026-06-18 06:16:43', '2026-06-19 06:33:43'),
+(49, 'Bachelor of Computer Applications in AI', 'BCA in Artificial Intelligence', 'bachelor-of-computer-applications-ai', 'UG', 1, '2026-06-18 06:18:08', '2026-06-19 06:36:19'),
+(50, 'Bachelor of Computer Applications Cyber Security', 'BCA in Cyber Security', 'bachelor-of-computer-applications-cyber', 'UG', 1, '2026-06-18 06:19:29', '2026-06-19 06:28:44'),
+(51, 'Bachelor of Computer Applications Cloud Computing', 'BCA in Cloud Computing', 'bachelor-of-computer-applications-cloud-comp', 'UG', 1, '2026-06-18 06:20:11', '2026-06-19 06:27:19'),
+(52, 'Master of Business Administration in Human Resource Management', 'MBA in Human Resource Management', 'master-of-business-administration-in-human-resource-management', 'PG', 1, '2026-06-18 06:30:37', '2026-06-19 06:22:53'),
+(53, 'Master of Business Administration Finance', 'MBA in Finance', 'master-of-business-administration-finance', 'PG', 1, '2026-06-18 06:33:06', '2026-06-19 06:22:40'),
+(54, 'Master of Business Administration Marketing', 'MBA in Marketing', 'master-of-business-administration-marketing', 'PG', 1, '2026-06-18 06:34:11', '2026-06-19 06:22:31'),
+(55, 'Master of Business Administration General', 'MBA in General', 'master-of-business-administration-general', 'PG', 1, '2026-06-18 06:40:03', '2026-06-19 06:22:22'),
 (56, 'Master of Business Administration in International Finance (ACCA)', 'MBA in International Finance (ACCA)', 'master-of-business-administration-in-international-finance-acca', 'PG', 1, '2026-06-18 06:47:24', '2026-06-18 06:47:24'),
-(57, 'Master of Commerce Association of Chartered Certified Accountants', 'M.Com Association of Chartered Certified Accountants', 'master-of-commerce-association-of-chartered-certified-accountants', 'PG', 1, '2026-06-18 06:52:55', '2026-06-18 06:52:55'),
-(58, 'Bachelor of Commerce with Association of Chartered Certified Accountants', 'B.Com Association of Chartered Certified Accountants', 'bachelor-of-commerce-with-association-of-chartered-certified-accountants', 'PG', 1, '2026-06-18 06:53:47', '2026-06-18 06:53:47'),
-(59, 'Master of Computer Applications Computer Science Information Technology', 'MCA Computer Science Information Technology', 'master-of-computer-applications-computer-science-information-technology', 'PG', 1, '2026-06-18 06:56:07', '2026-06-18 06:56:07'),
-(60, 'Master of Computer Applications Data analytics', 'MCA Data analytics', 'master-of-computer-applications-data-analytics', 'PG', 1, '2026-06-18 06:57:13', '2026-06-18 06:57:13'),
-(61, 'Master of Computer Applications Cyber Security', 'MCA Cyber Security', 'master-of-computer-applications-cyber-security', 'PG', 1, '2026-06-18 06:58:05', '2026-06-18 06:58:05');
+(57, 'Master of Commerce Association of Chartered Certified Accountants', 'MCOM in Association of Chartered Certified Accountants', 'master-of-commerce-association-of-chartered-certified-accountants', 'PG', 1, '2026-06-18 06:52:55', '2026-06-19 06:22:12'),
+(58, 'Bachelor of Commerce with Association of Chartered Certified Accountants', 'BCOM in Association of Chartered Certified Accountants', 'bachelor-of-commerce-with-association-of-chartered-certified-accountants', 'PG', 1, '2026-06-18 06:53:47', '2026-06-19 06:22:01'),
+(59, 'Master of Computer Applications Computer Science Information Technology', 'MCA in Computer Science & Information Technology', 'master-of-computer-applications-computer-science-information-technology', 'PG', 1, '2026-06-18 06:56:07', '2026-06-19 06:21:11'),
+(60, 'Master of Computer Applications Data analytics', 'MCA in Data Analytics', 'master-of-computer-applications-data-analytics', 'PG', 1, '2026-06-18 06:57:13', '2026-06-19 06:18:56'),
+(61, 'Master of Computer Applications Cyber Security', 'MCA in Cyber Security', 'master-of-computer-applications-cyber-security', 'PG', 1, '2026-06-18 06:58:05', '2026-06-19 06:15:46');
 
 -- --------------------------------------------------------
 
@@ -272,29 +202,87 @@ INSERT INTO `exam_modes` (`id`, `mode_name`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `scholarship_leads`
+-- Table structure for table `roles`
 --
 
-CREATE TABLE `scholarship_leads` (
+CREATE TABLE `roles` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `permissions` text NOT NULL,
+  `module_access` text DEFAULT NULL,
+  `team_permissions` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `roles`
+--
+
+INSERT INTO `roles` (`id`, `name`, `permissions`, `module_access`, `team_permissions`, `created_at`, `updated_at`) VALUES
+(5, 'Manager', '', '[\"dashboard\",\"universities\",\"courses\",\"mappings\",\"users\",\"change_password\"]', '{\"1\":[\"Read\",\"Create\",\"Update\",\"Delete\",\"Write\"],\"3\":[\"Read\"],\"2\":[\"Read\",\"Update\",\"Write\"]}', '2026-06-22 10:39:21', '2026-06-27 06:44:45');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `sidebar_items`
+--
+
+CREATE TABLE `sidebar_items` (
   `id` int(11) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `email` varchar(255) NOT NULL,
-  `country_code` varchar(10) NOT NULL DEFAULT '+91',
-  `phone` varchar(50) NOT NULL,
-  `course` varchar(255) NOT NULL,
-  `state` varchar(100) NOT NULL,
-  `uni_name` varchar(255) DEFAULT NULL,
-  `page_url` text DEFAULT NULL,
-  `user_ip` varchar(45) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `link` varchar(255) NOT NULL,
+  `active_key` varchar(50) NOT NULL,
+  `icon` text NOT NULL,
+  `module_key` varchar(50) NOT NULL,
+  `section` varchar(50) NOT NULL DEFAULT 'Manage',
+  `is_superadmin_only` tinyint(1) NOT NULL DEFAULT 0,
+  `sort_order` int(11) NOT NULL DEFAULT 0,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `scholarship_leads`
+-- Dumping data for table `sidebar_items`
 --
 
-INSERT INTO `scholarship_leads` (`id`, `name`, `email`, `country_code`, `phone`, `course`, `state`, `uni_name`, `page_url`, `user_ip`, `created_at`) VALUES
-(4, 'Rachit final test', 'mrfui@gmail.com', '+91', '9447645784', 'BBA (UG)', 'Arunachal Pradesh', 'Shoolini University Online', 'http://localhost/ai-tools/compare-universities.php', '127.0.0.1', '2026-05-12 09:49:31');
+INSERT INTO `sidebar_items` (`id`, `name`, `link`, `active_key`, `icon`, `module_key`, `section`, `is_superadmin_only`, `sort_order`, `is_active`, `created_at`) VALUES
+(1, 'Dashboard', 'dashboard.php', 'dashboard', '<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\"><rect x=\"3\" y=\"3\" width=\"7\" height=\"9\" /><rect x=\"14\" y=\"3\" width=\"7\" height=\"5\" /><rect x=\"14\" y=\"12\" width=\"7\" height=\"9\" /><rect x=\"3\" y=\"16\" width=\"7\" height=\"5\" /></svg>', 'dashboard', 'Main', 0, 1, 1, '2026-06-26 10:26:03'),
+(2, 'Universities', 'universities/index.php', 'universities', '<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\"><path d=\"M3 21h18M5 21V7l7-4 7 4v14M9 21V11h6v10\" /></svg>', 'universities', 'Manage', 0, 2, 1, '2026-06-26 10:26:03'),
+(3, 'Courses', 'courses/index.php', 'courses', '<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\"><path d=\"M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z\" /><path d=\"M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z\" /></svg>', 'courses', 'Manage', 0, 3, 1, '2026-06-26 10:26:03'),
+(4, 'Course Mappings', 'mappings/index.php', 'mappings', '<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\"><path d=\"M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01\" /></svg>', 'mappings', 'Manage', 0, 4, 1, '2026-06-26 10:26:03'),
+(5, 'Manage Users', 'rbac/users.php', 'users', '<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\">\r\n  <path d=\"M20 21a8 8 0 0 0-16 0\"/>\r\n  <circle cx=\"12\" cy=\"8\" r=\"4\"/>\r\n</svg>', 'users', 'Access Control', 0, 5, 1, '2026-06-26 10:26:03'),
+(6, 'Manage Teams', 'rbac/teams.php', 'teams', '<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\">\r\n  <circle cx=\"12\" cy=\"8\" r=\"3\"/>\r\n  <path d=\"M5 20a7 7 0 0 1 14 0\"/>\r\n  <circle cx=\"5\" cy=\"9\" r=\"2\"/>\r\n  <path d=\"M1 20a5 5 0 0 1 4-4\"/>\r\n  <circle cx=\"19\" cy=\"9\" r=\"2\"/>\r\n  <path d=\"M23 20a5 5 0 0 0-4-4\"/>\r\n</svg>', 'teams', 'Access Control', 0, 6, 1, '2026-06-26 10:26:03'),
+(7, 'Manage Roles', 'rbac/roles.php', 'roles', '<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\"><rect x=\"3\" y=\"11\" width=\"18\" height=\"11\" rx=\"2\" ry=\"2\" /><path d=\"M7 11V7a5 5 0 0 1 10 0v4\" /></svg>', 'roles', 'Access Control', 0, 7, 1, '2026-06-26 10:26:03'),
+(8, 'Sidebar Manager', 'rbac/sidebar_manager.php', 'sidebar', '<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\"><line x1=\"8\" y1=\"6\" x2=\"21\" y2=\"6\" /><line x1=\"8\" y1=\"12\" x2=\"21\" y2=\"12\" /><line x1=\"8\" y1=\"18\" x2=\"21\" y2=\"18\" /><line x1=\"3\" y1=\"6\" x2=\"3.01\" y2=\"6\" /><line x1=\"3\" y1=\"12\" x2=\"3.01\" y2=\"12\" /><line x1=\"3\" y1=\"18\" x2=\"3.01\" y2=\"18\" /></svg>', 'sidebar', 'Access Control', 0, 8, 1, '2026-06-26 10:26:03'),
+(9, 'University Types', 'masters/university_types.php', 'university_types', '<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\"><path d=\"M3 21h18M5 21V7l7-4 7 4v14M9 21V11h6v10\" /></svg>', 'university_types', 'Settings', 0, 9, 1, '2026-06-26 10:26:03'),
+(10, 'Education Modes', 'masters/modes.php', 'modes', '<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\"><circle cx=\"12\" cy=\"12\" r=\"3\" /><path d=\"M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14\" /></svg>', 'education_modes', 'Settings', 0, 10, 1, '2026-06-26 10:26:03'),
+(11, 'Exam Modes', 'masters/exam_modes.php', 'exam_modes', '<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\"><path d=\"M9 11l3 3L22 4\" /><path d=\"M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11\" /></svg>', 'exam_modes', 'Settings', 0, 11, 1, '2026-06-26 10:26:03'),
+(12, 'Accreditations', 'masters/accreditations.php', 'accreditations', '<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\"><path d=\"M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z\" /></svg>', 'accreditations', 'Settings', 0, 12, 1, '2026-06-26 10:26:03'),
+(13, 'Change Password', 'change-password.php', 'change-password', '<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\"><rect x=\"3\" y=\"11\" width=\"18\" height=\"11\" rx=\"2\" ry=\"2\" /><path d=\"M7 11V7a5 5 0 0 1 10 0v4\" /></svg>', 'change_password', 'Settings', 0, 13, 1, '2026-06-26 10:26:03');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `teams`
+--
+
+CREATE TABLE `teams` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `name` varchar(150) NOT NULL,
+  `description` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `teams`
+--
+
+INSERT INTO `teams` (`id`, `name`, `description`, `created_at`, `updated_at`) VALUES
+(1, 'Development Team', 'Who can view, edit, or delete anything.', '2026-06-19 09:46:38', '2026-06-19 09:46:38'),
+(2, 'Testing Team', 'Who can only view data.', '2026-06-19 09:47:17', '2026-06-19 09:47:17'),
+(3, 'Support Team', 'Who can view the leads.', '2026-06-19 09:47:50', '2026-06-19 09:47:50');
 
 -- --------------------------------------------------------
 
@@ -330,23 +318,23 @@ CREATE TABLE `universities` (
 --
 
 INSERT INTO `universities` (`id`, `name`, `display_name`, `slug`, `image`, `sample_certificate`, `rating`, `nirf_ranking`, `year_of_establishment`, `university_type_id`, `campus_location`, `avg_placement_package`, `placement_assistance`, `emi_facility`, `scholarship`, `key_advantages`, `view_university_link`, `is_active`, `created_at`, `updated_at`) VALUES
-(7, 'Amity Univesity Online', NULL, 'amity-univesity-online', '/ai-tools/assets/uploads/images/6a30e00406e917.85074817_1781587972.webp', '/ai-tools/assets/uploads/certificates/6a30e004070175.31229441_1781587972.jpg', 4.5, 32, '2009', 2, 'Noida, Uttar Pradesh', '5 LPA', 1, 1, 1, 'Strong Alumni Network\r\nMentorship & Feedback Guidance\r\nComprehensive Curriculum\r\nKnown for a large campus, industry exposure, and global tie-ups', 'https://distanceeducationschool.com/amity-university/', 1, '2026-06-16 05:32:00', '2026-06-16 05:32:52'),
+(7, 'Amity Univesity Online', NULL, 'amity-univesity-online', '/ai-tools/assets/uploads/images/6a30e00406e917.85074817_1781587972.webp', '/ai-tools/assets/uploads/certificates/6a30e004070175.31229441_1781587972.jpg', 4.5, 32, '2009', 2, 'Noida, Uttar Pradesh', '5 LPA', 1, 1, 1, 'Strong Alumni Network\r\nMentorship & Feedback Guidance\r\nComprehensive Curriculum\r\nKnown for a Large Campus\r\n Industry Exposure and Global Tie-Ups', 'https://distanceeducationschool.com/amity-university/', 1, '2026-06-16 05:32:00', '2026-06-19 07:57:19'),
 (8, 'Shoolini University Online', NULL, 'shoolini-university-online', '/ai-tools/assets/uploads/images/6a31241f210780.24399239_1781605407.webp', '/ai-tools/assets/uploads/certificates/6a31241f212b47.74352839_1781605407.webp', NULL, 69, '2009', 2, 'Solan, Himachal Pradesh', NULL, 0, 1, 1, '1st Pay-After-Placement Options\r\nCareer-Focused Learning\r\nTop Faculty & Mentors\r\nBest Learning Platform\r\nGlobal Opportunities', 'https://distanceeducationschool.com/Shoolini-university/', 1, '2026-06-16 10:23:27', '2026-06-16 10:50:48'),
 (9, 'Andra University Online', NULL, 'andra-university-online', '/ai-tools/assets/uploads/images/6a313f9e273ff0.76053206_1781612446.webp', '/ai-tools/assets/uploads/certificates/6a313f9e2758e5.15442988_1781612446.webp', NULL, 23, '1926', 1, 'Visakhapatnam, Andhra Pradesh', NULL, 0, 0, 0, NULL, 'https://distanceeducationschool.com/andhra-university/', 1, '2026-06-16 12:20:46', '2026-06-16 12:20:46'),
-(10, 'Sikkim Manipal University', NULL, 'sikkim-manipal-university', '/ai-tools/assets/uploads/images/6a322b8c91edc6.35341895_1781672844.png', '/ai-tools/assets/uploads/certificates/6a322b8c920d39.74308042_1781672844.webp', 4.3, NULL, '1995', 2, 'Sikkim Gangtok', '6 LPA', 1, 1, 1, 'Quality Education \r\nAttractive Scholarships\r\nVast alumni network\r\nExperienced faculty \r\ncomprehensive curriculum', 'https://distanceeducationschool.com/sikkim-manipal-university/', 1, '2026-06-16 13:01:59', '2026-06-17 05:07:24'),
-(11, 'Manipal University Online', NULL, 'manipal-university-online', '/ai-tools/assets/uploads/images/6a3233f46fda09.63913276_1781674996.png', '/ai-tools/assets/uploads/certificates/6a3233f46ff395.64478985_1781674996.webp', NULL, 58, '2011', 2, 'Jaipur, Rajasthan', NULL, 1, 1, 1, 'Industry-focused training\r\nOur Advanced Learning System Designed for Your Course\r\nCareer Support for Online Manipal Learners\r\nHands-On Campus Learning Experiences\r\nCampus Immersions\r\nWeekly Webinars with industry leaders', 'https://distanceeducationschool.com/online-manipal-university/', 1, '2026-06-17 05:43:16', '2026-06-17 06:38:23'),
-(12, 'Uttranchal University Online', NULL, 'uttranchal-university-online', '/ai-tools/assets/uploads/images/6a323f96c96b67.22031952_1781677974.png', '/ai-tools/assets/uploads/certificates/6a323f96c98a79.25817951_1781677974.webp', NULL, NULL, '2013', 2, 'Dehradun, Uttarakhand', NULL, 1, 1, 1, 'Prodigious Faculty and World-Class Curriculum\r\n1-on-1 Personalised Mentorship\r\nReputed Degree from a Top-Ranked University\r\nIntegrated LMS & e-library', 'https://distanceeducationschool.com/uttaranchal-university/', 1, '2026-06-17 06:32:54', '2026-06-17 12:59:55'),
-(13, 'Lovely Professional University Online', NULL, 'lovely-professional-university-online', '/ai-tools/assets/uploads/images/6a32489a0608f0.63841838_1781680282.png', '/ai-tools/assets/uploads/certificates/6a32489a0623a8.66355699_1781680282.jpg', NULL, 30, '2005', 2, 'Phagwara, Punjab, India', NULL, 1, 1, 1, 'Strong Placements\r\nIndustry Curriculum\r\nOnline Flexibility\r\nWide Specializations', 'https://distanceeducationschool.com/lovely-professional-university/', 1, '2026-06-17 07:11:22', '2026-06-17 10:00:42'),
-(14, 'Mangalayatan University Online', NULL, 'mangalayatan-university-online', '/ai-tools/assets/uploads/images/6a32533a2b4038.06053005_1781683002.png', '/ai-tools/assets/uploads/certificates/6a32533a2b5c17.31302879_1781683002.webp', NULL, NULL, '2006', 2, 'Aligarh, Uttar Pradesh,', '3.0 LPA to ₹6.0 LPA', 1, 1, 1, 'Affordable career-oriented programs', 'https://distanceeducationschool.com/mangalayatan-university/', 1, '2026-06-17 07:56:42', '2026-06-17 10:01:27'),
-(15, 'Kurukshetra University', NULL, 'kurukshetra-university', '/ai-tools/assets/uploads/images/6a3265e51a6431.95774554_1781687781.png', '/ai-tools/assets/uploads/certificates/6a3265e51a7ef2.95342902_1781687781.webp', NULL, NULL, '1956', 1, 'Thanesar, Haryana', NULL, 1, 1, 1, 'Known for traditional academic strength + affordability', 'https://distanceeducationschool.com/kurukshetra-university/', 1, '2026-06-17 09:16:21', '2026-06-17 09:16:21'),
-(16, 'Vignan University', NULL, 'vignan-university', '/ai-tools/assets/uploads/images/6a326c83d85e97.51383765_1781689475.png', '/ai-tools/assets/uploads/certificates/6a326c83d87982.95705907_1781689475.jpg', NULL, 75, '2008', 2, 'Guntur, Andhra Pradesh', NULL, 1, 1, 1, 'Strong in engineering and technical education', 'https://distanceeducationschool.com/vignan-university/', 1, '2026-06-17 09:44:35', '2026-06-17 09:44:35'),
-(17, 'Chandigarh University', NULL, 'chandigarh-university', '/ai-tools/assets/uploads/images/6a3278b960aa93.55093307_1781692601.png', '/ai-tools/assets/uploads/certificates/6a3278b960bea6.68681899_1781692601.jpg', NULL, 19, '2012', 2, 'Ajitgarh, Punjab', '6 LPA', 1, 1, 1, 'Famous for record placements and industry-linked programs', 'https://distanceeducationschool.com/online-chandigarh-university/', 1, '2026-06-17 10:36:41', '2026-06-17 10:36:41'),
-(18, 'Jamia Hamdard', NULL, 'jamia-hamdard', '/ai-tools/assets/uploads/images/6a3281b8b5c035.56452678_1781694904.webp', '/ai-tools/assets/uploads/certificates/6a3281b8b5da21.88226133_1781694904.webp', NULL, 40, '1989', 1, 'Hamdard Nagar, New Delhi', NULL, 1, 1, 1, NULL, 'https://distanceeducationschool.com/jamia-hamdard-university/', 1, '2026-06-17 11:15:04', '2026-06-17 11:15:04'),
-(19, 'Bharathidasan University', NULL, 'bharathidasan-university', '/ai-tools/assets/uploads/images/6a3285d0ae15a2.84011853_1781695952.webp', '/ai-tools/assets/uploads/certificates/6a3285d0ae2be9.03744371_1781695952.webp', NULL, 36, '1982', 1, 'Tiruchirappalli, Tamil Nadu', NULL, 1, 1, 1, 'Strong in science and research programs', 'https://distanceeducationschool.com/Bharathidasan-University/', 1, '2026-06-17 11:32:32', '2026-06-17 11:33:00'),
-(20, 'Vivekananda Global University', NULL, 'vivekananda-global-university', '/ai-tools/assets/uploads/images/6a328a7c1e75c5.96796534_1781697148.webp', '/ai-tools/assets/uploads/certificates/6a328a7c1e9425.89795401_1781697148.webp', NULL, NULL, '2012', 2, 'Jaipur, Rajasthan', NULL, 1, 1, 1, 'Popular for design, architecture, and emerging tech courses', 'https://distanceeducationschool.com/vivekananda-global-university/', 1, '2026-06-17 11:52:28', '2026-06-17 11:52:28'),
-(21, 'Sharda University Online', NULL, 'sharda-university-online', '/ai-tools/assets/uploads/images/6a32926112b6d6.35586295_1781699169.webp', '/ai-tools/assets/uploads/certificates/6a32926112d904.95907957_1781699169.webp', NULL, NULL, '2009', 2, 'Greater Noida, Uttar Pradesh', NULL, 0, 0, 0, NULL, 'https://distanceeducationschool.com/sharda-university/', 1, '2026-06-17 12:26:09', '2026-06-17 12:41:39'),
-(22, 'Galgotias Online University', NULL, 'galgotias-online-university', '/ai-tools/assets/uploads/images/6a339865b692f3.09146395_1781766245.png', '/ai-tools/assets/uploads/certificates/6a339865b6b477.80468835_1781766245.webp', 4.2, NULL, '2011', 2, 'Greater Noida, Uttar Pradesh', '5.40 Lakhs', 1, 1, 1, 'Known for placements + proximity to corporate hubs (Noida), Corporate-driven learning', 'https://distanceeducationschool.com/galgotias-university/', 1, '2026-06-18 05:10:26', '2026-06-18 07:04:05'),
-(23, 'Jain University', NULL, 'jain-university', '/ai-tools/assets/uploads/images/6a3385c325f712.60798107_1781761475.png', '/ai-tools/assets/uploads/certificates/6a3385c3261949.63873705_1781761475.jpg', 3.9, 65, '1990', 2, 'Bengaluru, Karnataka', '7 LPA', 1, 1, 1, 'Famous for management, commerce & entrepreneurship focus, Premium programs', 'https://distanceeducationschool.com/jain-university/', 1, '2026-06-18 05:44:35', '2026-06-18 07:04:54');
+(10, 'Sikkim Manipal University', NULL, 'sikkim-manipal-university', '/ai-tools/assets/uploads/images/6a322b8c91edc6.35341895_1781672844.png', '/ai-tools/assets/uploads/certificates/6a322b8c920d39.74308042_1781672844.webp', 4.3, NULL, '1995', 2, 'Sikkim Gangtok', '6 LPA', 1, 1, 1, 'Quality Education \r\nAttractive Scholarships\r\nVast Alumni Network\r\nExperienced Faculty \r\nComprehensive Curriculum', 'https://distanceeducationschool.com/sikkim-manipal-university/', 1, '2026-06-16 13:01:59', '2026-06-19 07:52:18'),
+(11, 'Manipal University Online', NULL, 'manipal-university-online', '/ai-tools/assets/uploads/images/6a3233f46fda09.63913276_1781674996.png', '/ai-tools/assets/uploads/certificates/6a3233f46ff395.64478985_1781674996.webp', NULL, 58, '2011', 2, 'Jaipur, Rajasthan', NULL, 1, 1, 1, 'Industry-Focused Training\r\nOur Advanced Learning System Designed for Your Course\r\nCareer Support for Online Manipal Learners\r\nHands-On Campus Learning Experiences\r\nCampus Immersions\r\nWeekly Webinars with Industry Leaders', 'https://distanceeducationschool.com/online-manipal-university/', 1, '2026-06-17 05:43:16', '2026-06-19 09:11:37'),
+(12, 'Uttranchal University Online', NULL, 'uttranchal-university-online', '/ai-tools/assets/uploads/images/6a323f96c96b67.22031952_1781677974.png', '/ai-tools/assets/uploads/certificates/6a323f96c98a79.25817951_1781677974.webp', NULL, NULL, '2013', 2, 'Dehradun, Uttarakhand', NULL, 1, 1, 1, 'Prodigious Faculty and World-Class Curriculum\r\n1-on-1 Personalised Mentorship\r\nReputed Degree from a Top-Ranked University\r\nIntegrated LMS & E-Library', 'https://distanceeducationschool.com/uttaranchal-university/', 1, '2026-06-17 06:32:54', '2026-06-19 09:11:23'),
+(13, 'Lovely Professional University Online', NULL, 'lovely-professional-university-online', '/ai-tools/assets/uploads/images/6a32489a0608f0.63841838_1781680282.png', '/ai-tools/assets/uploads/certificates/6a32489a0623a8.66355699_1781680282.jpg', NULL, 31, '2005', 2, 'Phagwara, Punjab, India', NULL, 1, 1, 1, 'Strong Placements\r\nIndustry Curriculum\r\nOnline Flexibility\r\nWide Specializations', 'https://distanceeducationschool.com/lovely-professional-university/', 1, '2026-06-17 07:11:22', '2026-06-19 07:27:23'),
+(14, 'Mangalayatan University Online', NULL, 'mangalayatan-university-online', '/ai-tools/assets/uploads/images/6a32533a2b4038.06053005_1781683002.png', '/ai-tools/assets/uploads/certificates/6a32533a2b5c17.31302879_1781683002.webp', NULL, NULL, '2006', 2, 'Aligarh, Uttar Pradesh,', '3.0 LPA to ₹6.0 LPA', 1, 1, 1, 'Affordable Career-Oriented Programs', 'https://distanceeducationschool.com/mangalayatan-university/', 1, '2026-06-17 07:56:42', '2026-06-19 08:43:51'),
+(15, 'Kurukshetra University', NULL, 'kurukshetra-university', '/ai-tools/assets/uploads/images/6a3265e51a6431.95774554_1781687781.png', '/ai-tools/assets/uploads/certificates/6a3265e51a7ef2.95342902_1781687781.webp', NULL, NULL, '1956', 1, 'Thanesar, Haryana', NULL, 1, 1, 1, 'Known for Traditional Academic Strength + Affordability', 'https://distanceeducationschool.com/kurukshetra-university/', 1, '2026-06-17 09:16:21', '2026-06-19 08:43:37'),
+(16, 'Vignan University', NULL, 'vignan-university', '/ai-tools/assets/uploads/images/6a326c83d85e97.51383765_1781689475.png', '/ai-tools/assets/uploads/certificates/6a326c83d87982.95705907_1781689475.jpg', NULL, 75, '2008', 2, 'Guntur, Andhra Pradesh', NULL, 1, 1, 1, 'Strong in Engineering and Technical Education', 'https://distanceeducationschool.com/vignan-university/', 1, '2026-06-17 09:44:35', '2026-06-19 08:43:12'),
+(17, 'Chandigarh University', NULL, 'chandigarh-university', '/ai-tools/assets/uploads/images/6a3278b960aa93.55093307_1781692601.png', '/ai-tools/assets/uploads/certificates/6a3278b960bea6.68681899_1781692601.jpg', NULL, 19, '2012', 2, 'Ajitgarh, Punjab', '6 LPA', 1, 1, 1, 'Famous for Record Placements and Industry-Linked Programs', 'https://distanceeducationschool.com/online-chandigarh-university/', 1, '2026-06-17 10:36:41', '2026-06-19 08:42:53'),
+(18, 'Jamia Hamdard University', NULL, 'jamia-hamdard-university', '/ai-tools/assets/uploads/images/6a3281b8b5c035.56452678_1781694904.webp', '/ai-tools/assets/uploads/certificates/6a3281b8b5da21.88226133_1781694904.webp', NULL, 40, '1989', 1, 'Hamdard Nagar, New Delhi', NULL, 1, 1, 1, NULL, 'https://distanceeducationschool.com/jamia-hamdard-university/', 1, '2026-06-17 11:15:04', '2026-06-19 06:15:03'),
+(19, 'Bharathidasan University', NULL, 'bharathidasan-university', '/ai-tools/assets/uploads/images/6a3285d0ae15a2.84011853_1781695952.webp', '/ai-tools/assets/uploads/certificates/6a3285d0ae2be9.03744371_1781695952.webp', NULL, 36, '1982', 1, 'Tiruchirappalli, Tamil Nadu', NULL, 1, 1, 1, 'Strong in Science and Research Programs', 'https://distanceeducationschool.com/Bharathidasan-University/', 1, '2026-06-17 11:32:32', '2026-06-19 08:42:24'),
+(20, 'Vivekananda Global University', NULL, 'vivekananda-global-university', '/ai-tools/assets/uploads/images/6a328a7c1e75c5.96796534_1781697148.webp', '/ai-tools/assets/uploads/certificates/6a328a7c1e9425.89795401_1781697148.webp', NULL, NULL, '2012', 2, 'Jaipur, Rajasthan', NULL, 1, 1, 1, 'Popular for Design\r\nArchitecture and Emerging Tech Courses', 'https://distanceeducationschool.com/vivekananda-global-university/', 1, '2026-06-17 11:52:28', '2026-06-19 09:08:03'),
+(21, 'Sharda University Online', NULL, 'sharda-university-online', '/ai-tools/assets/uploads/images/6a3e1a954fbc91.78770409_1782454933.webp', '/ai-tools/assets/uploads/certificates/6a32926112d904.95907957_1781699169.webp', NULL, NULL, '2009', 2, 'Greater Noida, Uttar Pradesh', NULL, 0, 0, 0, NULL, 'https://distanceeducationschool.com/sharda-university/', 1, '2026-06-17 12:26:09', '2026-06-26 06:22:13'),
+(22, 'Galgotias Online University', NULL, 'galgotias-online-university', '/ai-tools/assets/uploads/images/6a339865b692f3.09146395_1781766245.png', '/ai-tools/assets/uploads/certificates/6a339865b6b477.80468835_1781766245.webp', 4.2, NULL, '2011', 2, 'Greater Noida, Uttar Pradesh', '5.40 Lakhs', 1, 1, 1, 'Known for Placements + Proximity to Corporate Hubs (Noida)\r\nCorporate-Driven Learning', 'https://distanceeducationschool.com/galgotias-university/', 1, '2026-06-18 05:10:26', '2026-06-19 07:59:16'),
+(23, 'Jain University', NULL, 'jain-university', '/ai-tools/assets/uploads/images/6a3e1af7826b66.43689950_1782455031.png', '/ai-tools/assets/uploads/certificates/6a3385c3261949.63873705_1781761475.jpg', 3.9, 65, '1990', 2, 'Bengaluru, Karnataka', '7 LPA', 1, 1, 1, 'Famous for Management\r\nCommerce & Entrepreneurship Focus\r\nPremium Programs', 'https://distanceeducationschool.com/jain-university/', 1, '2026-06-18 05:44:35', '2026-06-26 06:23:51');
 
 -- --------------------------------------------------------
 
@@ -366,70 +354,70 @@ CREATE TABLE `university_accreditations` (
 --
 
 INSERT INTO `university_accreditations` (`id`, `university_id`, `accreditation_id`, `image`) VALUES
-(157, 7, 3, NULL),
-(158, 7, 5, NULL),
-(159, 7, 7, NULL),
-(160, 7, 4, NULL),
-(166, 8, 10, NULL),
-(167, 8, 13, NULL),
-(168, 8, 9, NULL),
-(169, 8, 12, NULL),
-(170, 8, 4, NULL),
-(171, 9, 10, NULL),
-(172, 9, 4, NULL),
-(177, 10, 3, NULL),
-(178, 10, 7, NULL),
-(179, 10, 9, NULL),
-(180, 10, 4, NULL),
-(181, 10, 14, NULL),
-(182, 10, 15, NULL),
-(201, 11, 3, NULL),
-(202, 11, 7, NULL),
-(203, 11, 13, NULL),
-(204, 11, 9, NULL),
-(205, 11, 4, NULL),
-(206, 11, 11, NULL),
-(229, 15, 3, NULL),
-(230, 15, 10, NULL),
-(231, 15, 8, NULL),
-(232, 15, 4, NULL),
-(233, 16, 7, NULL),
-(234, 16, 4, NULL),
-(255, 13, 3, NULL),
-(256, 13, 10, NULL),
-(257, 13, 9, NULL),
-(258, 13, 4, NULL),
-(259, 13, 11, NULL),
-(260, 13, 14, NULL),
-(261, 14, 3, NULL),
-(262, 14, 5, NULL),
-(263, 14, 7, NULL),
-(264, 14, 4, NULL),
-(265, 17, 7, NULL),
-(266, 17, 8, NULL),
-(267, 17, 4, NULL),
-(268, 18, 7, NULL),
-(269, 18, 4, NULL),
-(273, 19, 3, NULL),
-(274, 19, 10, NULL),
-(275, 19, 4, NULL),
-(276, 20, 3, NULL),
-(277, 20, 7, NULL),
-(278, 20, 4, NULL),
-(283, 21, 3, NULL),
-(284, 21, 8, NULL),
-(285, 21, 9, NULL),
-(286, 21, 4, NULL),
-(287, 12, 3, NULL),
-(288, 12, 5, NULL),
-(289, 12, 7, NULL),
-(290, 12, 9, NULL),
-(291, 12, 4, NULL),
-(292, 12, 11, NULL),
-(299, 22, 7, NULL),
-(300, 22, 4, NULL),
-(301, 23, 10, NULL),
-(302, 23, 4, NULL);
+(380, 9, 10, NULL),
+(381, 9, 4, NULL),
+(408, 18, 7, NULL),
+(409, 18, 4, NULL),
+(449, 13, 3, NULL),
+(450, 13, 10, NULL),
+(451, 13, 9, NULL),
+(452, 13, 4, NULL),
+(453, 13, 11, NULL),
+(454, 13, 14, NULL),
+(467, 10, 3, NULL),
+(468, 10, 15, NULL),
+(469, 10, 7, NULL),
+(470, 10, 9, NULL),
+(471, 10, 4, NULL),
+(472, 10, 14, NULL),
+(473, 8, 10, NULL),
+(474, 8, 13, NULL),
+(475, 8, 9, NULL),
+(476, 8, 12, NULL),
+(477, 8, 4, NULL),
+(478, 7, 3, NULL),
+(479, 7, 5, NULL),
+(480, 7, 7, NULL),
+(481, 7, 4, NULL),
+(486, 19, 3, NULL),
+(487, 19, 10, NULL),
+(488, 19, 4, NULL),
+(489, 17, 7, NULL),
+(490, 17, 8, NULL),
+(491, 17, 4, NULL),
+(492, 16, 7, NULL),
+(493, 16, 4, NULL),
+(494, 15, 3, NULL),
+(495, 15, 10, NULL),
+(496, 15, 8, NULL),
+(497, 15, 4, NULL),
+(498, 14, 3, NULL),
+(499, 14, 5, NULL),
+(500, 14, 7, NULL),
+(501, 14, 4, NULL),
+(504, 22, 7, NULL),
+(505, 22, 4, NULL),
+(510, 20, 3, NULL),
+(511, 20, 7, NULL),
+(512, 20, 4, NULL),
+(519, 12, 3, NULL),
+(520, 12, 5, NULL),
+(521, 12, 7, NULL),
+(522, 12, 9, NULL),
+(523, 12, 4, NULL),
+(524, 12, 11, NULL),
+(531, 11, 3, NULL),
+(532, 11, 7, NULL),
+(533, 11, 13, NULL),
+(534, 11, 9, NULL),
+(535, 11, 4, NULL),
+(536, 11, 11, NULL),
+(539, 21, 3, NULL),
+(540, 21, 8, NULL),
+(541, 21, 9, NULL),
+(542, 21, 4, NULL),
+(543, 23, 10, NULL),
+(544, 23, 4, NULL);
 
 -- --------------------------------------------------------
 
@@ -534,17 +522,16 @@ INSERT INTO `university_courses` (`id`, `university_id`, `course_id`, `education
 (83, 14, 27, 3, 8500.00, '2 Years', 30, NULL, NULL, NULL, '/ai-tools/assets/uploads/brochures/6a32630bdf1791.11135673_1781687051.pdf', 1, '2026-06-17 09:04:11', '2026-06-17 09:25:59'),
 (84, 14, 35, 3, 8500.00, '2 Years', 30, NULL, NULL, NULL, '/ai-tools/assets/uploads/brochures/6a3263a49ea421.00669175_1781687204.pdf', 1, '2026-06-17 09:06:44', '2026-06-17 09:25:49'),
 (85, 14, 36, 3, 8500.00, '2 Years', 30, NULL, NULL, NULL, '/ai-tools/assets/uploads/brochures/6a32642164f8b8.77657582_1781687329.pdf', 1, '2026-06-17 09:08:49', '2026-06-17 09:25:41'),
-(86, 14, 14, 3, 8500.00, '2 Years', 30, NULL, NULL, NULL, '/ai-tools/assets/uploads/brochures/6a326465489505.15247637_1781687397.pdf', 1, '2026-06-17 09:09:57', '2026-06-17 09:25:33'),
 (87, 15, 17, 3, 12000.00, '3 Years', 30, NULL, NULL, NULL, '/ai-tools/assets/uploads/brochures/6a3266e2636147.00674932_1781688034.pdf', 1, '2026-06-17 09:20:34', '2026-06-17 09:20:34'),
 (88, 15, 19, 3, 12000.00, '3 Years', 30, NULL, NULL, NULL, '/ai-tools/assets/uploads/brochures/6a3268bacf23b7.87256925_1781688506.pdf', 1, '2026-06-17 09:28:26', '2026-06-17 09:28:26'),
 (89, 15, 18, 3, 12000.00, '3 Years', 30, NULL, NULL, NULL, '/ai-tools/assets/uploads/brochures/6a326903a3fa46.75684408_1781688579.pdf', 1, '2026-06-17 09:29:39', '2026-06-17 09:29:39'),
 (90, 15, 9, 3, 25499.99, '2 Years', 30, NULL, NULL, 'Business analytics\r\nIT mgmt\r\nfinance\r\nmarketing mgmt\r\nhr mgmt', '/ai-tools/assets/uploads/brochures/6a32695c64ed45.93102418_1781688668.pdf', 1, '2026-06-17 09:31:08', '2026-06-17 09:31:08'),
 (91, 15, 10, 3, 18900.00, '2 Years', 30, NULL, NULL, NULL, '/ai-tools/assets/uploads/brochures/6a3269cded3789.07095534_1781688781.pdf', 1, '2026-06-17 09:33:01', '2026-06-17 09:33:01'),
-(92, 15, 13, 3, 14999.98, '2 Years', 30, NULL, NULL, NULL, '/ai-tools/assets/uploads/brochures/6a3269f4420da4.23617936_1781688820.pdf', 1, '2026-06-17 09:33:40', '2026-06-17 09:33:40'),
+(92, 15, 13, 3, 15000.00, '2 Years', 30, NULL, NULL, NULL, '/ai-tools/assets/uploads/brochures/6a3269f4420da4.23617936_1781688820.pdf', 1, '2026-06-17 09:33:40', '2026-06-18 12:04:13'),
 (93, 15, 25, 3, 15000.00, '2 Years', 30, NULL, NULL, NULL, '/ai-tools/assets/uploads/brochures/6a326a36b53043.47668328_1781688886.pdf', 1, '2026-06-17 09:34:46', '2026-06-17 09:34:46'),
 (94, 15, 27, 3, 15000.00, '2 Years', 30, NULL, NULL, NULL, '/ai-tools/assets/uploads/brochures/6a326a550412e9.35261535_1781688917.pdf', 1, '2026-06-17 09:35:17', '2026-06-17 09:35:17'),
 (95, 15, 37, 3, 15000.00, '2 Years', 30, NULL, NULL, NULL, '/ai-tools/assets/uploads/brochures/6a326ac037b908.84834463_1781689024.pdf', 1, '2026-06-17 09:37:04', '2026-06-17 09:37:04'),
-(96, 16, 19, 2, 17999.99, '3 Years', 30, NULL, NULL, 'Marketing & HR\r\nMarketing & analytics', '/ai-tools/assets/uploads/brochures/6a326d4ee2f121.47192542_1781689678.pdf', 1, '2026-06-17 09:47:58', '2026-06-17 10:11:21'),
+(96, 16, 19, 2, 18000.00, '3 Years', 30, NULL, NULL, 'Marketing & HR\r\nMarketing & analytics', '/ai-tools/assets/uploads/brochures/6a326d4ee2f121.47192542_1781689678.pdf', 1, '2026-06-17 09:47:58', '2026-06-18 12:02:40'),
 (97, 16, 20, 2, 17999.98, '3 Years', 30, NULL, NULL, 'Data Science', '/ai-tools/assets/uploads/brochures/6a326dfce47786.22977718_1781689852.pdf', 1, '2026-06-17 09:50:52', '2026-06-17 10:11:28'),
 (98, 16, 9, 2, 22500.00, '2 Years', 30, NULL, NULL, 'Marketing\r\nhr\r\nfinance\r\nbusiness analytics\r\nIT\r\nHealthcare and hosp\r\nlogistics and supply chain', '/ai-tools/assets/uploads/brochures/6a326f40ae3168.96233772_1781690176.pdf', 1, '2026-06-17 09:56:16', '2026-06-17 10:11:33'),
 (99, 16, 10, 2, 22500.00, '2 Years', 30, NULL, NULL, 'Computer science & IT\r\nData science', '/ai-tools/assets/uploads/brochures/6a327325116031.22489334_1781691173.pdf', 1, '2026-06-17 10:12:53', '2026-06-17 10:12:53'),
@@ -634,14 +621,13 @@ CREATE TABLE `university_education_modes` (
 --
 
 INSERT INTO `university_education_modes` (`university_id`, `education_mode_id`) VALUES
-(13, 1),
 (7, 2),
 (8, 2),
 (9, 2),
 (10, 2),
 (11, 2),
 (12, 2),
-(13, 2),
+(13, 3),
 (14, 2),
 (15, 3),
 (16, 3),
@@ -725,25 +711,9 @@ ALTER TABLE `accreditations`
 --
 ALTER TABLE `admins`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `email` (`email`);
-
---
--- Indexes for table `brochure_leads`
---
-ALTER TABLE `brochure_leads`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `compare_unlock_leads`
---
-ALTER TABLE `compare_unlock_leads`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `counseling_leads`
---
-ALTER TABLE `counseling_leads`
-  ADD PRIMARY KEY (`id`);
+  ADD UNIQUE KEY `email` (`email`),
+  ADD KEY `fk_admins_team` (`team_id`),
+  ADD KEY `fk_admins_role` (`role_id`);
 
 --
 -- Indexes for table `courses`
@@ -770,10 +740,24 @@ ALTER TABLE `exam_modes`
   ADD UNIQUE KEY `mode_name` (`mode_name`);
 
 --
--- Indexes for table `scholarship_leads`
+-- Indexes for table `roles`
 --
-ALTER TABLE `scholarship_leads`
+ALTER TABLE `roles`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `name` (`name`);
+
+--
+-- Indexes for table `sidebar_items`
+--
+ALTER TABLE `sidebar_items`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `teams`
+--
+ALTER TABLE `teams`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `name` (`name`);
 
 --
 -- Indexes for table `universities`
@@ -837,25 +821,7 @@ ALTER TABLE `accreditations`
 -- AUTO_INCREMENT for table `admins`
 --
 ALTER TABLE `admins`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
--- AUTO_INCREMENT for table `brochure_leads`
---
-ALTER TABLE `brochure_leads`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
-
---
--- AUTO_INCREMENT for table `compare_unlock_leads`
---
-ALTER TABLE `compare_unlock_leads`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
-
---
--- AUTO_INCREMENT for table `counseling_leads`
---
-ALTER TABLE `counseling_leads`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `courses`
@@ -876,10 +842,22 @@ ALTER TABLE `exam_modes`
   MODIFY `id` tinyint(3) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
--- AUTO_INCREMENT for table `scholarship_leads`
+-- AUTO_INCREMENT for table `roles`
 --
-ALTER TABLE `scholarship_leads`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+ALTER TABLE `roles`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT for table `sidebar_items`
+--
+ALTER TABLE `sidebar_items`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+
+--
+-- AUTO_INCREMENT for table `teams`
+--
+ALTER TABLE `teams`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `universities`
@@ -891,7 +869,7 @@ ALTER TABLE `universities`
 -- AUTO_INCREMENT for table `university_accreditations`
 --
 ALTER TABLE `university_accreditations`
-  MODIFY `id` smallint(5) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=303;
+  MODIFY `id` smallint(5) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=545;
 
 --
 -- AUTO_INCREMENT for table `university_courses`
@@ -908,6 +886,13 @@ ALTER TABLE `university_types`
 --
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `admins`
+--
+ALTER TABLE `admins`
+  ADD CONSTRAINT `fk_admins_role` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `fk_admins_team` FOREIGN KEY (`team_id`) REFERENCES `teams` (`id`) ON DELETE SET NULL;
 
 --
 -- Constraints for table `university_accreditations`

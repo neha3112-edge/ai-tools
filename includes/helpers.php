@@ -136,3 +136,106 @@ function render_flash(): string {
     $msg   = e($flash['message']);
     return "<div class=\"alert alert-{$type}\">{$msg}</div>";
 }
+
+/**
+ * Get dynamic sidebar modules list
+ */
+function get_sidebar_modules(): array {
+    global $pdo;
+    try {
+        if (!isset($pdo)) {
+            require_once __DIR__ . '/db.php';
+        }
+        $stmt = $pdo->query("
+            SELECT module_key, name
+            FROM sidebar_items
+            WHERE is_active = 1
+            ORDER BY sort_order ASC
+        ");
+        $modules = [];
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $modules[$row['module_key']] = $row['name'];
+        }
+        return $modules;
+    } catch (Exception $e) {
+        return [
+            'dashboard'        => 'Dashboard',
+            'universities'     => 'Universities',
+            'courses'          => 'Courses',
+            'mappings'         => 'Course Mappings',
+            'users'            => 'Manage Users',
+            'teams'            => 'Manage Teams',
+            'roles'            => 'Manage Roles',
+            'sidebar'          => 'Sidebar Manager',
+            'university_types' => 'University Types',
+            'education_modes'  => 'Education Modes',
+            'exam_modes'       => 'Exam Modes',
+            'accreditations'   => 'Accreditations',
+            'change_password'  => 'Change Password'
+        ];
+    }
+}
+
+/**
+ * Render pagination controls
+ */
+function render_pagination(int $total_count, int $limit, int $current_page): string {
+    if ($total_count <= 0) return '';
+    $total_pages = (int)ceil($total_count / $limit);
+    $offset = ($current_page - 1) * $limit;
+    
+    $html = '<div class="pagination" style="display:flex; justify-content:space-between; align-items:center; margin-top:1.5rem; padding-top:1rem; border-top:1px solid var(--border); flex-wrap:wrap; gap:10px;">';
+    $start_num = min($total_count, $offset + 1);
+    $end_num = min($total_count, $offset + $limit);
+    $html .= '<div style="font-size:13px; color:var(--text-s);">Showing ' . $start_num . ' to ' . $end_num . ' of ' . $total_count . ' entries</div>';
+    
+    if ($total_pages > 1) {
+        $html .= '<div class="pagination-buttons" style="display:flex; gap:0.35rem; align-items:center;">';
+        
+        // Helper to build URL with page param
+        $get_url = function($p) {
+            $params = $_GET;
+            $params['page'] = $p;
+            return '?' . http_build_query($params);
+        };
+        
+        // Prev button
+        if ($current_page > 1) {
+            $html .= '<a href="' . $get_url($current_page - 1) . '" class="btn btn-secondary btn-sm" style="padding:4px 8px;font-size:12px;">&laquo; Prev</a>';
+        }
+        
+        // Pages
+        $start_page = max(1, $current_page - 2);
+        $end_page = min($total_pages, $current_page + 2);
+        
+        if ($start_page > 1) {
+            $html .= '<a href="' . $get_url(1) . '" class="btn btn-secondary btn-sm" style="padding:4px 8px;font-size:12px;">1</a>';
+            if ($start_page > 2) {
+                $html .= '<span style="color:var(--text-s);padding:0 4px;">...</span>';
+            }
+        }
+        
+        for ($p = $start_page; $p <= $end_page; $p++) {
+            $cls = ($p === $current_page) ? 'btn-primary' : 'btn-secondary';
+            $html .= '<a href="' . $get_url($p) . '" class="btn ' . $cls . ' btn-sm" style="padding:4px 8px;font-size:12px;">' . $p . '</a>';
+        }
+        
+        if ($end_page < $total_pages) {
+            if ($end_page < $total_pages - 1) {
+                $html .= '<span style="color:var(--text-s);padding:0 4px;">...</span>';
+            }
+            $html .= '<a href="' . $get_url($total_pages) . '" class="btn btn-secondary btn-sm" style="padding:4px 8px;font-size:12px;">' . $total_pages . '</a>';
+        }
+        
+        // Next button
+        if ($current_page < $total_pages) {
+            $html .= '<a href="' . $get_url($current_page + 1) . '" class="btn btn-secondary btn-sm" style="padding:4px 8px;font-size:12px;">Next &raquo;</a>';
+        }
+        
+        $html .= '</div>';
+    }
+    $html .= '</div>';
+    
+    return $html;
+}
+
